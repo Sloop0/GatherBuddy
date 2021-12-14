@@ -46,14 +46,14 @@ namespace GatherBuddy.Game
 
             x -= XCoord;
             y -= YCoord;
-            return Math.Sqrt(x * x + y * y);
+            return System.Math.Sqrt(x * x + y * y);
         }
 
         public double AetherDistance(int x, int y)
         {
             x -= XStream;
             y -= YStream;
-            return Math.Sqrt(x * x + y * y);
+            return System.Math.Sqrt(x * x + y * y);
         }
 
         public double AetherDistance(Aetheryte rhs)

@@ -16,13 +16,14 @@ public partial class Interface
                     _plugin.Alarms!.Disable();
                 GatherBuddy.Config.AlarmsEnabled = b;
             });
-
     private void DrawHeaderRow()
     {
         var spacing = 5 * _horizontalSpace;
         using (var _ = ImGuiRaii.NewGroup())
         {
             DrawAlarmToggle();
+            HorizontalSpace(spacing);
+            HorizontalSpace(spacing);
         }
 
         ImGui.Dummy(new Vector2(0, _horizontalSpace / 2));

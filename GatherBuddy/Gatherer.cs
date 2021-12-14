@@ -49,7 +49,6 @@ namespace GatherBuddy
         {
             Alarms.Dispose();
         }
-
         private static SeString ReplaceFormatPlaceholders(string format, string input, Gatherable item)
         {
             IReadOnlyList<Payload>? Replace(string s)
@@ -59,10 +58,10 @@ namespace GatherBuddy
 
                 return s switch
                 {
-                    "{Id}"       => ChatUtil.GetPayloadsFromString(item.ItemId.ToString()),
-                    "{Name}"     => ChatUtil.CreateLink(item.ItemData),
-                    "{Input}"    => ChatUtil.GetPayloadsFromString(input),
-                    _            => null,
+                    "{Id}"    => ChatUtil.GetPayloadsFromString(item.ItemId.ToString()),
+                    "{Name}"  => ChatUtil.CreateLink(item.ItemData),
+                    "{Input}" => ChatUtil.GetPayloadsFromString(input),
+                    _         => null,
                 };
             }
 
@@ -205,7 +204,7 @@ namespace GatherBuddy
         private static async Task ExecuteTeleport(uint id)
         {
             Teleporter.Teleport(id);
-            await Task.Delay(250);
+            await Task.Delay(100);
         }
 
         private static async Task<bool> TeleportToNode(Node node)
@@ -251,12 +250,12 @@ namespace GatherBuddy
             if (node.Meta!.IsBotanist())
             {
                 _commandManager.Execute($"/gearset change {GatherBuddy.Config.BotanistSetName}");
-                await Task.Delay(250);
+                await Task.Delay(200);
             }
             else if (node.Meta!.IsMiner())
             {
                 _commandManager.Execute($"/gearset change {GatherBuddy.Config.MinerSetName}");
-                await Task.Delay(250);
+                await Task.Delay(200);
             }
             else
             {
@@ -273,11 +272,13 @@ namespace GatherBuddy
                 return;
 
             _commandManager.Execute($"/gearset change {GatherBuddy.Config.FisherSetName}");
-            await Task.Delay(250);
+            await Task.Delay(200);
         }
 
         private static async Task<bool> SetNodeFlag(Node node)
         {
+            Dalamud.Chat.Print($"Coordinate Flags temporarily disabled: {node.GetX():00.00} - {node.GetY():00.00}");
+            return true;
             // Coordinates = 0.0 are acceptable because of the diadem, so no error message.
             if (!(GatherBuddy.Config.WriteCoordinates || GatherBuddy.Config.UseCoordinates) || node.GetX() == 0.0 || node.GetY() == 0.0)
                 return true;
@@ -291,7 +292,7 @@ namespace GatherBuddy
             var link = ChatUtil.CreateNodeLink(node, GatherBuddy.Config.UseCoordinates);
             if (GatherBuddy.Config.WriteCoordinates)
                 Dalamud.Chat.Print(link);
-            await Task.Delay(150);
+            await Task.Delay(100);
             return true;
         }
 
@@ -307,7 +308,7 @@ namespace GatherBuddy
             }
 
             ChatUtil.CreateMapLink(spot, GatherBuddy.Config.UseCoordinates);
-            await Task.Delay(250);
+            await Task.Delay(100);
             return true;
         }
 

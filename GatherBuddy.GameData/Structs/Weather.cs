@@ -1,7 +1,8 @@
 using System;
+using GatherBuddyA.Utility;
 using LuminaWeather = Lumina.Excel.GeneratedSheets.Weather;
 
-namespace GatherBuddy.Structs;
+namespace GatherBuddyA.Structs;
 
 public readonly struct Weather : IComparable<Weather>
 {
@@ -16,7 +17,7 @@ public readonly struct Weather : IComparable<Weather>
     public Weather(LuminaWeather data)
     {
         Data = data;
-        Name = data.Name.ToString();
+        Name = MultiString.ParseSeStringLumina(data.Name);
     }
 
     public override string ToString()

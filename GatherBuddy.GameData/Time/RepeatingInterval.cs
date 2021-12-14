@@ -1,6 +1,6 @@
 using System;
 
-namespace GatherBuddy.Time;
+namespace GatherBuddyA.Time;
 
 public readonly struct RepeatingInterval : IEquatable<RepeatingInterval>
 {

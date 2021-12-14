@@ -368,7 +368,7 @@ namespace GatherBuddy.Managers
 
                 // Compute the Levenshtein distance between the item name and the search-string.
                 // Keep the name with minimal distance logged.
-                var dist = Levenshtein.Distance(fishNameLc, haystack);
+                var dist = Utility.Levenshtein.Distance(fishNameLc, haystack);
                 if (dist < minDist)
                 {
                     minDist = dist;

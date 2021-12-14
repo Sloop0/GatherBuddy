@@ -33,9 +33,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GatherBuddy.Levenshtein\GatherBuddy.Levenshtein.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Reference Include="Dalamud">
             <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
             <Private>False</Private>
+        </Reference>
+        <Reference Include="ImGui.NET">
+          <HintPath>C:\Users\Ozy\AppData\Roaming\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
         </Reference>
         <Reference Include="ImGuiScene">
             <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\ImGuiScene.dll</HintPath>

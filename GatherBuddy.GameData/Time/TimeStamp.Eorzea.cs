@@ -1,4 +1,4 @@
-namespace GatherBuddy.Time;
+namespace GatherBuddyA.Time;
 
 public static class EorzeaTimeStampExtensions
 {

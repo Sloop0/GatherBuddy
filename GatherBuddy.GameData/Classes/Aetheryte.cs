@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
 using Dalamud.Logging;
-using GatherBuddy.Utility;
+using Dalamud.Utility;
+using GatherBuddyA.Utility;
 using Lumina.Excel.GeneratedSheets;
 using AetheryteRow = Lumina.Excel.GeneratedSheets.Aetheryte;
+using Math = System.Math;
 
-namespace GatherBuddy.Classes;
+namespace GatherBuddyA.Classes;
 
 public class Aetheryte : IComparable<Aetheryte>
 {
@@ -27,7 +29,7 @@ public class Aetheryte : IComparable<Aetheryte>
     public Aetheryte(GameData gameData, AetheryteRow data)
     {
         Data      = data;
-        Name      = MultiString.ParseSeStringLumina(data.AethernetName.Value?.Name);
+        Name      = MultiString.ParseSeStringLumina(data.PlaceName.Value?.Name);
         Territory = gameData.FindOrAddTerritory(data.Territory.Value) ?? Territory.Invalid;
         var mapMarker = gameData.DataManager.GetExcelSheet<MapMarker>()?.FirstOrDefault(m => m.DataType == 3 && m.DataKey == data.RowId);
         if (mapMarker == null)
@@ -35,7 +37,7 @@ public class Aetheryte : IComparable<Aetheryte>
         else
         {
             XCoord = Maps.MarkerToMap(mapMarker.X, Territory.SizeFactor);
-            XCoord = Maps.MarkerToMap(mapMarker.Y, Territory.SizeFactor);
+            YCoord = Maps.MarkerToMap(mapMarker.Y, Territory.SizeFactor);
         }
 
         Territory.Aetherytes.Add(this);
@@ -44,22 +46,13 @@ public class Aetheryte : IComparable<Aetheryte>
     public int CompareTo(Aetheryte? rhs)
         => Id.CompareTo(rhs?.Id ?? 0);
 
-    public double WorldDistance(uint mapId, int x, int y)
-    {
-        if (mapId != Territory.Id)
-            return double.PositiveInfinity;
+    public int WorldDistance(uint mapId, int x, int y)
+        => mapId == Territory.Id 
+            ? Utility.Math.SquaredDistance(x, y, XCoord, YCoord)
+            : int.MaxValue;
 
-        x -= XCoord;
-        y -= YCoord;
-        return Math.Sqrt(x * x + y * y);
-    }
-
-    public double AetherDistance(int x, int y)
-    {
-        x -= XStream;
-        y -= YStream;
-        return Math.Sqrt(x * x + y * y);
-    }
+    public int AetherDistance(int x, int y)
+        => Utility.Math.SquaredDistance(x, y, XStream, YStream);
 
     public double AetherDistance(Aetheryte rhs)
         => AetherDistance(rhs.XStream, rhs.YStream);

@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using GatherBuddy.Structs;
+using GatherBuddyA.Structs;
+using GatherBuddyA.Utility;
 using TerritoryType = Lumina.Excel.GeneratedSheets.TerritoryType;
 
-namespace GatherBuddy.Classes;
+namespace GatherBuddyA.Classes;
 
 public class Territory : IComparable<Territory>
 {
@@ -24,7 +25,7 @@ public class Territory : IComparable<Territory>
     public Territory(GameData gameData, TerritoryType data)
     {
         Data       = data;
-        Name       = data.PlaceName.Value?.Name ?? string.Empty;
+        Name       = MultiString.ParseSeStringLumina(data.PlaceName.Value?.Name);
         SizeFactor = (data.Map.Value?.SizeFactor ?? 100f) / 100f;
         var aetheryte = data.Aetheryte.Value;
         if (aetheryte != null)

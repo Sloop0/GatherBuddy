@@ -1,10 +1,9 @@
 using System;
 using System.Linq;
-using Dalamud.Utility;
-using GatherBuddy.Utility;
+using GatherBuddyA.Utility;
 using Lumina.Excel.GeneratedSheets;
 
-namespace GatherBuddy.Time;
+namespace GatherBuddyA.Time;
 
 public readonly struct BitfieldUptime : IEquatable<BitfieldUptime>
 {

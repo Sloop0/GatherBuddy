@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
-using Dalamud.Data;
 using Dalamud.Logging;
-using GatherBuddy.Utility;
+using GatherBuddyA.Utility;
 using Lumina.Excel.GeneratedSheets;
 
-namespace GatherBuddy.Classes;
+namespace GatherBuddyA.Classes;
 
-public class Gatherable : IComparable<Gatherable>
+public class Gatherable : IComparable<Gatherable>, IGatherable
 {
     public Item                   ItemData      { get; }
     public GatheringItem          GatheringData { get; }
     public MultiString            Name          { get; }
     public HashSet<GatheringNode> NodeList      { get; } = new();
+    public IEnumerable<ILocation> Locations
+        => NodeList;
 
     public uint ItemId
         => ItemData.RowId;
@@ -41,6 +42,9 @@ public class Gatherable : IComparable<Gatherable>
 
     public string StarsString()
         => StarsArray[Stars];
+
+    public string LevelString()
+        => $"{Level}{StarsString()}";
 
     public override string ToString()
         => $"{Name} ({Level}{StarsString()})";

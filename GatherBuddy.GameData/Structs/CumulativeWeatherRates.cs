@@ -3,13 +3,13 @@ using System.Linq;
 using Dalamud.Logging;
 using Lumina.Excel.GeneratedSheets;
 
-namespace GatherBuddy.Structs;
+namespace GatherBuddyA.Structs;
 
 public readonly struct CumulativeWeatherRates
 {
-    public static readonly CumulativeWeatherRates StaticWeather = new();
+    public static readonly CumulativeWeatherRates StaticWeather = new(false);
 
-    public readonly (Weather Weather, byte CumulativeRate)[] Rates = Array.Empty<(Weather, byte)>();
+    public readonly (Weather Weather, byte CumulativeRate)[] Rates;
 
     public CumulativeWeatherRates(GameData data, WeatherRate rate)
     {
@@ -27,4 +27,7 @@ public readonly struct CumulativeWeatherRates
             lastRate                =  Rates[i].CumulativeRate;
         }
     }
+
+    private CumulativeWeatherRates(bool _)
+        => Rates = Array.Empty<(Weather, byte)>();
 }

@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GatherBuddy.GameData", "GatherBuddy.GameData\GatherBuddy.GameData.csproj", "{4DC34533-59B5-4F5A-9F0F-2CD49EFC7092}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GatherBuddy.Levenshtein", "GatherBuddy.Levenshtein\GatherBuddy.Levenshtein.csproj", "{751A5A02-9232-4DD6-87AA-A374D015B4B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,18 @@ Global
 		{4DC34533-59B5-4F5A-9F0F-2CD49EFC7092}.Release|x64.Build.0 = Release|Any CPU
 		{4DC34533-59B5-4F5A-9F0F-2CD49EFC7092}.Release|x86.ActiveCfg = Release|Any CPU
 		{4DC34533-59B5-4F5A-9F0F-2CD49EFC7092}.Release|x86.Build.0 = Release|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Debug|x64.Build.0 = Debug|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Debug|x86.Build.0 = Debug|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Release|x64.ActiveCfg = Release|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Release|x64.Build.0 = Release|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Release|x86.ActiveCfg = Release|Any CPU
+		{751A5A02-9232-4DD6-87AA-A374D015B4B5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,3 @@
-using System;
-
 namespace GatherBuddy.Utility
 {
     public static class Levenshtein
@@ -21,11 +19,11 @@ namespace GatherBuddy.Utility
             {
                 for (var j = 1; j <= d.GetUpperBound(1); j += 1)
                 {
-                    var cost = Convert.ToInt32(lhs[i - 1] != rhs[j - 1]);
+                    var cost = System.Convert.ToInt32(lhs[i - 1] != rhs[j - 1]);
                     var min1 = d[i - 1, j] + 1;
                     var min2 = d[i, j - 1] + 1;
                     var min3 = d[i - 1, j - 1] + cost;
-                    d[i, j] = Math.Min(Math.Min(min1, min2), min3);
+                    d[i, j] = System.Math.Min(System.Math.Min(min1, min2), min3);
                 }
             }
 

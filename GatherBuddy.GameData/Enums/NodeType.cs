@@ -1,4 +1,4 @@
-namespace GatherBuddy.Enums;
+namespace GatherBuddyA.Enums;
 
 public enum NodeType : byte
 {

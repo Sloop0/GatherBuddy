@@ -3,15 +3,12 @@ using Dalamud;
 using Dalamud.Data;
 using Lumina.Text;
 
-namespace GatherBuddy.Utility; 
+namespace GatherBuddyA.Utility; 
 
-// ReSharper disable once InconsistentNaming
 public readonly struct MultiString
 {
     public static string ParseSeStringLumina(SeString? luminaString)
         => luminaString == null ? string.Empty : Dalamud.Game.Text.SeStringHandling.SeString.Parse(luminaString.RawData).TextValue;
-
-    private static readonly ClientLanguage[] _languages = Enum.GetValues<ClientLanguage>();
 
     public readonly string English;
     public readonly string German;

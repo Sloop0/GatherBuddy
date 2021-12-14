@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-
-namespace GatherBuddy.Classes;
+namespace GatherBuddyA.Classes;
 
 public partial class GatheringNode
 {
     public Territory  Territory        { get; init; }
-    public Aetheryte? ClosestAetheryte { get; set; }
+    public Aetheryte? ClosestAetheryte { get; internal set; }
 
     public int IntegralXCoord { get; init; }
     public int IntegralYCoord { get; init; }

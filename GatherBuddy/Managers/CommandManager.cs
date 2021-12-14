@@ -5,68 +5,66 @@ using Dalamud.Game;
 using Dalamud.Logging;
 using GatherBuddy.SeFunctions;
 
-namespace GatherBuddy.Managers
+namespace GatherBuddy.Managers;
+
+public class CommandManager
 {
-    public class CommandManager
+    private readonly ProcessChatBox _processChatBox;
+    private readonly IntPtr         _uiModulePtr;
+
+    public CommandManager(SeAddressBase baseUiObject, GetUiModule getUiModule, ProcessChatBox processChatBox)
     {
-        private readonly ProcessChatBox                      _processChatBox;
+        _processChatBox = processChatBox;
+        _uiModulePtr    = getUiModule.Invoke(Marshal.ReadIntPtr(baseUiObject.Address));
+    }
 
-        private readonly IntPtr _uiModulePtr;
+    public CommandManager(SigScanner sigScanner)
+        : this(new BaseUiObject(sigScanner), new GetUiModule(sigScanner),
+            new ProcessChatBox(sigScanner))
+    { }
 
-        public CommandManager(SeAddressBase baseUiObject, GetUiModule getUiModule, ProcessChatBox processChatBox)
+    public bool Execute(string message)
+    {
+        // First try to process the command through Dalamud.
+        if (Dalamud.Commands.ProcessCommand(message))
         {
-            _processChatBox  = processChatBox;
-            _uiModulePtr     = getUiModule.Invoke(Marshal.ReadIntPtr(baseUiObject.Address));
+            PluginLog.Verbose("Executed Dalamud command \"{Message:l}\".", message);
+            return true;
         }
 
-        public CommandManager(SigScanner sigScanner)
-            : this(new BaseUiObject(sigScanner), new GetUiModule(sigScanner),
-                new ProcessChatBox(sigScanner))
-        { }
-
-        public bool Execute(string message)
+        if (_uiModulePtr == IntPtr.Zero)
         {
-            // First try to process the command through Dalamud.
-            if (Dalamud.Commands.ProcessCommand(message))
-            {
-                PluginLog.Verbose("Executed Dalamud command \"{Message:l}\".", message);
-                return true;
-            }
-
-            if (_uiModulePtr == IntPtr.Zero)
-            {
-                PluginLog.Error("Can not execute \"{Message:l}\" because no uiModulePtr is available.", message);
-                return false;
-            }
-
-            // Then prepare a string to send to the game itself.
-            var (text, length) = PrepareString(message);
-            var payload = PrepareContainer(text, length);
-
-            _processChatBox.Invoke(_uiModulePtr, payload, IntPtr.Zero, (byte) 0);
-
-            Marshal.FreeHGlobal(payload);
-            Marshal.FreeHGlobal(text);
+            PluginLog.Error("Can not execute \"{Message:l}\" because no uiModulePtr is available.", message);
             return false;
         }
 
-        private static (IntPtr, long) PrepareString(string message)
-        {
-            var bytes = Encoding.UTF8.GetBytes(message);
-            var mem   = Marshal.AllocHGlobal(bytes.Length + 30);
-            Marshal.Copy(bytes, 0, mem, bytes.Length);
-            Marshal.WriteByte(mem + bytes.Length, 0);
-            return (mem, bytes.Length + 1);
-        }
+        // Then prepare a string to send to the game itself.
+        var (text, length) = PrepareString(message);
+        var payload = PrepareContainer(text, length);
 
-        private static IntPtr PrepareContainer(IntPtr message, long length)
-        {
-            var mem = Marshal.AllocHGlobal(400);
-            Marshal.WriteInt64(mem,        message.ToInt64());
-            Marshal.WriteInt64(mem + 0x8,  64);
-            Marshal.WriteInt64(mem + 0x10, length);
-            Marshal.WriteInt64(mem + 0x18, 0);
-            return mem;
-        }
+        _processChatBox.Invoke(_uiModulePtr, payload, IntPtr.Zero, (byte)0);
+
+        Marshal.FreeHGlobal(payload);
+        Marshal.FreeHGlobal(text);
+        return false;
+    }
+
+    private static (IntPtr, long) PrepareString(string message)
+    {
+        var bytes = Encoding.UTF8.GetBytes(message);
+        var mem   = Marshal.AllocHGlobal(bytes.Length + 30);
+        Marshal.Copy(bytes, 0, mem, bytes.Length);
+        Marshal.WriteByte(mem + bytes.Length, 0);
+        return (mem, bytes.Length + 1);
+    }
+
+    private static IntPtr PrepareContainer(IntPtr message, long length)
+    {
+        var mem = Marshal.AllocHGlobal(400);
+        Marshal.WriteInt64(mem,        message.ToInt64());
+        Marshal.WriteInt64(mem + 0x8,  64);
+        Marshal.WriteInt64(mem + 0x10, length);
+        Marshal.WriteInt64(mem + 0x18, 0);
+        return mem;
     }
 }

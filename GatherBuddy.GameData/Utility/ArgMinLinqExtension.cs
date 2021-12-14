@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GatherBuddy.Utility;
+namespace GatherBuddyA.Utility;
 
 public static class ArgMinLinqExtension
 {
