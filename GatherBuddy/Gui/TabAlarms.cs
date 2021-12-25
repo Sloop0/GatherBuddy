@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Numerics;
-using GatherBuddy.Classes;
-using GatherBuddy.Enums;
+using GatherBuddy.Alarms;
 using ImGuiNET;
 
 namespace GatherBuddy.Gui
@@ -56,7 +55,7 @@ namespace GatherBuddy.Gui
             {
                 var alarm  = _plugin.Alarms.Alarms[idx];
                 var offset = alarm.MinuteOffset.ToString();
-                ImGui.SetNextItemWidth(_alarmCache!.OffsetSize * _globalScale);
+                ImGui.SetNextItemWidth(Alarms.Cache.OffsetSize * _globalScale);
                 if (!ImGui.InputText($"##Offset{idx}", ref offset, 4, ImGuiInputTextFlags.CharsDecimal))
                     continue;
 
@@ -92,7 +91,7 @@ namespace GatherBuddy.Gui
                     sound = 0;
                 }
 
-                ImGui.SetNextItemWidth(_alarmCache!.SoundSize * _globalScale);
+                ImGui.SetNextItemWidth(Alarms.Cache.SoundSize * _globalScale);
                 if (!ImGui.Combo($"##sound{idx}", ref sound, _alarmCache.SoundNames, _alarmCache.SoundNames.Length))
                     continue;
 
@@ -136,15 +135,15 @@ namespace GatherBuddy.Gui
                 {
                     case AlarmType.Node:
                         ImGui.Text(alarm.Node!.Times!.PrintHours(true, " | "));
-                        ImGuiHelper.HoverTooltip($"Click to /gather.\n{alarm.Node!.Items!.PrintItems("\n", GatherBuddy.Language)}");
+                        ImGuiHelper.HoverTooltip($"Click to /gather.\n{alarm.Node.PrintItems("\n", GatherBuddy.Language)}");
                         if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
-                            _plugin.Gatherer.OnGatherActionWithNode(alarm.Node!);
+                            _plugin.Executor.OnGatherActionWithNode(alarm.Node!);
                         break;
                     case AlarmType.Fish:
                         ImGui.Text(alarm.Fish!.Name[GatherBuddy.Language]);
                         ImGuiHelper.HoverTooltip("Click to /gather.");
                         if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
-                            _plugin.Gatherer.OnFishActionWithFish(alarm.Fish!);
+                            _plugin.Executor.OnFishActionWithFish(alarm.Fish!);
                         break;
                     default: throw new InvalidEnumArgumentException();
                 }
@@ -157,7 +156,7 @@ namespace GatherBuddy.Gui
                 _alarmCache!.AddAlarm();
 
             ImGui.SameLine();
-            ImGui.SetNextItemWidth(_alarmCache!.NameSize * _globalScale);
+            ImGui.SetNextItemWidth(Alarms.Cache.NameSize * _globalScale);
             ImGui.InputTextWithHint("##Name", "New Alarm Name", ref _alarmCache.NewName, 64);
             ImGui.SameLine();
             ImGui.SetNextItemWidth(-1);

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using GatherBuddy.Caching;
 using GatherBuddy.Classes;
 using GatherBuddy.Managers;
 using GatherBuddy.Utility;
+using GatherBuddy.Weather;
 using ImGuiNET;
 using ImGuiScene;
 
@@ -10,7 +12,7 @@ namespace GatherBuddy.Gui.Cache
 {
     internal class Weather
     {
-        private static WeatherManager? _weather;
+        private static Manager? _weather;
 
         public const int NumWeathers = 8;
 
@@ -25,11 +27,11 @@ namespace GatherBuddy.Gui.Cache
         public          string FilterLower;
         public readonly float  FilterSize;
 
-        public Weather(WeatherManager weather)
+        public Weather(Manager weather)
         {
             var hour = TimeStamp.UtcNow.TotalEorzeaHours();
             _weather           = weather;
-            WeatherTimes       = WeatherManager.NextWeatherChangeTimes(NumWeathers, TimeStamp.Epoch.AddEorzeaHours(-16));
+            WeatherTimes       = Manager.NextWeatherChangeTimes(NumWeathers, TimeStamp.Epoch.AddEorzeaHours(-16));
             WeatherTimeStrings = new string[NumWeathers];
             _totalHour         = hour - 8;
             Filter             = "";

@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Logging;
 using Lumina.Excel.GeneratedSheets;
 
-namespace GatherBuddyA.Structs;
+namespace GatherBuddy.Structs;
 
 public readonly struct CumulativeWeatherRates
 {
@@ -30,4 +31,27 @@ public readonly struct CumulativeWeatherRates
 
     private CumulativeWeatherRates(bool _)
         => Rates = Array.Empty<(Weather, byte)>();
+
+    public byte ChanceForWeather(params Weather[] weathers)
+    {
+        if (weathers.Length == 0)
+            return 100;
+
+        var summedChance = 0;
+        foreach (var weather in weathers)
+        {
+            for (var i = 0; i < Rates.Length; ++i)
+            {
+                if (Rates[i].Weather.Id != weather.Id)
+                    continue;
+
+                if (i == 0)
+                    summedChance += Rates[i].CumulativeRate;
+                else
+                    summedChance += Rates[i].CumulativeRate - Rates[i - 1].CumulativeRate;
+            }
+        }
+
+        return (byte)summedChance;
+    }
 }

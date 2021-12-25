@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using GatherBuddy.Classes;
+using GatherBuddy.Time;
 using ImGuiNET;
 
 namespace GatherBuddy.Gui;
@@ -16,6 +16,7 @@ public partial class Interface
                     _plugin.Alarms!.Disable();
                 GatherBuddy.Config.AlarmsEnabled = b;
             });
+
     private void DrawHeaderRow()
     {
         var spacing = 5 * _horizontalSpace;

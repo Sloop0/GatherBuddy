@@ -1,4 +1,4 @@
-﻿namespace GatherBuddyA.Utility;
+﻿namespace GatherBuddy.Utility;
 
 public static class Bits
 {

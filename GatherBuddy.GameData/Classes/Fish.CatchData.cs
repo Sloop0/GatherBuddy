@@ -1,8 +1,8 @@
-using GatherBuddyA.Enums;
-using GatherBuddyA.Structs;
-using GatherBuddyA.Time;
+using GatherBuddy.Enums;
+using GatherBuddy.Structs;
+using GatherBuddy.Time;
 
-namespace GatherBuddyA.Classes;
+namespace GatherBuddy.Classes;
 
 public partial class Fish
 {

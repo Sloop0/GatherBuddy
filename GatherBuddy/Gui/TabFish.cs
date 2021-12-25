@@ -3,7 +3,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Logging;
-using GatherBuddy.Classes;
+using GatherBuddy.Caching;
+using GatherBuddy.Time;
 using GatherBuddy.Utility;
 using ImGuiNET;
 
@@ -35,7 +36,7 @@ public partial class Interface
         ImGui.Text(t);
     }
 
-    private void DrawFish(Cache.Fish fish)
+    private void DrawFish(ExtendedFish fish)
     {
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
@@ -50,7 +51,7 @@ public partial class Interface
         if (fish.IsFixed)
             ImGui.PushStyleColor(ImGuiCol.Text, GatherBuddy.Config.AvailableFishColor);
         if (ImGui.Selectable(fish.Name))
-            _plugin.Gatherer!.OnFishActionWithFish(fish.Base);
+            _plugin.Executor.OnFishActionWithFish(fish.Base);
         if (fish.IsFixed)
             ImGui.PopStyleColor();
         if (ImGui.IsItemHovered())
@@ -61,7 +62,7 @@ public partial class Interface
         static void DependencyWarning()
             => ImGui.TextColored(Colors.FishTab.DependencyWarning, "!!! May be dependent on intuition or mooch availability !!!");
 
-        var uptime = fish.Base.NextUptime(_plugin.Gatherer!.WeatherManager, out var newCache);
+        var uptime = fish.Fish.NextUptime(GatherBuddy.WeatherManager, out var newCache);
         _fishCache!.ResortFish |= newCache;
         ImGui.TableNextColumn();
         if (uptime == TimeInterval.Always)
@@ -131,7 +132,7 @@ public partial class Interface
 
             ImGui.TableNextColumn();
             if (ImGui.Selectable(baitName))
-                _plugin.Gatherer!.OnBaitAction(baitName);
+                _plugin.Executor.OnBaitAction(baitName);
 
             ImGuiHelper.HoverTooltip("Click to copy to clipboard.");
         }
@@ -143,7 +144,7 @@ public partial class Interface
 
         ImGui.TableNextColumn();
         if (ImGui.Selectable(fish.FishingSpot))
-            _plugin.Gatherer!.OnFishActionWithSpot(fish.Base.FishingSpots.First());
+            _plugin.Executor.OnFishActionWithSpot(fish.Fish.FishingSpots.First());
         ImGuiHelper.HoverTooltip(fish.FishingSpotTooltip);
 
         if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
@@ -247,7 +248,7 @@ public partial class Interface
 
         var actualFish = _fishCache.GetFishToSettings();
 
-        var lineHeight = (int)Math.Ceiling(ImGui.GetWindowHeight() / _textHeight) + 1;
+        var lineHeight = (int)System.Math.Ceiling(ImGui.GetWindowHeight() / _textHeight) + 1;
 
         bool BeginTable()
         {
@@ -341,7 +342,7 @@ public partial class Interface
         }
         else
         {
-            ClippedDraw(new FusedList<Cache.Fish>(_fishCache.FixedFish.ToArray(), actualFish), DrawFish, BeginTable, ImGui.EndTable);
+            ClippedDraw(new FusedList<ExtendedFish>(_fishCache.FixedFish.ToArray(), actualFish), DrawFish, BeginTable, ImGui.EndTable);
         }
 
         child.End();

@@ -1,4 +1,4 @@
-namespace GatherBuddyA.Enums;
+namespace GatherBuddy.Enums;
 
 public enum Patch : ushort
 {
@@ -48,7 +48,7 @@ public static class PatchExtensions
         => (Patch)(value.ToMajor() * 100);
 
     public static string ToVersionString(this Patch value)
-        => $"{value.ToMajor()}.{value.ToMinor()}";
+        => value == Patch.Unknown ? "???" : $"{value.ToMajor()}.{value.ToMinor()}";
 
     public static string ToPatchName(this Patch value)
     {

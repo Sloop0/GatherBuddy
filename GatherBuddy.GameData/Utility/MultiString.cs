@@ -3,7 +3,7 @@ using Dalamud;
 using Dalamud.Data;
 using Lumina.Text;
 
-namespace GatherBuddyA.Utility; 
+namespace GatherBuddy.Utility;
 
 public readonly struct MultiString
 {

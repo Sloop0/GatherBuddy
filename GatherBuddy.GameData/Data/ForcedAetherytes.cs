@@ -1,25 +1,22 @@
-using System.Linq;
 using Dalamud.Logging;
-using GatherBuddyA.Classes;
-using Lumina.Data.Parsing.Uld;
 using Lumina.Excel.GeneratedSheets;
 
-namespace GatherBuddyA.Data;
+namespace GatherBuddy.Data;
 
 public static class ForcedAetherytes
 {
     public static readonly (uint ZoneId, uint AetheryteId)[] ZonesWithoutAetherytes =
     {
-        (128, 8),  // Limsa Upper Decks -> Limsa
-        (900, 8),  // The Endeavor -> Limsa
-        (901, 70), // The Diadem -> Foundation
-        (929, 70), // The Diadem -> Foundation
-        (939, 70), // The Diadem -> Foundation
-        (399, 75), // The Dravanian Hinterlands -> Idyllshire
-        (133, 2), // Old Gridania -> New Gridania,
-        (339, 8), // Mist -> Limsa
-        (340, 2), // Lavender Beds -> New Gridania
-        (341, 9), // Goblet -> Ul'dah
+        (128, 8),   // Limsa Upper Decks -> Limsa
+        (900, 8),   // The Endeavor -> Limsa
+        (901, 70),  // The Diadem -> Foundation
+        (929, 70),  // The Diadem -> Foundation
+        (939, 70),  // The Diadem -> Foundation
+        (399, 75),  // The Dravanian Hinterlands -> Idyllshire
+        (133, 2),   // Old Gridania -> New Gridania,
+        (339, 8),   // Mist -> Limsa
+        (340, 2),   // Lavender Beds -> New Gridania
+        (341, 9),   // Goblet -> Ul'dah
         (641, 111), // Shirogane -> Kugane
     };
 

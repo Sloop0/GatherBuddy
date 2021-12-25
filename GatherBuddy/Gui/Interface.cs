@@ -4,11 +4,13 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
 using GatherBuddy.Classes;
-using GatherBuddy.Game;
 using GatherBuddy.Levenshtein;
 using GatherBuddy.Managers;
 using GatherBuddy.Utility;
-using GatherBuddyA;
+using GatherBuddy;
+using GatherBuddy.Caching;
+using GatherBuddy.Time;
+using GatherBuddy.Weather;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 
@@ -23,15 +25,14 @@ public partial class Interface : IDisposable
     private readonly GatherBuddy _plugin;
 
     private FishManager FishManager
-        => _plugin.Gatherer!.FishManager;
+        => _plugin.FishManager;
 
-    private WeatherManager WeatherManager
-        => _plugin.Gatherer!.WeatherManager;
+    private static Manager WeatherManager
+        => GatherBuddy.WeatherManager;
 
-    private readonly Cache.Icons  _icons;
     private readonly Cache.Header _headerCache;
 
-    private Cache.Alarms?  _alarmCache;
+    private Alarms.Cache?  _alarmCache;
     private Cache.FishTab? _fishCache;
     private Cache.NodeTab? _nodeTabCache;
     private Cache.Weather? _weatherCache;
@@ -57,9 +58,6 @@ public partial class Interface : IDisposable
         _configHeader = GatherBuddy.Version.Length > 0 ? $"{PluginName} v{GatherBuddy.Version}###GatherBuddyMain" : PluginName;
         _headerCache.Setup();
 
-        var weatherSheet = Dalamud.GameData.GetExcelSheet<Weather>()!;
-        _icons = Service<Cache.Icons>.Set((int)weatherSheet.RowCount + FishManager.FishByUptime.Count + FishManager.Bait.Count)!;
-
         if (GatherBuddy.Config.ShowFishFromPatch < Cache.FishTab.PatchSelector.Length)
             return;
 
@@ -69,7 +67,7 @@ public partial class Interface : IDisposable
 
     public void Dispose()
     {
-        Service<Cache.Icons>.Dispose();
+        Icons.DefaultStorage.Dispose();
     }
 
     public void Draw()
@@ -112,7 +110,7 @@ public partial class Interface : IDisposable
           + "Click on a node to do a /gather command for that node.");
         if (nodeTab)
         {
-            _nodeTabCache ??= new Cache.NodeTab(_plugin.Gatherer!.Timeline);
+            _nodeTabCache ??= new Cache.NodeTab(_plugin.NodeTimeLine);
             _nodeTabCache.Update(hour);
             DrawNodesTab();
             raii.End();
@@ -143,7 +141,7 @@ public partial class Interface : IDisposable
           + "You can use [/gather alarm] to directly gather the last triggered alarm.");
         if (alertTab)
         {
-            _alarmCache ??= new Cache.Alarms(_plugin.Alarms!, GatherBuddy.Language);
+            _alarmCache ??= new Alarms.Cache(_plugin.Alarms!, _plugin.NodeTimeLine, _plugin.FishManager);
             DrawAlarmsTab();
             raii.End();
         }
@@ -156,23 +154,22 @@ public partial class Interface : IDisposable
 
         if (raii.BeginTabItem("Debug"))
         {
-            if (GatherBuddy.GameData != null)
+            ImGuiTable.DrawTabbedTable($"Aetherytes ({GatherBuddy.GameData.Aetherytes.Count})", GatherBuddy.GameData.Aetherytes.Values, a =>
             {
-                ImGuiTable.DrawTabbedTable($"Aetherytes ({GatherBuddy.GameData.Aetherytes.Count})", GatherBuddy.GameData.Aetherytes.Values, a =>
-                {
-                    ImGui.TableNextColumn();
-                    ImGui.Text(a.Id.ToString());
-                    ImGui.TableNextColumn();
-                    ImGui.Text(a.Name);
-                    ImGui.TableNextColumn();
-                    ImGui.Text(a.Territory.Name);
-                    ImGui.TableNextColumn();
-                    ImGui.Text($"{a.XCoord}-{a.YCoord}");
-                    ImGui.TableNextColumn();
-                    ImGui.Text($"{a.XStream}-{a.YStream}");
-                }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "Id", "Name", "Territory", "Coords", "Aetherstream");
+                ImGui.TableNextColumn();
+                ImGui.Text(a.Id.ToString());
+                ImGui.TableNextColumn();
+                ImGui.Text(a.Name);
+                ImGui.TableNextColumn();
+                ImGui.Text(a.Territory.Name);
+                ImGui.TableNextColumn();
+                ImGui.Text($"{a.XCoord}-{a.YCoord}");
+                ImGui.TableNextColumn();
+                ImGui.Text($"{a.XStream}-{a.YStream}");
+            }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "Id", "Name", "Territory", "Coords", "Aetherstream");
 
-                ImGuiTable.DrawTabbedTable($"Territories ({GatherBuddy.GameData.WeatherTerritories.Length})", GatherBuddy.GameData.WeatherTerritories, t =>
+            ImGuiTable.DrawTabbedTable($"Territories ({GatherBuddy.GameData.WeatherTerritories.Length})",
+                GatherBuddy.GameData.WeatherTerritories, t =>
                 {
                     ImGui.TableNextColumn();
                     ImGui.Text(t.Id.ToString());
@@ -184,15 +181,16 @@ public partial class Interface : IDisposable
                     ImGui.Text(t.WeatherRates.Rates.Length.ToString());
                 }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "Id", "Name", "SizeFactor", "#Weathers");
 
-                ImGuiTable.DrawTabbedTable($"Bait ({GatherBuddy.GameData.Bait.Count})", GatherBuddy.GameData.Bait.Values, b =>
-                {
-                    ImGui.TableNextColumn();
-                    ImGui.Text(b.Id.ToString());
-                    ImGui.TableNextColumn();
-                    ImGui.Text(b.Name);
-                }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "Id", "Name");
+            ImGuiTable.DrawTabbedTable($"Bait ({GatherBuddy.GameData.Bait.Count})", GatherBuddy.GameData.Bait.Values, b =>
+            {
+                ImGui.TableNextColumn();
+                ImGui.Text(b.Id.ToString());
+                ImGui.TableNextColumn();
+                ImGui.Text(b.Name);
+            }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "Id", "Name");
 
-                ImGuiTable.DrawTabbedTable($"Gatherables ({GatherBuddy.GameData.Gatherables.Count})", GatherBuddy.GameData.Gatherables.Values.OrderBy((g, h) => g.ItemId.CompareTo(h.ItemId)), g =>
+            ImGuiTable.DrawTabbedTable($"Gatherables ({GatherBuddy.GameData.Gatherables.Count})",
+                GatherBuddy.GameData.Gatherables.Values.OrderBy((g, h) => g.ItemId.CompareTo(h.ItemId)), g =>
                 {
                     ImGui.TableNextColumn();
                     ImGui.Text(g.ItemId.ToString());
@@ -206,7 +204,8 @@ public partial class Interface : IDisposable
                     ImGui.Text(g.NodeList.Count.ToString());
                 }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "ItemId", "GatheringId", "Name", "Level", "#Nodes");
 
-                ImGuiTable.DrawTabbedTable($"Gathering Nodes ({GatherBuddy.GameData.GatheringNodes.Count})", GatherBuddy.GameData.GatheringNodes.Values, g =>
+            ImGuiTable.DrawTabbedTable($"Gathering Nodes ({GatherBuddy.GameData.GatheringNodes.Count})",
+                GatherBuddy.GameData.GatheringNodes.Values, g =>
                 {
                     ImGui.TableNextColumn();
                     ImGui.Text(g.BaseId.ToString());
@@ -230,9 +229,10 @@ public partial class Interface : IDisposable
                     ImGui.Text(g.Times.PrintHours(true));
                     ImGui.TableNextColumn();
                     ImGui.Text(g.PrintItems());
-                }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "Id", "Name", "Job", "Level", "Type", "Territory", "Coords", "Aetheryte", "Folklore", "Times", "Items");
+                }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "Id", "Name", "Job", "Level", "Type", "Territory", "Coords",
+                "Aetheryte", "Folklore", "Times", "Items");
 
-                ImGuiTable.DrawTabbedTable($"Fish ({GatherBuddy.GameData.Fishes.Count})", GatherBuddy.GameData.Fishes.Values, f =>
+            ImGuiTable.DrawTabbedTable($"Fish ({GatherBuddy.GameData.Fishes.Count})", GatherBuddy.GameData.Fishes.Values, f =>
                 {
                     ImGui.TableNextColumn();
                     ImGui.Text(f.ItemId.ToString());
@@ -250,9 +250,11 @@ public partial class Interface : IDisposable
                     ImGui.Text(f.IsBigFish.ToString());
                     ImGui.TableNextColumn();
                     ImGui.Text(string.Join('|', f.FishingSpots.Select(s => s.Name)));
-                }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "ItemId", "FishId", "Name", "Restrictions", "Folklore", "InLog", "Big", "Fishing Spots");
+                }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "ItemId", "FishId", "Name", "Restrictions", "Folklore", "InLog",
+                "Big", "Fishing Spots");
 
-                ImGuiTable.DrawTabbedTable($"Fishing Spots ({GatherBuddy.GameData.FishingSpots.Count})", GatherBuddy.GameData.FishingSpots.Values, f =>
+            ImGuiTable.DrawTabbedTable($"Fishing Spots ({GatherBuddy.GameData.FishingSpots.Count})",
+                GatherBuddy.GameData.FishingSpots.Values, f =>
                 {
                     ImGui.TableNextColumn();
                     ImGui.Text($"{f.Id}{(f.Spearfishing ? " (sf)" : "")}");
@@ -263,42 +265,45 @@ public partial class Interface : IDisposable
                     ImGui.TableNextColumn();
                     ImGui.Text(f.ClosestAetheryte?.Name ?? "Unknown");
                     ImGui.TableNextColumn();
-                    ImGui.Text($"{f.IntegralXCoord/100f:00.00}-{f.IntegralYCoord/100f:00.00}");
+                    ImGui.Text($"{f.IntegralXCoord / 100f:00.00}-{f.IntegralYCoord / 100f:00.00}");
                     ImGui.TableNextColumn();
                     ImGui.Text(string.Join('|', f.Items.Select(fish => fish.Name)));
                 }, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit, "Id", "Name", "Territory", "Aetheryte", "Coords", "Fishes");
 
-                void PrintNode<T>(PatriciaTrie<T>.Node node)
+            void PrintNode<T>(PatriciaTrie<T>.Node node)
+            {
+                var name = node.TotalWord.ToString();
+                if (name.Length == 0)
+                    name = "Root";
+                if (node.Children.Count == 0)
                 {
-                    var name = node.TotalWord.ToString();
-                    if (name.Length == 0)
-                        name = "Root";
-                    if (node.Children.Count == 0)
-                        ImGui.Text(name);
-                    else
-                    {
-                        if (!ImGui.TreeNodeEx(name))
-                            return;
-
-                        foreach (var child in node.Children)
-                            PrintNode(child);
-                        ImGui.TreePop();
-                    }
+                    ImGui.Text(name);
                 }
+                else
+                {
+                    if (!ImGui.TreeNodeEx(name))
+                        return;
 
-                if (ImGui.CollapsingHeader("GatheringTree"))
-                {
-                    ImGui.PushID("GatheringTree");
-                    PrintNode(GatherBuddy.GameData.GatherablesTrie.Root); 
-                    ImGui.PopID();
-                }
-                if (ImGui.CollapsingHeader("FishingTree"))
-                {
-                    ImGui.PushID("FishingTree");
-                    PrintNode(GatherBuddy.GameData.FishTrie.Root);
-                    ImGui.PopID();
+                    foreach (var child in node.Children)
+                        PrintNode(child);
+                    ImGui.TreePop();
                 }
             }
+
+            if (ImGui.CollapsingHeader("GatheringTree"))
+            {
+                ImGui.PushID("GatheringTree");
+                PrintNode(GatherBuddy.GameData.GatherablesTrie.Root);
+                ImGui.PopID();
+            }
+
+            if (ImGui.CollapsingHeader("FishingTree"))
+            {
+                ImGui.PushID("FishingTree");
+                PrintNode(GatherBuddy.GameData.FishTrie.Root);
+                ImGui.PopID();
+            }
+
             raii.End();
         }
     }

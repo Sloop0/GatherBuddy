@@ -1,38 +1,36 @@
-﻿using GatherBuddy.Managers;
-using GatherBuddy.Utility;
+﻿using GatherBuddy.Caching;
+using GatherBuddy.Classes;
+using GatherBuddy.SeFunctions;
 using ImGuiScene;
 
-namespace GatherBuddy.Gui.Cache
+namespace GatherBuddy.Gui.Cache;
+
+internal struct Header
 {
-    internal struct Header
+    public long         DrawHour;
+    public Territory    Territory;
+    public TextureWrap? CurrentWeather;
+    public TextureWrap? NextWeather;
+
+    public void Setup()
+        => Update(0, Territory.Invalid);
+
+    public void Update(long hour, Territory territory)
     {
-        public long         DrawHour;
-        public uint         Territory;
-        public TextureWrap? CurrentWeather;
-        public TextureWrap? NextWeather;
+        if (hour - DrawHour < 8 && Territory == territory)
+            return;
 
-        public void Setup()
-            => Update(0, 0);
-
-        public void Update(long hour, uint territory)
+        DrawHour  = hour - (hour & 0b111);
+        Territory = territory;
+        if (territory.Id == 0)
         {
-            if (hour - DrawHour < 8 && Territory == territory)
-                return;
-
-            DrawHour = hour - (hour & 0b111);
-            if (territory == 0)
-            {
-                Territory      = 0;
-                CurrentWeather = null;
-                NextWeather    = null;
-                return;
-            }
-
-            Territory = territory;
-            var weathers = Service<SkyWatcher>.Get().GetForecast(Territory, 2);
-            var icons    = Service<Icons>.Get();
-            CurrentWeather = icons[weathers[0].Weather.Icon];
-            NextWeather    = icons[weathers[1].Weather.Icon];
+            CurrentWeather = null;
+            NextWeather    = null;
+            return;
         }
+
+        var weathers = global::GatherBuddy.Weather.Manager.GetForecast(Territory, 2, SeTime.ServerTime);
+        CurrentWeather = Icons.DefaultStorage[weathers[0].Weather.Data.Icon];
+        NextWeather    = Icons.DefaultStorage[weathers[1].Weather.Data.Icon];
     }
 }

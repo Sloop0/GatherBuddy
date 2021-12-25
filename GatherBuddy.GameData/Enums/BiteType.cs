@@ -1,4 +1,4 @@
-﻿namespace GatherBuddyA.Enums;
+﻿namespace GatherBuddy.Enums;
 
 public enum BiteType : byte
 {

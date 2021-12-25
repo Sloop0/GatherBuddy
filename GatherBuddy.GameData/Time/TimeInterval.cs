@@ -1,6 +1,6 @@
 using System;
 
-namespace GatherBuddyA.Time;
+namespace GatherBuddy.Time;
 
 public readonly struct TimeInterval : IEquatable<TimeInterval>
 {

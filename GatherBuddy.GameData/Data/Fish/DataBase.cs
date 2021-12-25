@@ -1,15 +1,14 @@
 using System;
 using System.Linq;
 using Dalamud.Logging;
-using GatherBuddyA.Classes;
-using GatherBuddyA.Enums;
-using GatherBuddyA.Time;
+using GatherBuddy.Enums;
+using GatherBuddy.Time;
 
-namespace GatherBuddyA.Data;
+namespace GatherBuddy.Data;
 
-public static partial class FishData
+public static partial class Fish
 {
-    private static Fish? Apply(this GameData data, uint id, Patch patch)
+    private static Classes.Fish? Apply(this GameData data, uint id, Patch patch)
     {
         if (data.Fishes.TryGetValue(id, out var fish))
             return fish;
@@ -18,7 +17,7 @@ public static partial class FishData
         return null;
     }
 
-    private static Fish? Transition(this Fish? fish, GameData data, params uint[] previousWeathers)
+    private static Classes.Fish? Transition(this Classes.Fish? fish, GameData data, params uint[] previousWeathers)
     {
         if (fish == null)
             return null;
@@ -38,7 +37,7 @@ public static partial class FishData
         return fish;
     }
 
-    private static Fish? Weather(this Fish? fish, GameData data, params uint[] weathers)
+    private static Classes.Fish? Weather(this Classes.Fish? fish, GameData data, params uint[] weathers)
     {
         if (fish == null)
             return null;
@@ -58,7 +57,7 @@ public static partial class FishData
         return fish;
     }
 
-    private static Fish? Bait(this Fish? fish, GameData data, params uint[] items)
+    private static Classes.Fish? Bait(this Classes.Fish? fish, GameData data, params uint[] items)
     {
         if (fish == null)
             return null;
@@ -89,7 +88,7 @@ public static partial class FishData
         return fish;
     }
 
-    private static Fish? Predators(this Fish? fish, GameData data, int intuitionLength, params (uint, int)[] predators)
+    private static Classes.Fish? Predators(this Classes.Fish? fish, GameData data, int intuitionLength, params (uint, int)[] predators)
     {
         if (fish == null)
             return null;
@@ -114,7 +113,7 @@ public static partial class FishData
         return fish;
     }
 
-    private static Fish? Time(this Fish? fish, int uptimeMinuteOfDayStart, int uptimeMinuteOfDayEnd)
+    private static Classes.Fish? Time(this Classes.Fish? fish, int uptimeMinuteOfDayStart, int uptimeMinuteOfDayEnd)
     {
         if (fish == null)
             return null;
@@ -123,7 +122,7 @@ public static partial class FishData
         return fish;
     }
 
-    private static Fish? Snag(this Fish? fish, Snagging snagging)
+    private static Classes.Fish? Snag(this Classes.Fish? fish, Snagging snagging)
     {
         if (fish == null)
             return null;
@@ -138,7 +137,7 @@ public static partial class FishData
         return fish;
     }
 
-    private static Fish? Bite(this Fish? fish, HookSet hookSet, BiteType biteType = BiteType.Unknown)
+    private static Classes.Fish? Bite(this Classes.Fish? fish, HookSet hookSet, BiteType biteType = BiteType.Unknown)
     {
         if (fish == null)
             return null;
@@ -154,7 +153,7 @@ public static partial class FishData
         return fish;
     }
 
-    private static Fish? Spear(this Fish? fish, SpearfishSize size, SpearfishSpeed speed = SpearfishSpeed.Unknown)
+    private static Classes.Fish? Spear(this Classes.Fish? fish, SpearfishSize size, SpearfishSpeed speed = SpearfishSpeed.Unknown)
     {
         if (fish == null)
             return null;

@@ -1,120 +1,116 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GatherBuddy.Classes;
 using GatherBuddy.Enums;
-using GatherBuddy.Nodes;
 
-namespace GatherBuddy.Managers
+namespace GatherBuddy.Managers;
+
+public class NodeTimeLine
 {
-    public class NodeTimeLine
+    public Dictionary<NodeType, Dictionary<GatheringType, List<GatheringNode>>> TimedNodesDict { get; }
+    public GatheringNode[]                                                      TimedNodes     { get; }
+    private class NodeComparer : IComparer<GatheringNode>
     {
-        public Dictionary<NodeType, Dictionary<GatheringType, List<Node>>> TimedNodes { get; }
+        public int Compare(GatheringNode? lhs, GatheringNode? rhs)
+            => (rhs?.Level ?? 0) - (lhs?.Level ?? 0);
+    }
 
-        private class NodeComparer : IComparer<Node>
+    public NodeTimeLine()
+    {
+        TimedNodesDict = new Dictionary<NodeType, Dictionary<GatheringType, List<GatheringNode>>>()
         {
-            public int Compare(Node? lhs, Node? rhs)
-                => (rhs?.Meta?.Level ?? 0) - (lhs?.Meta?.Level ?? 0);
-        }
-
-        public NodeTimeLine(NodeManager nodes)
-        {
-            TimedNodes = new Dictionary<NodeType, Dictionary<GatheringType, List<Node>>>()
             {
+                NodeType.Unspoiled, new Dictionary<GatheringType, List<GatheringNode>>()
                 {
-                    NodeType.Unspoiled, new Dictionary<GatheringType, List<Node>>()
-                    {
-                        { GatheringType.Botanist, new List<Node>() },
-                        { GatheringType.Miner, new List<Node>() },
-                    }
-                },
+                    { GatheringType.Botanist, new List<GatheringNode>() },
+                    { GatheringType.Miner, new List<GatheringNode>() },
+                }
+            },
+            {
+                NodeType.Ephemeral, new Dictionary<GatheringType, List<GatheringNode>>()
                 {
-                    NodeType.Ephemeral, new Dictionary<GatheringType, List<Node>>()
-                    {
-                        { GatheringType.Botanist, new List<Node>() },
-                        { GatheringType.Miner, new List<Node>() },
-                    }
-                },
-            };
+                    { GatheringType.Botanist, new List<GatheringNode>() },
+                    { GatheringType.Miner, new List<GatheringNode>() },
+                }
+            },
+        };
 
-            foreach (var node in nodes.BaseNodes())
-            {
-                if (node.Meta!.NodeType == NodeType.Regular)
-                    continue;
-                if (node.Meta!.GatheringType == GatheringType.Spearfishing)
-                    continue;
-
-                TimedNodes[node.Meta.NodeType][node.Meta.GatheringType.ToGroup()].Add(node);
-            }
-
-            TimedNodes[NodeType.Unspoiled][GatheringType.Miner].Sort(new NodeComparer());
-            TimedNodes[NodeType.Unspoiled][GatheringType.Botanist].Sort(new NodeComparer());
-            TimedNodes[NodeType.Ephemeral][GatheringType.Miner].Sort(new NodeComparer());
-            TimedNodes[NodeType.Ephemeral][GatheringType.Botanist].Sort(new NodeComparer());
-        }
-
-        private ShowNodes ExpansionForNode(Node n)
+        foreach (var node in GatherBuddy.GameData.GatheringNodes.Values)
         {
-            var addon = n.Nodes?.Territory?.Data.ExVersion.Row ?? uint.MaxValue;
-            if (addon == 0 && n.Meta!.Level <= 50)
-                return ShowNodes.ARealmReborn;
-            if (addon <= 1 && n.Meta!.Level <= 60)
-                return ShowNodes.Heavensward;
-            if (addon <= 2 && n.Meta!.Level <= 70)
-                return ShowNodes.Stormblood;
-            if (addon <= 3 && n.Meta!.Level <= 80)
-                return ShowNodes.Shadowbringers;
-            if (addon <= 4 && n.Meta!.Level <= 90)
-                return ShowNodes.Endwalker;
+            if (node.NodeType == NodeType.Regular)
+                continue;
+            if (node.GatheringType == GatheringType.Spearfishing)
+                continue;
 
-            return ShowNodes.AllNodes;
+            TimedNodesDict[node.NodeType][node.GatheringType.ToGroup()].Add(node);
         }
 
-        public List<(Node, uint)> GetNewList(ShowNodes which)
+        TimedNodesDict[NodeType.Unspoiled][GatheringType.Miner].Sort(new NodeComparer());
+        TimedNodesDict[NodeType.Unspoiled][GatheringType.Botanist].Sort(new NodeComparer());
+        TimedNodesDict[NodeType.Ephemeral][GatheringType.Miner].Sort(new NodeComparer());
+        TimedNodesDict[NodeType.Ephemeral][GatheringType.Botanist].Sort(new NodeComparer());
+    }
+
+    private ShowNodes ExpansionForNode(GatheringNode n)
+    {
+        var addon = n.Territory.Data.ExVersion.Row;
+        return addon switch
         {
-            var list = Enumerable.Empty<Node>();
+            0 when n.Level <= 50    => ShowNodes.ARealmReborn,
+            <= 1 when n.Level <= 60 => ShowNodes.Heavensward,
+            <= 2 when n.Level <= 70 => ShowNodes.Stormblood,
+            <= 3 when n.Level <= 80 => ShowNodes.Shadowbringers,
+            <= 4 when n.Level <= 90 => ShowNodes.Endwalker,
+            _                       => ShowNodes.AllNodes,
+        };
+    }
 
-            bool LevelCheck(Node n)
-                => which.HasFlag(ExpansionForNode(n));
+    public List<(GatheringNode, uint)> GetNewList(ShowNodes which)
+    {
+        var list = Enumerable.Empty<GatheringNode>();
 
-            if (which.HasFlag(ShowNodes.Unspoiled))
-            {
-                if (which.HasFlag(ShowNodes.Mining))
-                    list = list.Concat(TimedNodes[NodeType.Unspoiled][GatheringType.Miner]).Where(LevelCheck);
-                if (which.HasFlag(ShowNodes.Botanist))
-                    list = list.Concat(TimedNodes[NodeType.Unspoiled][GatheringType.Botanist]).Where(LevelCheck);
-            }
+        bool LevelCheck(GatheringNode n)
+            => which.HasFlag(ExpansionForNode(n));
 
-            if (which.HasFlag(ShowNodes.Ephemeral))
-            {
-                if (which.HasFlag(ShowNodes.Mining))
-                    list = list.Concat(TimedNodes[NodeType.Ephemeral][GatheringType.Miner]).Where(LevelCheck);
-                if (which.HasFlag(ShowNodes.Botanist))
-                    list = list.Concat(TimedNodes[NodeType.Ephemeral][GatheringType.Botanist]).Where(LevelCheck);
-            }
-
-            return list.Select(n => (n, 25u)).ToList();
-        }
-
-        private class Comparer : IComparer<(Node, uint)>
+        if (which.HasFlag(ShowNodes.Unspoiled))
         {
-            public int Compare((Node, uint) lhs, (Node, uint) rhs)
-            {
-                if (lhs.Item2 != rhs.Item2)
-                    return (int) (lhs.Item2 - rhs.Item2);
-
-                return rhs.Item1.Meta!.Level - lhs.Item1.Meta!.Level;
-            }
+            if (which.HasFlag(ShowNodes.Mining))
+                list = list.Concat(TimedNodesDict[NodeType.Unspoiled][GatheringType.Miner]).Where(LevelCheck);
+            if (which.HasFlag(ShowNodes.Botanist))
+                list = list.Concat(TimedNodesDict[NodeType.Unspoiled][GatheringType.Botanist]).Where(LevelCheck);
         }
 
-        private static void UpdateUptimes(int currentHour, IList<(Node, uint)> nodes)
+        if (which.HasFlag(ShowNodes.Ephemeral))
         {
-            for (var i = 0; i < nodes.Count; ++i)
-                nodes[i] = (nodes[i].Item1, nodes[i].Item1.Times!.NextUptime(currentHour));
+            if (which.HasFlag(ShowNodes.Mining))
+                list = list.Concat(TimedNodesDict[NodeType.Ephemeral][GatheringType.Miner]).Where(LevelCheck);
+            if (which.HasFlag(ShowNodes.Botanist))
+                list = list.Concat(TimedNodesDict[NodeType.Ephemeral][GatheringType.Botanist]).Where(LevelCheck);
         }
 
-        public static void SortByUptime(int currentHour, List<(Node, uint)> nodes)
+        return list.Select(n => (n, 25u)).ToList();
+    }
+
+    private class Comparer : IComparer<(GatheringNode, uint)>
+    {
+        public int Compare((GatheringNode, uint) lhs, (GatheringNode, uint) rhs)
         {
-            UpdateUptimes(currentHour, nodes);
-            nodes.Sort(new Comparer());
+            if (lhs.Item2 != rhs.Item2)
+                return (int)(lhs.Item2 - rhs.Item2);
+
+            return rhs.Item1.Level - lhs.Item1.Level;
         }
+    }
+
+    private static void UpdateUptimes(int currentHour, IList<(GatheringNode, uint)> nodes)
+    {
+        for (var i = 0; i < nodes.Count; ++i)
+            nodes[i] = (nodes[i].Item1, nodes[i].Item1.Times!.NextUptime(currentHour));
+    }
+
+    public static void SortByUptime(int currentHour, List<(GatheringNode, uint)> nodes)
+    {
+        UpdateUptimes(currentHour, nodes);
+        nodes.Sort(new Comparer());
     }
 }

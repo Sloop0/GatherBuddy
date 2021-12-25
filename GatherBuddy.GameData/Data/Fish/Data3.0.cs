@@ -1,9 +1,9 @@
-using GatherBuddyA;
-using GatherBuddyA.Enums;
+using GatherBuddy.Enums;
+using GatherBuddy;
 
-namespace GatherBuddyA.Data;
+namespace GatherBuddy.Data;
 
-public static partial class FishData
+public static partial class Fish
 {
     // @formatter:off
     private static void ApplyHeavensward(this GameData data)

@@ -1,6 +1,6 @@
 using Dalamud.Logging;
 
-namespace GatherBuddyA.Data;
+namespace GatherBuddy.Data;
 
 public static class HiddenMaps
 {

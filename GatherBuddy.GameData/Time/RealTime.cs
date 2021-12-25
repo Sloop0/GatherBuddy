@@ -1,4 +1,4 @@
-namespace GatherBuddyA.Time;
+namespace GatherBuddy.Time;
 
 public static class RealTime
 {

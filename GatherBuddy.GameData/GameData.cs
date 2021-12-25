@@ -3,16 +3,16 @@ using Dalamud.Data;
 using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Logging;
+using GatherBuddy.Classes;
+using GatherBuddy.Data;
 using GatherBuddy.Levenshtein;
-using GatherBuddyA.Classes;
-using GatherBuddyA.Data;
-using GatherBuddyA.Structs;
+using GatherBuddy.Structs;
 using Lumina.Excel.GeneratedSheets;
-using Aetheryte = GatherBuddyA.Classes.Aetheryte;
-using FishingSpot = GatherBuddyA.Classes.FishingSpot;
-using Weather = GatherBuddyA.Structs.Weather;
+using Aetheryte = GatherBuddy.Classes.Aetheryte;
+using FishingSpot = GatherBuddy.Classes.FishingSpot;
+using Weather = GatherBuddy.Structs.Weather;
 
-namespace GatherBuddyA;
+namespace GatherBuddy;
 
 public class GameData
 {
@@ -28,11 +28,11 @@ public class GameData
     public Dictionary<uint, Gatherable>    GatherablesByGatherId { get; init; } = new();
     public Dictionary<uint, GatheringNode> GatheringNodes        { get; init; } = new();
     public Dictionary<uint, Bait>          Bait                  { get; init; } = new();
-    public Dictionary<uint, Fish>      Fishes                { get; init; } = new();
+    public Dictionary<uint, Classes.Fish>  Fishes                { get; init; } = new();
     public Dictionary<uint, FishingSpot>   FishingSpots          { get; init; } = new();
 
-    public PatriciaTrie<Gatherable> GatherablesTrie { get; init; } = new();
-    public PatriciaTrie<Fish>   FishTrie        { get; init; } = new();
+    public PatriciaTrie<Gatherable>   GatherablesTrie { get; init; } = new();
+    public PatriciaTrie<Classes.Fish> FishTrie        { get; init; } = new();
 
 
     public GameData(DataManager gameData)
@@ -91,17 +91,17 @@ public class GameData
 
             Fishes = DataManager.GetExcelSheet<FishParameter>()?
                     .Where(f => f.Item != 0 && f.Item < 1000000)
-                    .Select(f => new Fish(DataManager, f))
+                    .Select(f => new Classes.Fish(DataManager, f))
                     .Concat(DataManager.GetExcelSheet<SpearfishingItem>()?
                             .Where(sf => sf.Item.Row != 0 && sf.Item.Row < 1000000)
-                            .Select(sf => new Fish(DataManager, sf))
-                     ?? Array.Empty<Fish>())
+                            .Select(sf => new Classes.Fish(DataManager, sf))
+                     ?? Array.Empty<Classes.Fish>())
                     .GroupBy(f => f.ItemId)
                     .Select(group => group.First())
                     .ToDictionary(f => f.ItemId, f => f)
-             ?? new Dictionary<uint, Fish>();
+             ?? new Dictionary<uint, Classes.Fish>();
             PluginLog.Verbose("Collected {NumFishes} different types of fish.", Fishes.Count);
-            FishData.Apply(this);
+            Data.Fish.Apply(this);
 
             FishingSpots = DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.FishingSpot>()?
                     .Where(f => f.PlaceName.Row != 0)

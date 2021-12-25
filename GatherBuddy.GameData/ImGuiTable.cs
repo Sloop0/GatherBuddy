@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using ImGuiNET;
 
-namespace GatherBuddyA;
+namespace GatherBuddy;
 
 public static class ImGuiTable
 {

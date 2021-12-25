@@ -1,8 +1,8 @@
-using GatherBuddyA.Enums;
+using GatherBuddy.Enums;
 
-namespace GatherBuddyA.Data;
+namespace GatherBuddy.Data;
 
-public static partial class FishData
+public static partial class Fish
 {
     // @formatter:off
     private static void ApplyDeathUntoDawn(this GameData data)

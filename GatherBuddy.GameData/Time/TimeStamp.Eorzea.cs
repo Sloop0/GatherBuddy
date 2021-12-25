@@ -1,4 +1,4 @@
-namespace GatherBuddyA.Time;
+namespace GatherBuddy.Time;
 
 public static class EorzeaTimeStampExtensions
 {
@@ -8,6 +8,9 @@ public static class EorzeaTimeStampExtensions
     public const int SecondsPerEorzeaWeather      = MillisecondsPerEorzeaWeather / RealTime.MillisecondsPerSecond;
     public const int MillisecondsPerEorzeaDay     = RealTime.HoursPerDay * MillisecondsPerEorzeaHour;
     public const int SecondsPerEorzeaDay          = MillisecondsPerEorzeaDay / RealTime.MillisecondsPerSecond;
+
+    public static TimeStamp ConvertToEorzea(this TimeStamp t)
+        => new(t.Time * 72 / 35);
 
     public static TimeStamp AddEorzeaSeconds(this TimeStamp t, long value)
         => new(t.Time + value * 875 / 18);

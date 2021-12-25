@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Dalamud;
 
-namespace GatherBuddyA.Classes;
+namespace GatherBuddy.Classes;
 
 public partial class GatheringNode
 {

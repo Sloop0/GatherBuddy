@@ -1,19 +1,20 @@
 using System;
 using System.Linq;
-using GatherBuddyA.Enums;
-using GatherBuddyA.Time;
-using GatherBuddyA.Utility;
+using GatherBuddy.Enums;
+using GatherBuddy.Interfaces;
+using GatherBuddy.Time;
+using GatherBuddy.Utility;
 using Lumina.Excel.GeneratedSheets;
-using GatheringType = GatherBuddyA.Enums.GatheringType;
+using GatheringType = GatherBuddy.Enums.GatheringType;
 
-namespace GatherBuddyA.Classes;
+namespace GatherBuddy.Classes;
 
 public partial class GatheringNode : IComparable<GatheringNode>, ILocation
 {
-    public NodeType           NodeType     { get; init; } = NodeType.Regular;
+    public NodeType           NodeType     { get; init; }
     public GatheringPointBase BaseNodeData { get; init; }
-    public string         Name  { get; init; } = string.Empty;
-    public BitfieldUptime Times { get; init; } = BitfieldUptime.AllHours;
+    public string             Name         { get; init; }
+    public BitfieldUptime     Times        { get; init; }
 
     public uint BaseId
         => BaseNodeData.RowId;
@@ -42,12 +43,12 @@ public partial class GatheringNode : IComparable<GatheringNode>, ILocation
         Territory = data.FindOrAddTerritory(nodeRow?.TerritoryType.Value) ?? Territory.Invalid;
         Name      = MultiString.ParseSeStringLumina(nodeRow?.PlaceName.Value?.Name);
         // Obtain the center of the coordinates. We do not care for the radius.
-        var coords = data.DataManager.GetExcelSheet<ExportedGatheringPoint>();
-        var coordRow    = coords?.GetRow(node.RowId);
+        var coords   = data.DataManager.GetExcelSheet<ExportedGatheringPoint>();
+        var coordRow = coords?.GetRow(node.RowId);
         IntegralXCoord = coordRow != null ? Maps.NodeToMap(coordRow.X, Territory.SizeFactor) : 100;
         IntegralYCoord = coordRow != null ? Maps.NodeToMap(coordRow.Y, Territory.SizeFactor) : 100;
-        ClosestAetheryte = Territory.Aetherytes.Count > 0 
-            ? Territory.Aetherytes.ArgMin(a => a.WorldDistance(Territory.Id, IntegralXCoord, IntegralYCoord)) 
+        ClosestAetheryte = Territory.Aetherytes.Count > 0
+            ? Territory.Aetherytes.ArgMin(a => a.WorldDistance(Territory.Id, IntegralXCoord, IntegralYCoord))
             : null;
 
         // Obtain additional information.
@@ -57,7 +58,7 @@ public partial class GatheringNode : IComparable<GatheringNode>, ILocation
 
         // Obtain the items and add the node to their individual lists.
         Items = node.Item
-            .Select(i => data.GatherablesByGatherId.TryGetValue((uint) i, out var gatherable) ? gatherable : null)
+            .Select(i => data.GatherablesByGatherId.TryGetValue((uint)i, out var gatherable) ? gatherable : null)
             .Where(g => g != null)
             .Cast<Gatherable>()
             .ToList();

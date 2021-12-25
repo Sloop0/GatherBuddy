@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Numerics;
-using GatherBuddy.Nodes;
+using GatherBuddy.Classes;
 using ImGuiNET;
 
 namespace GatherBuddy.Gui;
@@ -34,17 +34,16 @@ public partial class Interface
     private void DrawEndwalkerBox()
         => DrawVisibilityBox(ShowNodes.Endwalker, "EW", "Show nodes with level 81 to 90.");
 
-    private void SetNodeTooltip(Node n)
+    private void SetNodeTooltip(GatheringNode n)
     {
-        var coords = n.GetX() != 0 ? $"({n.GetX()}|{n.GetY()})" : "(Unknown Location)";
+        var coords = n.XCoord != 0 ? $"({n.XCoord}|{n.YCoord})" : "(Unknown Location)";
         var tooltip =
-            $"{n.Nodes!.Territory!.Name[GatherBuddy.Language]}, {coords} - {n.GetClosestAetheryte()?.Name[GatherBuddy.Language] ?? ""}\n"
-          + $"{n.Meta!.NodeType}, up at {n.Times!.PrintHours()}\n"
-          + $"{n.Meta!.GatheringType} at {n.Meta!.Level}";
+            $"{n.Territory.Name}, {coords} - {n.ClosestAetheryte?.Name ?? "Unknown"}\n"
+          + $"{n.NodeType}, up at {n.Times.PrintHours()}\n"
+          + $"{n.GatheringType} at {n.Level}";
         using var tt = ImGuiRaii.NewTooltip();
-        foreach (var item in n.Items!.ActualItems)
+        foreach (var icon in n.Items.Select(item => _icons[item.ItemData.Icon]))
         {
-            var icon = _icons[item.ItemData.Icon];
             ImGui.Image(icon.ImGuiHandle, _iconSize);
             ImGui.SameLine();
         }
@@ -75,7 +74,7 @@ public partial class Interface
             imgui.PushColor(ImGuiCol.Text, colors);
 
             if (ImGui.Selectable(i))
-                _plugin.Gatherer!.OnGatherActionWithNode(n);
+                _plugin.Executor.OnGatherActionWithNode(n);
             imgui.PopColors();
 
             if (ImGui.IsItemHovered())

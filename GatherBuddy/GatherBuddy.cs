@@ -2,72 +2,68 @@
 using System.Reflection;
 using Dalamud;
 using Dalamud.Plugin;
+using GatherBuddy.Caching;
 using GatherBuddy.Gui;
 using GatherBuddy.Managers;
-using SDL2;
 
-namespace GatherBuddy
+namespace GatherBuddy;
+
+public partial class GatherBuddy : IDalamudPlugin
 {
-    public partial class GatherBuddy : IDalamudPlugin
+    public string Name
+        => "GatherBuddy";
+
+    public static string Version = string.Empty;
+
+    public static GatherBuddyConfiguration Config         { get; private set; } = null!;
+    public static GameData                 GameData       { get; private set; } = null!;
+    public static ClientLanguage           Language       { get; private set; } = ClientLanguage.English;
+    public static CommandManager           CommandManager { get; private set; } = null!;
+    public static Weather.Manager          WeatherManager { get; private set; } = null!;
+
+    public readonly  Identificator       Identificator;
+    public readonly  Alarms.Manager      Alarms;
+    public readonly  FishManager         FishManager;
+    public readonly  NodeTimeLine        NodeTimeLine;
+    private readonly Interface           _gatherInterface;
+    private readonly FishTimer.FishTimer _fishTimer;
+
+    public GatherBuddy(DalamudPluginInterface pluginInterface)
     {
-        public string Name
-            => "GatherBuddy";
+        Dalamud.Initialize(pluginInterface);
+        Version        = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
+        Config         = GatherBuddyConfiguration.Load();
+        Language       = Dalamud.ClientState.ClientLanguage;
+        GameData       = new GameData(Dalamud.GameData);
+        WeatherManager = new Weather.Manager();
+        FishManager    = new FishManager();
+        NodeTimeLine   = new NodeTimeLine();
+        CommandManager = new CommandManager(Dalamud.SigScanner);
+        Identificator  = new Identificator();
 
-        public static string Version = string.Empty;
+        Alarms           = new Alarms.Manager();
+        _fishTimer       = new FishTimer.FishTimer(FishManager, WeatherManager);
+        _gatherInterface = new Interface(this);
 
-        public static GatherBuddyConfiguration Config         { get; private set; } = null!;
-        public static GatherBuddyA.GameData    GameData       { get; private set; } = null!;
-        public static ClientLanguage           Language       { get; private set; } = ClientLanguage.English;
-        public static CommandManager           CommandManager { get; private set; } = null!;
+        Dalamud.PluginInterface.UiBuilder.Draw         += _gatherInterface!.Draw;
+        Dalamud.PluginInterface.UiBuilder.OpenConfigUi += OnGatherBuddy;
 
-        public readonly  Identificator Identificator;
-        public readonly  Gatherer      Gatherer;
-        public readonly  AlarmManager  Alarms;
-        private readonly Interface     _gatherInterface;
-        private readonly FishingTimer  _fishingTimer;
+        if (Config.AlarmsEnabled)
+            Alarms.Enable(true);
 
-        public GatherBuddy(DalamudPluginInterface pluginInterface)
-        {
-            Dalamud.Initialize(pluginInterface);
-            Version        = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
-            Config         = GatherBuddyConfiguration.Load();
-            Language       = Dalamud.ClientState.ClientLanguage;
-            GameData       = new GatherBuddyA.GameData(Dalamud.GameData);
-            CommandManager = new CommandManager(Dalamud.SigScanner);
-            Identificator  = new Identificator();
+        if (Config.OpenOnStart)
+            OnGatherBuddy();
 
-            Gatherer         = new Gatherer(CommandManager);
-            Alarms           = Gatherer.Alarms;
-            _gatherInterface = new Interface(this);
-            _fishingTimer    = new FishingTimer(Gatherer!.FishManager, Gatherer!.WeatherManager);
+        InitializeCommands();
+    }
 
-            if (!FishManager.GetSaveFileName().Exists)
-                Gatherer!.FishManager.SaveFishRecords();
-            else
-                Gatherer!.FishManager.LoadFishRecords();
-
-            Dalamud.ClientState.TerritoryChanged           += Gatherer!.OnTerritoryChange;
-            Dalamud.PluginInterface.UiBuilder.Draw         += _gatherInterface!.Draw;
-            Dalamud.PluginInterface.UiBuilder.OpenConfigUi += OnGatherBuddy;
-
-            if (Config.AlarmsEnabled)
-                Alarms.Enable(true);
-
-            if (Config.OpenOnStart)
-                OnGatherBuddy();
-
-            InitializeCommands();
-        }
-
-        void IDisposable.Dispose()
-        {
-            _gatherInterface.Dispose();
-            _fishingTimer.Dispose();
-            Dalamud.PluginInterface.UiBuilder.OpenConfigUi -= OnGatherBuddy;
-            Dalamud.PluginInterface.UiBuilder.Draw         -= _gatherInterface!.Draw;
-            Dalamud.ClientState.TerritoryChanged           -= Gatherer!.OnTerritoryChange;
-            (Gatherer as IDisposable).Dispose();
-            DisposeCommands();
-        }
+    void IDisposable.Dispose()
+    {
+        _gatherInterface.Dispose();
+        _fishTimer.Dispose();
+        Alarms.Dispose();
+        Dalamud.PluginInterface.UiBuilder.OpenConfigUi -= OnGatherBuddy;
+        Dalamud.PluginInterface.UiBuilder.Draw         -= _gatherInterface!.Draw;
+        DisposeCommands();
     }
 }

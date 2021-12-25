@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 using Dalamud.Data;
-using GatherBuddyA.Enums;
-using GatherBuddyA.Utility;
+using GatherBuddy.Enums;
+using GatherBuddy.Interfaces;
+using GatherBuddy.Utility;
 using Lumina.Excel.GeneratedSheets;
 using ItemRow = Lumina.Excel.GeneratedSheets.Item;
 using FishRow = Lumina.Excel.GeneratedSheets.FishParameter;
 using SpearFishRow = Lumina.Excel.GeneratedSheets.SpearfishingItem;
 
-namespace GatherBuddyA.Classes;
+namespace GatherBuddy.Classes;
 
 public partial class Fish : IComparable<Fish>, IGatherable
 {

@@ -1,6 +1,7 @@
 using System;
+using System.Diagnostics;
 
-namespace GatherBuddyA.Time;
+namespace GatherBuddy.Time;
 
 public readonly struct RepeatingInterval : IEquatable<RepeatingInterval>
 {
@@ -14,9 +15,24 @@ public readonly struct RepeatingInterval : IEquatable<RepeatingInterval>
     public bool AlwaysUp()
         => OffTime == 0;
 
+    public bool NeverUp()
+        => OnTime == 0;
+
+    public bool IsUp(TimeStamp time)
+    {
+        if (this == Invalid || NeverUp())
+            return false;
+        if (AlwaysUp())
+            return true;
+
+        var shift  = SyncToShift(time);
+        var period = shift % Period;
+        return period < OnTime;
+    }
+
     private TimeStamp SyncToShift(TimeStamp ts)
         => new((ts - ShiftTime) / Period * Period + ShiftTime);
-
+    
     public TimeInterval FirstOverlap(TimeInterval interval)
     {
         if (interval == TimeInterval.Invalid)

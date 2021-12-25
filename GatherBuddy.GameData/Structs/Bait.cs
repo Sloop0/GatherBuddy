@@ -1,8 +1,8 @@
 ﻿using System;
-using GatherBuddyA.Utility;
+using GatherBuddy.Utility;
 using Lumina.Excel.GeneratedSheets;
 
-namespace GatherBuddyA.Structs;
+namespace GatherBuddy.Structs;
 
 public readonly struct Bait : IComparable<Bait>
 {

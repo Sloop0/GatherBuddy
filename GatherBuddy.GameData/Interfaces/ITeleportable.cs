@@ -1,4 +1,6 @@
-namespace GatherBuddyA.Classes;
+using GatherBuddy.Classes;
+
+namespace GatherBuddy.Interfaces;
 
 public interface ITeleportable
 {

@@ -1,8 +1,8 @@
 using System.Linq;
 using Dalamud.Logging;
-using GatherBuddyA.Enums;
+using GatherBuddy.Enums;
 
-namespace GatherBuddyA.Data;
+namespace GatherBuddy.Data;
 
 public static class HiddenItems
 {

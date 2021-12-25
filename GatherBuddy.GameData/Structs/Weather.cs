@@ -1,8 +1,8 @@
 using System;
-using GatherBuddyA.Utility;
+using GatherBuddy.Utility;
 using LuminaWeather = Lumina.Excel.GeneratedSheets.Weather;
 
-namespace GatherBuddyA.Structs;
+namespace GatherBuddy.Structs;
 
 public readonly struct Weather : IComparable<Weather>
 {

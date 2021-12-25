@@ -1,13 +1,11 @@
 using System;
 using System.Linq;
 using Dalamud.Logging;
-using Dalamud.Utility;
-using GatherBuddyA.Utility;
+using GatherBuddy.Utility;
 using Lumina.Excel.GeneratedSheets;
 using AetheryteRow = Lumina.Excel.GeneratedSheets.Aetheryte;
-using Math = System.Math;
 
-namespace GatherBuddyA.Classes;
+namespace GatherBuddy.Classes;
 
 public class Aetheryte : IComparable<Aetheryte>
 {
@@ -33,7 +31,9 @@ public class Aetheryte : IComparable<Aetheryte>
         Territory = gameData.FindOrAddTerritory(data.Territory.Value) ?? Territory.Invalid;
         var mapMarker = gameData.DataManager.GetExcelSheet<MapMarker>()?.FirstOrDefault(m => m.DataType == 3 && m.DataKey == data.RowId);
         if (mapMarker == null)
+        {
             PluginLog.Error($"No Map Marker for Aetheryte {Name} [{data.RowId}].");
+        }
         else
         {
             XCoord = Maps.MarkerToMap(mapMarker.X, Territory.SizeFactor);
@@ -47,7 +47,7 @@ public class Aetheryte : IComparable<Aetheryte>
         => Id.CompareTo(rhs?.Id ?? 0);
 
     public int WorldDistance(uint mapId, int x, int y)
-        => mapId == Territory.Id 
+        => mapId == Territory.Id
             ? Utility.Math.SquaredDistance(x, y, XCoord, YCoord)
             : int.MaxValue;
 

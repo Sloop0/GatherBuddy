@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Configuration;
-using GatherBuddy.Classes;
+using GatherBuddy.Alarms;
 using GatherBuddy.Gui;
 
 namespace GatherBuddy
@@ -40,8 +40,14 @@ namespace GatherBuddy
         InverseFishingSpotName,
         InverseZoneName,
         InverseUptime,
-    };
+    }
 
+
+    public enum AetherytePreference : byte
+    {
+        Cost,
+        Distance,
+    }
 
     [Serializable]
     public class GatherBuddyConfiguration : IPluginConfiguration
@@ -64,7 +70,6 @@ namespace GatherBuddy
 
         public const string DefaultIdentifiedItemFormat        = "Identified [{Id}: {Name}] for \"{Input}\".";
         public const string DefaultIdentifiedFishFormat        = "Identified [{Id}: {Name}] for \"{Input}\".";
-        public const string DefaultIdentifiedFishingSpotFormat = "Chose fishing spot {Name} for {FishName}.";
 
         public const string DefaultNodeAlarmFormat =
             "[GatherBuddy][Alarm {Name}]: The gathering node for {AllItems} {DelayString} at {Location}.";
@@ -79,7 +84,6 @@ namespace GatherBuddy
 
         public string IdentifiedItemFormat        { get; set; } = DefaultIdentifiedItemFormat;
         public string IdentifiedFishFormat        { get; set; } = DefaultIdentifiedFishFormat;
-        public string IdentifiedFishingSpotFormat { get; set; } = DefaultIdentifiedFishingSpotFormat;
         public string NodeAlarmFormat             { get; set; } = DefaultNodeAlarmFormat;
         public string FishAlarmFormat             { get; set; } = DefaultFishAlarmFormat;
 
@@ -87,6 +91,10 @@ namespace GatherBuddy
         public string AlarmFormat
         {
             set => NodeAlarmFormat = value;
+        }
+        public bool PrintGigHead
+        {
+            set => PrintSpearfishInfo = value;
         }
 
 
@@ -100,7 +108,7 @@ namespace GatherBuddy
         public bool WriteCoordinates    { get; set; } = true;
         public bool AlarmsEnabled       { get; set; } = false;
         public bool PrintUptime         { get; set; } = true;
-        public bool PrintGigHead        { get; set; } = true;
+        public bool PrintSpearfishInfo  { get; set; } = true;
         public bool ShowFishTimer       { get; set; } = true;
         public bool FishTimerEdit       { get; set; } = true;
         public bool HideUncaughtFish    { get; set; } = false;
@@ -113,6 +121,8 @@ namespace GatherBuddy
         public bool ShowSpearFish     { get; set; } = true;
         public bool ShowAlwaysUp      { get; set; } = true;
         public byte ShowFishFromPatch { get; set; } = 0;
+
+        public AetherytePreference AetherytePreference { get; set; } = AetherytePreference.Distance;
 
         public Vector4 AvailableFishColor          { get; set; } = Colors.FishTab.UptimeRunning;
         public Vector4 UpcomingFishColor           { get; set; } = Colors.FishTab.UptimeUpcoming;

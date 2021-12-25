@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Dalamud.Logging;
-using GatherBuddyA.Classes;
+using GatherBuddy.Classes;
 
-namespace GatherBuddyA.Data;
+namespace GatherBuddy.Data;
 
 public static class HiddenSeeds
 {

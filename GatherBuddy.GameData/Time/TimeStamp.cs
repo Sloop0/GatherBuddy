@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace GatherBuddyA.Time;
+namespace GatherBuddy.Time;
 
 public readonly struct TimeStamp : IComparable<TimeStamp>, IEquatable<TimeStamp>
 {

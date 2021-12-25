@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Dalamud.Logging;
-using GatherBuddyA.Utility;
+using GatherBuddy.Interfaces;
+using GatherBuddy.Utility;
 using Lumina.Excel.GeneratedSheets;
 
-namespace GatherBuddyA.Classes;
+namespace GatherBuddy.Classes;
 
 public class Gatherable : IComparable<Gatherable>, IGatherable
 {
@@ -12,6 +13,7 @@ public class Gatherable : IComparable<Gatherable>, IGatherable
     public GatheringItem          GatheringData { get; }
     public MultiString            Name          { get; }
     public HashSet<GatheringNode> NodeList      { get; } = new();
+
     public IEnumerable<ILocation> Locations
         => NodeList;
 
@@ -31,7 +33,7 @@ public class Gatherable : IComparable<Gatherable>, IGatherable
 
         var levelData = gatheringData.GatheringItemLevel?.Value;
         _levelStars = levelData == null ? 0 : (levelData.GatheringItemLevel << 3) + levelData.Stars;
-        Name        = MultiString.FromItem(gameData.DataManager, (uint) gatheringData.Item);
+        Name        = MultiString.FromItem(gameData.DataManager, (uint)gatheringData.Item);
     }
 
     public int Level

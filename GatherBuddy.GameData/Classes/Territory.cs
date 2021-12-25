@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using GatherBuddyA.Structs;
-using GatherBuddyA.Utility;
+using GatherBuddy.Structs;
+using GatherBuddy.Utility;
 using TerritoryType = Lumina.Excel.GeneratedSheets.TerritoryType;
 
-namespace GatherBuddyA.Classes;
+namespace GatherBuddy.Classes;
 
 public class Territory : IComparable<Territory>
 {
