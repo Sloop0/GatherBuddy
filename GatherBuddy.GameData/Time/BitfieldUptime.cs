@@ -73,10 +73,9 @@ public readonly struct BitfieldUptime : IEquatable<BitfieldUptime>
     public uint NextDowntime(int currentHour)
         => NextTime(currentHour, ~_hours & AllHoursValue);
 
-    public TimeInterval NextUptime()
+    public TimeInterval NextUptime(TimeStamp now)
     {
-        var timestamp    = TimeStamp.UtcNow;
-        var hour         = timestamp.CurrentEorzeaHour();
+        var hour         = now.CurrentEorzeaHour();
         var nextUptime   = NextUptime(hour);
         var nextDowntime = NextDowntime((int)(hour + nextUptime) % RealTime.HoursPerDay);
         if (nextUptime == BadHour)
@@ -84,10 +83,10 @@ public readonly struct BitfieldUptime : IEquatable<BitfieldUptime>
         if (nextDowntime == BadHour)
             return TimeInterval.Always;
         if (nextUptime == 0)
-            return new TimeInterval(timestamp, timestamp.SyncToEorzeaHour().AddEorzeaHours(nextDowntime));
+            return new TimeInterval(now, now.SyncToEorzeaHour().AddEorzeaHours(nextDowntime));
 
-        timestamp = timestamp.SyncToEorzeaHour().AddEorzeaHours(nextUptime);
-        return new TimeInterval(timestamp, timestamp.AddEorzeaHours(nextDowntime));
+        now = now.SyncToEorzeaHour().AddEorzeaHours(nextUptime);
+        return new TimeInterval(now, now.AddEorzeaHours(nextDowntime));
     }
 
     // Print a string of 24 '0' or '1' as uptimes.

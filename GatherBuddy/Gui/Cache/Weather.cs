@@ -12,7 +12,7 @@ namespace GatherBuddy.Gui.Cache
 {
     internal class Weather
     {
-        private static Manager? _weather;
+        private static WeatherManager? _weather;
 
         public const int NumWeathers = 8;
 
@@ -27,11 +27,11 @@ namespace GatherBuddy.Gui.Cache
         public          string FilterLower;
         public readonly float  FilterSize;
 
-        public Weather(Manager weather)
+        public Weather(WeatherManager weather)
         {
             var hour = TimeStamp.UtcNow.TotalEorzeaHours();
             _weather           = weather;
-            WeatherTimes       = Manager.NextWeatherChangeTimes(NumWeathers, TimeStamp.Epoch.AddEorzeaHours(-16));
+            WeatherTimes       = WeatherManager.NextWeatherChangeTimes(NumWeathers, TimeStamp.Epoch.AddEorzeaHours(-16));
             WeatherTimeStrings = new string[NumWeathers];
             _totalHour         = hour - 8;
             Filter             = "";

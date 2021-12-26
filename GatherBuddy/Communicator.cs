@@ -106,14 +106,14 @@ public static class Communicator
         return builder;
     }
 
-    public static SeString FormatAlarmMessage(string format, Alarm alarm, uint currentEorzeaMinute)
+    public static SeString FormatNodeAlarmMessage(string format, NodeAlarm alarm, long timeDiff)
     {
         SeStringBuilder NodeReplace(SeStringBuilder builder, string s)
             => s.ToLowerInvariant() switch
             {
                 "{name}"        => builder.AddText(alarm.Name),
-                "{offset}"      => builder.AddText(alarm.MinuteOffset.ToString()),
-                "{delaystring}" => builder.AddText(DelayStringNode(alarm, currentEorzeaMinute)),
+                "{offset}"      => builder.AddText(alarm.SecondOffset.ToString()),
+                "{delaystring}" => builder.AddText(DelayString(timeDiff)),
                 "{timesshort}"  => builder.AddText(alarm.Node!.Times.PrintHours(true)),
                 "{timeslong}"   => builder.AddText(alarm.Node!.Times.PrintHours()),
                 "{location}" => AddFullMapLink(builder, alarm.Node!.Name, alarm.Node.Territory, (float)alarm.Node.XCoord,
@@ -122,53 +122,32 @@ public static class Communicator
                 _            => builder.AddText(s),
             };
 
+        return Format(format, NodeReplace);
+    }
+
+    public static SeString FormatFishAlarmMessage(string format, FishAlarm alarm, long timeDiff)
+    {
         SeStringBuilder FishReplace(SeStringBuilder builder, string s)
             => s.ToLowerInvariant() switch
             {
                 "{name}"        => builder.AddText(alarm.Name),
-                "{offset}"      => builder.AddText(alarm.MinuteOffset.ToString()),
-                "{delaystring}" => builder.AddText(DelayStringFish(alarm)),
-                "{fishingspotname}" => AddFullMapLink(builder, alarm.Fish!.FishingSpots.First().Name, alarm.Fish.FishingSpots.First().Territory,
-                    alarm.Fish.FishingSpots.First().XCoord,
-                    alarm.Fish.FishingSpots.First().YCoord),
-                "{baitname}" => alarm.Fish!.InitialBait.Id == 0
+                "{offset}"      => builder.AddText(alarm.SecondOffset.ToString()),
+                "{delaystring}" => builder.AddText(DelayString(timeDiff)),
+                "{fishingspotname}" => AddFullMapLink(builder, alarm.Fish.Fish.FishingSpots.First().Name, alarm.Fish.Fish.FishingSpots.First().Territory,
+                    alarm.Fish.Fish.FishingSpots.First().XCoord,
+                    alarm.Fish.Fish.FishingSpots.First().YCoord),
+                "{baitname}" => alarm.Fish.Fish.InitialBait.Id == 0
                     ? builder.AddText("Unknown Bait")
-                    : builder.AddItemLink(alarm.Fish!.InitialBait.Id, false),
-                "{fishname}" => builder.AddItemLink(alarm.Fish!.ItemId, false),
+                    : builder.AddItemLink(alarm.Fish.Fish.InitialBait.Id, false),
+                "{fishname}" => builder.AddItemLink(alarm.Fish.Fish.ItemId, false),
                 _            => builder.AddText(s),
             };
 
-        return alarm.Type == AlarmType.Node ? Format(format, NodeReplace) : Format(format, FishReplace);
+        return Format(format, FishReplace);
     }
 
-    private static string DelayStringFish(Alarm alarm)
-    {
-        var uptime    = alarm.Fish!.NextUptime();
-        var ret       = "is currently up";
-        var timeStamp = SeTime.ServerTime;
-        if (uptime.Start <= timeStamp)
-            return ret;
-
-        var diff = uptime.Start - timeStamp;
-        ret = $"will be up in {diff / RealTime.SecondsPerMinute}:{diff % RealTime.SecondsPerMinute:D2} minutes";
-
-        return ret;
-    }
-
-    private static string DelayStringNode(Alarm alarm, uint currentMinute)
-    {
-        var ret = "is currently up";
-        if (alarm.MinuteOffset <= 0)
-            return ret;
-
-        var hour       = currentMinute / RealTime.MinutesPerHour;
-        var hourOfDay  = (int)hour % RealTime.HoursPerDay;
-        var nextUptime = alarm.Node!.Times!.NextUptime(hourOfDay);
-        var offTime    = (hour + nextUptime) * RealTime.MinutesPerHour - currentMinute;
-        var (m, s) = EorzeaTimeStampExtensions.MinutesToReal(offTime);
-        if (offTime > 0)
-            ret = $"will be up in {m}:{s:D2} minutes";
-
-        return ret;
-    }
+    private static string DelayString(long timeDiff)
+        => timeDiff <= 0
+            ? $"is currently up for the next {-timeDiff / RealTime.MillisecondsPerMinute}:{-timeDiff / RealTime.MillisecondsPerSecond % RealTime.SecondsPerMinute:D2} minutes"
+            : $"will be up in {timeDiff / RealTime.MillisecondsPerMinute}:{timeDiff / RealTime.MillisecondsPerSecond % RealTime.SecondsPerMinute:D2} minutes";
 }

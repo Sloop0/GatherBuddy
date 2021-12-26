@@ -82,7 +82,7 @@ internal class FishTab
 
     public Func<ExtendedFish, bool> Selector;
 
-    private readonly Manager        _weather;
+    private readonly WeatherManager        _weather;
     private readonly FishManager    _fishManager;
     private readonly UptimeComparer _uptimeComparer = new();
 
@@ -112,7 +112,7 @@ internal class FishTab
         return ret;
     }
 
-    public FishTab(Manager weather, FishManager fishManager, Icons icons)
+    public FishTab(WeatherManager weather, FishManager fishManager, Icons icons)
     {
         _weather     = weather;
         _fishManager = fishManager;

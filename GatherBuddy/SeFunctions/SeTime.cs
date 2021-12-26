@@ -6,7 +6,8 @@ namespace GatherBuddy.SeFunctions;
 
 public static unsafe class SeTime
 {
-    private static readonly Framework* Framework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.Instance();
+    private static Framework* Framework
+        => FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.Instance();
 
     public static TimeStamp GetServerTime()
         => new(Framework == null ? TimeStamp.UtcNow : Framework->ServerTime * 1000);
@@ -24,11 +25,12 @@ public static unsafe class SeTime
 
     public static event Action? Updated;
     public static event Action? HourChanged;
-    public static event Action? WeatherChanged;     
+    public static event Action? WeatherChanged;
+
     public static void Update()
     {
-        ServerTime         = GetServerTime();
-        EorzeaTime         = GetEorzeaTime();
+        ServerTime = GetServerTime();
+        EorzeaTime = GetEorzeaTime();
         var minute = EorzeaTime.CurrentMinute;
         if (minute != EorzeaTotalMinute)
         {
@@ -46,6 +48,7 @@ public static unsafe class SeTime
             if (EorzeaHourOfDay >> 3 == 0)
                 WeatherChanged?.Invoke();
         }
+
         Updated?.Invoke();
     }
 }

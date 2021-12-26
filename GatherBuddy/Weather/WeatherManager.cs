@@ -7,13 +7,13 @@ using GatherBuddy.Time;
 
 namespace GatherBuddy.Weather;
 
-public partial class Manager
+public partial class WeatherManager
 {
     public Dictionary<Territory, Timeline> Forecast    { get; }
     public List<Timeline>                  UniqueZones { get; } = new();
 
 
-    public Manager()
+    public WeatherManager()
     {
         Forecast = GatherBuddy.GameData.WeatherTerritories.ToDictionary(t => t, t => new Timeline(t));
         foreach (var t in Forecast.Values.Where(t => UniqueZones.All(l => l.Territory.Name != t.Territory.Name)))

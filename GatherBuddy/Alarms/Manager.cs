@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using Dalamud.Logging;
-using GatherBuddy.Caching;
 using GatherBuddy.Classes;
-using GatherBuddy.Enums;
 using GatherBuddy.SeFunctions;
 using GatherBuddy.Time;
 
@@ -14,18 +12,13 @@ public class Manager : IDisposable
 {
     private readonly PlaySound _sounds;
 
-    public List<Alarm> Alarms
-        => GatherBuddy.Config.Alarms;
-
-    private readonly List<bool> _status;
-    private          int        _lastEorzeaMinute;
-    public           Alarm?     LastNodeAlarm { get; set; }
-    public           Alarm?     LastFishAlarm { get; set; }
+    public  List<(IAlarm Alarm, bool Status)> Alarms = new();
+    public  NodeAlarm?                        LastNodeAlarm { get; set; }
+    public  FishAlarm?                        LastFishAlarm { get; set; }
 
     public Manager()
     {
         _sounds = new PlaySound(Dalamud.SigScanner);
-        _status = Enumerable.Repeat(false, Alarms.Count).ToList();
     }
 
     public void Dispose()
@@ -54,17 +47,18 @@ public class Manager : IDisposable
         GatherBuddy.Config.Save();
     }
 
-    private static bool NewStatusNode(Alarm nodeAlarm)
+    private static TimeStamp NextUptime(IAlarm alarm)
     {
-        var hour      = (SeTime.EorzeaMinuteOfDay + nodeAlarm.MinuteOffset) / RealTime.MinutesPerHour;
-        var hourOfDay = (uint)hour % RealTime.HoursPerDay;
-        return nodeAlarm.Node!.Times.IsUp(hourOfDay);
-    }
-
-    private static bool NewStatusFish(Alarm fishAlarm)
-    {
-        var uptime = fishAlarm.Fish!.NextUptime();
-        return uptime.Start - SeTime.ServerTime < fishAlarm.MinuteOffset * RealTime.SecondsPerMinute;
+        
+        switch (alarm)
+        {
+            case NodeAlarm n:
+               return n.Node.Times.NextUptime()
+            case FishAlarm f: 
+                return f.Fish.NextUptime().Start < time;
+        }
+        Debug.Assert(false, "Can not be reached.");
+        return false;
     }
 
     public void OnUpdate()
@@ -73,40 +67,32 @@ public class Manager : IDisposable
         if (Dalamud.ClientState.TerritoryType == 0 || Dalamud.ClientState.LocalPlayer == null)
             return;
 
-        var minute = SeTime.EorzeaMinuteOfDay;
-        if (minute == _lastEorzeaMinute)
-            return;
-
-        _lastEorzeaMinute = minute;
         for (var i = 0; i < Alarms.Count; ++i)
         {
-            var alarm = Alarms[i];
+            var (alarm, status) = Alarms[i];
             if (!alarm.Enabled)
                 continue;
 
-            var newStatus = alarm.Type switch
-            {
-                AlarmType.Node => NewStatusNode(alarm),
-                AlarmType.Fish => NewStatusFish(alarm),
-                _              => false,
-            };
+            var currentTime = SeTime.ServerTime.AddSeconds(alarm.SecondOffset);
+            var nextTime    = 
+            var newStatus   = NewStatus(alarm);
 
-            if (_status[i] == newStatus)
+            if (status == newStatus)
                 continue;
 
-            _status[i] = newStatus;
+            Alarms[i] = (alarm, newStatus);
             if (newStatus)
                 Ring(alarm);
         }
     }
 
-    private void Ring(Alarm alarm)
+    private void Ring(IAlarm alarm)
     {
         if (alarm.SoundId > Sounds.Unknown)
             _sounds.Play(alarm.SoundId);
 
+        alarm.SendMessage();
         if (alarm.PrintMessage)
-        {
             switch (alarm.Type)
             {
                 case AlarmType.Node when GatherBuddy.Config.NodeAlarmFormat.Length > 0:
@@ -123,15 +109,14 @@ public class Manager : IDisposable
                         .FormatAlarmMessage(GatherBuddyConfiguration.DefaultFishAlarmFormat, alarm, (uint)SeTime.EorzeaMinuteOfDay).ToString());
                     break;
             }
-        }
 
-        switch (alarm.Type)
+        switch (alarm)
         {
-            case AlarmType.Node:
-                LastNodeAlarm = alarm;
+            case NodeAlarm n:
+                LastNodeAlarm = n;
                 break;
-            case AlarmType.Fish:
-                LastFishAlarm = alarm;
+            case FishAlarm f:
+                LastFishAlarm = f;
                 break;
         }
     }

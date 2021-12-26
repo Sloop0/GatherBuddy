@@ -7,7 +7,7 @@ using GatherBuddy.Time;
 
 namespace GatherBuddy.Weather;
 
-public class Timeline : IComparable<Timeline>
+public class WeatherTimeline : IComparable<WeatherTimeline>
 {
     public const int MillisecondsPerWeather = EorzeaTimeStampExtensions.MillisecondsPerEorzeaWeather;
 
@@ -37,7 +37,7 @@ public class Timeline : IComparable<Timeline>
     }
 
     private IEnumerable<WeatherListing> RequestData(uint amount, long millisecondOffset)
-        => Manager.GetForecastOffset(Territory, amount, millisecondOffset);
+        => WeatherManager.GetForecastOffset(Territory, amount, millisecondOffset);
 
     public void Append(uint amount)
     {
@@ -45,7 +45,7 @@ public class Timeline : IComparable<Timeline>
         List.AddRange(RequestData(amount, offset));
     }
 
-    public Timeline Update(uint amount)
+    public WeatherTimeline Update(uint amount)
     {
         TrimFront();
         if (List.Count < amount)
@@ -53,13 +53,13 @@ public class Timeline : IComparable<Timeline>
         return this;
     }
 
-    public Timeline(Territory territory, uint cache = 32)
+    public WeatherTimeline(Territory territory, uint cache = 32)
     {
         Territory = territory;
         List      = RequestData(cache, -MillisecondsPerWeather).ToList();
     }
 
-    public int CompareTo(Timeline? other)
+    public int CompareTo(WeatherTimeline? other)
         => Territory.Id.CompareTo(other?.Territory.Id ?? 0);
 
 

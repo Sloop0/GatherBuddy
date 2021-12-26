@@ -27,7 +27,7 @@ public partial class Interface : IDisposable
     private FishManager FishManager
         => _plugin.FishManager;
 
-    private static Manager WeatherManager
+    private static WeatherManager WeatherManager
         => GatherBuddy.WeatherManager;
 
     private readonly Cache.Header _headerCache;

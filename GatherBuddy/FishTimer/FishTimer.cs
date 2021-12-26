@@ -17,7 +17,7 @@ public partial class FishTimer : IDisposable
     private readonly Vector2 _itemSpacing     = new(0, 1);
 
     private readonly FishManager          _fish;
-    private readonly Weather.Manager      _weather;
+    private readonly Weather.WeatherManager      _weather;
     private readonly CurrentBait          _bait;
     private readonly Parser.FishingParser _parser;
     private readonly EventFramework       _eventFramework;
@@ -36,7 +36,7 @@ public partial class FishTimer : IDisposable
     private FishCache[] _currentFishList = Array.Empty<FishCache>();
 
 
-    public FishTimer(FishManager fish, Weather.Manager weather)
+    public FishTimer(FishManager fish, Weather.WeatherManager weather)
     {
         _fish           = fish;
         _weather        = weather;

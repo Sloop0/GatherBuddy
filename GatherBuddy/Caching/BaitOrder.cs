@@ -2,7 +2,7 @@
 
 namespace GatherBuddy.Caching;
 
-internal struct BaitOrder
+public struct BaitOrder
 {
     public TextureWrap    Icon;
     public string         Name;

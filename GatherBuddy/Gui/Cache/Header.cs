@@ -29,7 +29,7 @@ internal struct Header
             return;
         }
 
-        var weathers = global::GatherBuddy.Weather.Manager.GetForecast(Territory, 2, SeTime.ServerTime);
+        var weathers = global::GatherBuddy.Weather.WeatherManager.GetForecast(Territory, 2, SeTime.ServerTime);
         CurrentWeather = Icons.DefaultStorage[weathers[0].Weather.Data.Icon];
         NextWeather    = Icons.DefaultStorage[weathers[1].Weather.Data.Icon];
     }

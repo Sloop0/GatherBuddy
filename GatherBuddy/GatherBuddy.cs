@@ -19,7 +19,7 @@ public partial class GatherBuddy : IDalamudPlugin
     public static GameData                 GameData       { get; private set; } = null!;
     public static ClientLanguage           Language       { get; private set; } = ClientLanguage.English;
     public static CommandManager           CommandManager { get; private set; } = null!;
-    public static Weather.Manager          WeatherManager { get; private set; } = null!;
+    public static Weather.WeatherManager          WeatherManager { get; private set; } = null!;
 
     public readonly  Identificator       Identificator;
     public readonly  Alarms.Manager      Alarms;
@@ -35,7 +35,7 @@ public partial class GatherBuddy : IDalamudPlugin
         Config         = GatherBuddyConfiguration.Load();
         Language       = Dalamud.ClientState.ClientLanguage;
         GameData       = new GameData(Dalamud.GameData);
-        WeatherManager = new Weather.Manager();
+        WeatherManager = new Weather.WeatherManager();
         FishManager    = new FishManager();
         NodeTimeLine   = new NodeTimeLine();
         CommandManager = new CommandManager(Dalamud.SigScanner);
