@@ -8,7 +8,7 @@ using GatherBuddy.Time;
 
 namespace GatherBuddy.Weather;
 
-public partial class Manager
+public partial class WeatherManager
 {
     private static TimeStamp GetRootTime(TimeStamp timestamp)
         => timestamp.SyncToEorzeaWeather();

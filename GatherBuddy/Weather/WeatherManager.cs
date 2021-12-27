@@ -9,13 +9,13 @@ namespace GatherBuddy.Weather;
 
 public partial class WeatherManager
 {
-    public Dictionary<Territory, Timeline> Forecast    { get; }
-    public List<Timeline>                  UniqueZones { get; } = new();
+    public Dictionary<Territory, WeatherTimeline> Forecast    { get; }
+    public List<WeatherTimeline>                  UniqueZones { get; } = new();
 
 
     public WeatherManager()
     {
-        Forecast = GatherBuddy.GameData.WeatherTerritories.ToDictionary(t => t, t => new Timeline(t));
+        Forecast = GatherBuddy.GameData.WeatherTerritories.ToDictionary(t => t, t => new WeatherTimeline(t));
         foreach (var t in Forecast.Values.Where(t => UniqueZones.All(l => l.Territory.Name != t.Territory.Name)))
             UniqueZones.Add(t);
     }
@@ -29,17 +29,17 @@ public partial class WeatherManager
         return ret;
     }
 
-    private Timeline FindOrCreateForecast(Territory territory, uint increment)
+    private WeatherTimeline FindOrCreateForecast(Territory territory, uint increment)
     {
         if (Forecast.TryGetValue(territory, out var values))
             return values;
 
-        var timeline = new Timeline(territory, increment);
+        var timeline = new WeatherTimeline(territory, increment);
         Forecast[territory] = timeline;
         return timeline;
     }
 
-    public Timeline RequestForecast(Territory territory, uint amount)
+    public WeatherTimeline RequestForecast(Territory territory, uint amount)
     {
         var list = FindOrCreateForecast(territory, amount);
         return list.Update(amount);

@@ -13,7 +13,7 @@ public class WeatherTimeline : IComparable<WeatherTimeline>
 
     public Territory            Territory { get; }
     public List<WeatherListing> List      { get; }
-
+    4
     public WeatherListing CurrentWeather
         => Get(1);
 

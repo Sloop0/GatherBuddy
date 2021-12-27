@@ -13,6 +13,10 @@ using Fish = GatherBuddy.Classes.Fish;
 
 namespace GatherBuddy.Caching;
 
+public interface IGatherable
+
+public sealed class GatherableFish : Fish
+
 public partial class ExtendedFish
 {
     public Fish               Fish                   { get; init; }
