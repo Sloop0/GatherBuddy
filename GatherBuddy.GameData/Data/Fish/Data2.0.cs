@@ -146,9 +146,9 @@ public static partial class Fish
             .Bait      (data, 2606)
             .Bite      (HookSet.Powerful, BiteType.Strong)
             .Time      (1020, 1320);
-        data.Apply     (4912, Patch.ARealmReborn) // Goosedata
+        data.Apply     (4912, Patch.ARealmReborn) // Goosefish
             .Bait      (data, 2585, 4869, 4904)
-            .Bite      (HookSet.Powerful, BiteType.Weak);
+            .Bite      (HookSet.Powerful, BiteType.Strong);
         data.Apply     (4913, Patch.ARealmReborn) // Little Thalaos
             .Bait      (data, 2606)
             .Bite      (HookSet.Powerful, BiteType.Strong)
@@ -168,8 +168,7 @@ public static partial class Fish
             .Bite      (HookSet.Powerful, BiteType.Legendary);
         data.Apply     (4918, Patch.ARealmReborn) // Coelacanth
             .Bait      (data, 2616, 4898)
-            .Bite      (HookSet.Powerful, BiteType.Strong)
-            .Time      (1080, 360);
+            .Bite      (HookSet.Powerful, BiteType.Strong);
         data.Apply     (4919, Patch.ARealmReborn) // Giant Squid
             .Bait      (data, 2585, 4869, 4904)
             .Bite      (HookSet.Powerful, BiteType.Legendary)

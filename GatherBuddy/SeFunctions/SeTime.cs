@@ -1,52 +1,71 @@
-﻿using System;
+﻿using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using GatherBuddy.Time;
+using Action = System.Action;
 
 namespace GatherBuddy.SeFunctions;
 
-public static unsafe class SeTime
+public class SeTime
 {
-    private static Framework* Framework
+    private static unsafe Framework* Framework
         => FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.Instance();
 
-    public static TimeStamp GetServerTime()
+    private static unsafe TimeStamp GetServerTime()
         => new(Framework == null ? TimeStamp.UtcNow : Framework->ServerTime * 1000);
 
-    public static TimeStamp GetEorzeaTime()
+    private static unsafe TimeStamp GetEorzeaTime()
         => new(Framework == null ? TimeStamp.UtcNow.ConvertToEorzea() : Framework->EorzeaTime * 1000);
 
-    public static TimeStamp ServerTime         { get; private set; }
-    public static TimeStamp EorzeaTime         { get; private set; }
-    public static int       EorzeaTotalMinute  { get; private set; }
-    public static int       EorzeaTotalHour    { get; private set; }
-    public static int       EorzeaMinuteOfDay  { get; private set; }
-    public static int       EorzeaHourOfDay    { get; private set; }
-    public static int       EorzeaMinuteOfHour { get; private set; }
+    public TimeStamp ServerTime         { get; private set; }
+    public TimeStamp EorzeaTime         { get; private set; }
+    public long      EorzeaTotalMinute  { get; private set; }
+    public long      EorzeaTotalHour    { get; private set; }
+    public short     EorzeaMinuteOfDay  { get; private set; }
+    public byte      EorzeaHourOfDay    { get; private set; }
+    public byte      EorzeaMinuteOfHour { get; private set; }
 
-    public static event Action? Updated;
-    public static event Action? HourChanged;
-    public static event Action? WeatherChanged;
+    public event Action? Updated;
+    public event Action? HourChanged;
+    public event Action? WeatherChanged;
 
-    public static void Update()
+    public SeTime()
+    {
+        Update(null!);
+        Dalamud.Framework.Update += Update;
+    }
+
+    public void Dispose()
+        => Dalamud.Framework.Update -= Update;
+
+    private void Update(global::Dalamud.Game.Framework _)
     {
         ServerTime = GetServerTime();
         EorzeaTime = GetEorzeaTime();
-        var minute = EorzeaTime.CurrentMinute;
+        var minute = EorzeaTime.TotalMinutes;
         if (minute != EorzeaTotalMinute)
         {
             EorzeaTotalMinute  = minute;
-            EorzeaMinuteOfDay  = EorzeaTotalMinute % RealTime.MinutesPerDay;
-            EorzeaMinuteOfHour = EorzeaMinuteOfDay % RealTime.MinutesPerHour;
+            EorzeaMinuteOfDay  = (short)(EorzeaTotalMinute % RealTime.MinutesPerDay);
+            EorzeaMinuteOfHour = (byte)(EorzeaMinuteOfDay % RealTime.MinutesPerHour);
         }
 
         var hour = EorzeaTotalMinute / RealTime.MinutesPerHour;
         if (hour != EorzeaTotalHour)
         {
+            // Sometimes the Eorzea time gets seemingly rounded up and triggers before the ServerTime.
+            //ServerTime      = ServerTime.AddEorzeaMinutes(30).SyncToEorzeaHour();
             EorzeaTotalHour = hour;
-            EorzeaHourOfDay = EorzeaMinuteOfDay / RealTime.MinutesPerHour;
+            EorzeaHourOfDay = (byte)(EorzeaMinuteOfDay / RealTime.MinutesPerHour);
             HourChanged?.Invoke();
-            if (EorzeaHourOfDay >> 3 == 0)
+            if ((EorzeaHourOfDay & 0b111) == 0)
+            {
+                PluginLog.Verbose("Eorzea Hour and Weather Change triggered. {ServerTime} {EorzeaTime}", (long)ServerTime, (long)EorzeaTime);
                 WeatherChanged?.Invoke();
+            }
+            else
+            {
+                PluginLog.Verbose("Eorzea Hour Change triggered. {ServerTime} {EorzeaTime}", (long)ServerTime, (long)EorzeaTime);
+            }
         }
 
         Updated?.Invoke();

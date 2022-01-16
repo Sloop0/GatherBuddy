@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Logging;
 using Lumina.Excel.GeneratedSheets;
@@ -8,7 +7,7 @@ namespace GatherBuddy.Structs;
 
 public readonly struct CumulativeWeatherRates
 {
-    public static readonly CumulativeWeatherRates StaticWeather = new(false);
+    public static readonly CumulativeWeatherRates InvalidWeather = new(false);
 
     public readonly (Weather Weather, byte CumulativeRate)[] Rates;
 

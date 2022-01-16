@@ -12,12 +12,10 @@ public static partial class Fish
             .Bite      (HookSet.Powerful, BiteType.Legendary);
         data.Apply     (23055, Patch.UnderTheMoonlight) // White Goldfish
             .Bait      (data, 20675, 22397)
-            .Bite      (HookSet.Powerful, BiteType.Strong)
-            .Time      (240, 480);
+            .Bite      (HookSet.Powerful, BiteType.Strong);
         data.Apply     (23056, Patch.UnderTheMoonlight) // Firelight Goldfish
             .Bait      (data, 20675, 22397)
-            .Bite      (HookSet.Precise, BiteType.Weak)
-            .Time      (240, 480);
+            .Bite      (HookSet.Precise, BiteType.Weak);
         data.Apply     (23057, Patch.UnderTheMoonlight) // Hookstealer
             .Bait      (data, 20615, 20056)
             .Bite      (HookSet.Powerful, BiteType.Legendary);

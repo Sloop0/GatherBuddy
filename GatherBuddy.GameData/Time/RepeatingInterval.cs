@@ -65,14 +65,13 @@ public readonly struct RepeatingInterval : IEquatable<RepeatingInterval>
             : new TimeInterval(newStart, newEnd);
     }
 
-    public TimeInterval NextRealUptime()
+    public TimeInterval NextRealUptime(TimeStamp now)
     {
         if (AlwaysUp())
             return TimeInterval.Always;
         if (OnTime == 0)
             return TimeInterval.Never;
 
-        var now       = TimeStamp.UtcNow;
         var syncedNow = SyncToShift(now);
         var end       = syncedNow + OnTime;
         return end > now

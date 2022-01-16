@@ -9,7 +9,7 @@ public static class RealTime
 
     public const int MillisecondsPerMinute = MillisecondsPerSecond * SecondsPerMinute;
     public const int MillisecondsPerHour   = MillisecondsPerMinute * MinutesPerHour;
-    public const int MillisecondsPerDay    = MillisecondsPerMinute * HoursPerDay;
+    public const int MillisecondsPerDay    = MillisecondsPerHour * HoursPerDay;
 
     public const int SecondsPerHour = SecondsPerMinute * MinutesPerHour;
     public const int SecondsPerDay  = SecondsPerHour * HoursPerDay;

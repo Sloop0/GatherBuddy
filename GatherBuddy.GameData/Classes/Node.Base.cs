@@ -16,8 +16,11 @@ public partial class GatheringNode : IComparable<GatheringNode>, ILocation
     public string             Name         { get; init; }
     public BitfieldUptime     Times        { get; init; }
 
-    public uint BaseId
+    public uint Id
         => BaseNodeData.RowId;
+
+    public ObjectType Type
+        => ObjectType.Gatherable;
 
     public int Level
         => BaseNodeData.GatheringLevel;
@@ -55,6 +58,8 @@ public partial class GatheringNode : IComparable<GatheringNode>, ILocation
         Folklore = MultiString.ParseSeStringLumina(nodeRow?.GatheringSubCategory.Value?.FolkloreBook);
         var extendedRow = nodeRow == null ? null : data.DataManager.GetExcelSheet<GatheringPointTransient>()?.GetRow(nodeRow.RowId);
         (Times, NodeType) = GetTimes(extendedRow);
+        if (Folklore.Any() && NodeType == NodeType.Unspoiled && nodeRow!.GatheringSubCategory.Value!.Item.Row != 0)
+            NodeType = NodeType.Legendary;
 
         // Obtain the items and add the node to their individual lists.
         Items = node.Item
@@ -66,11 +71,11 @@ public partial class GatheringNode : IComparable<GatheringNode>, ILocation
             return;
 
         foreach (var item in Items)
-            item.NodeList.Add(this);
+            AddNodeToItem(item);
     }
 
     public int CompareTo(GatheringNode? obj)
-        => BaseId.CompareTo(obj?.BaseId ?? 0);
+        => Id.CompareTo(obj?.Id ?? 0);
 
 
     private static (BitfieldUptime, NodeType) GetTimes(GatheringPointTransient? row)

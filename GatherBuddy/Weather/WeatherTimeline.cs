@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GatherBuddy.Classes;
-using GatherBuddy.SeFunctions;
 using GatherBuddy.Time;
 
 namespace GatherBuddy.Weather;
@@ -13,7 +12,6 @@ public class WeatherTimeline : IComparable<WeatherTimeline>
 
     public Territory            Territory { get; }
     public List<WeatherListing> List      { get; }
-    4
     public WeatherListing CurrentWeather
         => Get(1);
 
@@ -30,7 +28,7 @@ public class WeatherTimeline : IComparable<WeatherTimeline>
 
     public void TrimFront()
     {
-        var now    = SeTime.ServerTime;
+        var now    = GatherBuddy.Time.ServerTime;
         var remove = List.FindIndex(w => w.Offset(now) < 2 * MillisecondsPerWeather);
         if (remove > 0)
             List.RemoveRange(0, remove);
@@ -41,7 +39,7 @@ public class WeatherTimeline : IComparable<WeatherTimeline>
 
     public void Append(uint amount)
     {
-        var offset = List.Count > 0 ? MillisecondsPerWeather - (int)List.Last().Offset(SeTime.ServerTime) : -MillisecondsPerWeather;
+        var offset = List.Count > 0 ? MillisecondsPerWeather - (int)List.Last().Offset(GatherBuddy.Time.ServerTime) : -MillisecondsPerWeather;
         List.AddRange(RequestData(amount, offset));
     }
 
@@ -63,10 +61,9 @@ public class WeatherTimeline : IComparable<WeatherTimeline>
         => Territory.Id.CompareTo(other?.Territory.Id ?? 0);
 
 
-    public WeatherListing Find(IList<Structs.Weather> weather, IList<Structs.Weather> previousWeather, RepeatingInterval eorzeanHours, long offset = 0,
+    public WeatherListing Find(IList<Structs.Weather> weather, IList<Structs.Weather> previousWeather, RepeatingInterval eorzeanHours, TimeStamp now,
         uint increment = 32)
     {
-        var now = SeTime.ServerTime + offset;
         TrimFront();
         var previousFit = false;
         var idx         = 1;

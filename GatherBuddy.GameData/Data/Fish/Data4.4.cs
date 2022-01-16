@@ -9,8 +9,7 @@ public static partial class Fish
     {
         data.Apply     (24203, Patch.PreludeInViolet) // Indigo Prismfish
             .Bait      (data, 20675, 21177)
-            .Bite      (HookSet.Precise, BiteType.Weak)
-            .Time      (0, 240);
+            .Bite      (HookSet.Precise, BiteType.Weak);
         data.Apply     (24204, Patch.PreludeInViolet) // Green Prismfish
             .Bait      (data, 20675)
             .Bite      (HookSet.Precise, BiteType.Weak)

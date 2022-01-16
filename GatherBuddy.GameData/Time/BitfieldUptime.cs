@@ -13,6 +13,9 @@ public readonly struct BitfieldUptime : IEquatable<BitfieldUptime>
 
     public static readonly BitfieldUptime AllHours = new(AllHoursValue);
 
+    public static BitfieldUptime Combine(BitfieldUptime lhs, BitfieldUptime rhs)
+        => new(lhs._hours | rhs._hours);
+
     public bool Equals(BitfieldUptime rhs)
         => _hours == rhs._hours;
 
@@ -82,10 +85,12 @@ public readonly struct BitfieldUptime : IEquatable<BitfieldUptime>
             return TimeInterval.Never;
         if (nextDowntime == BadHour)
             return TimeInterval.Always;
-        if (nextUptime == 0)
-            return new TimeInterval(now, now.SyncToEorzeaHour().AddEorzeaHours(nextDowntime));
 
-        now = now.SyncToEorzeaHour().AddEorzeaHours(nextUptime);
+        now = now.SyncToEorzeaHour();
+        if (nextUptime == 0)
+            return new TimeInterval(now, now.AddEorzeaHours(nextDowntime));
+
+        now = now.AddEorzeaHours(nextUptime);
         return new TimeInterval(now, now.AddEorzeaHours(nextDowntime));
     }
 

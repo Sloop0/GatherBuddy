@@ -3,6 +3,7 @@ using System.Linq;
 using GatherBuddy.Interfaces;
 using GatherBuddy.Utility;
 using Lumina.Excel.GeneratedSheets;
+using GatheringType = GatherBuddy.Enums.GatheringType;
 
 namespace GatherBuddy.Classes;
 
@@ -23,15 +24,21 @@ public class FishingSpot : IComparable<FishingSpot>, ILocation
     public Aetheryte? ClosestAetheryte { get; internal set; }
     public Fish[]     Items            { get; init; }
 
-    public uint Id
+    public GatheringType GatheringType
+        => Spearfishing ? GatheringType.Spearfishing : GatheringType.Fisher;
+
+    public uint SheetId
         => _data is SpearfishingNotebook sf
             ? sf.RowId
             : ((Lumina.Excel.GeneratedSheets.FishingSpot)_data).RowId;
 
-    public uint UniqueId
+    public uint Id
         => _data is SpearfishingNotebook sf
             ? sf.RowId | SpearfishingIdOffset
             : ((Lumina.Excel.GeneratedSheets.FishingSpot)_data).RowId;
+
+    public ObjectType Type
+        => ObjectType.Fish;
 
     public int IntegralXCoord { get; internal set; }
     public int IntegralYCoord { get; internal set; }
@@ -46,7 +53,7 @@ public class FishingSpot : IComparable<FishingSpot>, ILocation
         => _data is SpearfishingNotebook;
 
     public int CompareTo(FishingSpot? obj)
-        => Id.CompareTo(obj?.Id ?? 0);
+        => SheetId.CompareTo(obj?.SheetId ?? 0);
 
     private DefaultInfo? _defaultInfo;
 

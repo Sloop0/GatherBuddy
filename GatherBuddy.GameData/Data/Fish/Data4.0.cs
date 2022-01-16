@@ -424,19 +424,19 @@ public static partial class Fish
         data.Apply     (20144, Patch.Stormblood) // Wentletrap
             .Spear     (SpearfishSize.Small);
         data.Apply     (20145, Patch.Stormblood) // Black Boxfish
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20146, Patch.Stormblood) // Glass Manta
             .Spear     (SpearfishSize.Large);
         data.Apply     (20147, Patch.Stormblood) // Regal Silverside
             .Spear     (SpearfishSize.Small);
         data.Apply     (20148, Patch.Stormblood) // Snowflake Moray
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20149, Patch.Stormblood) // Hoppfish
             .Spear     (SpearfishSize.Small);
         data.Apply     (20150, Patch.Stormblood) // Lightscale
             .Spear     (SpearfishSize.Large);
         data.Apply     (20151, Patch.Stormblood) // Grass Fugu
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20152, Patch.Stormblood) // Giant Eel
             .Spear     (SpearfishSize.Large);
         data.Apply     (20153, Patch.Stormblood) // Kamina Crab
@@ -444,7 +444,7 @@ public static partial class Fish
         data.Apply     (20154, Patch.Stormblood) // Spider Crab
             .Spear     (SpearfishSize.Large);
         data.Apply     (20155, Patch.Stormblood) // Little Dragonfish
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20156, Patch.Stormblood) // Black Fanfish
             .Spear     (SpearfishSize.Large);
         data.Apply     (20157, Patch.Stormblood) // Zebra Shark
@@ -452,7 +452,7 @@ public static partial class Fish
         data.Apply     (20158, Patch.Stormblood) // Nophica's Comb
             .Spear     (SpearfishSize.Small);
         data.Apply     (20159, Patch.Stormblood) // Warty Wartfish
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20160, Patch.Stormblood) // Common Whelk
             .Spear     (SpearfishSize.Small);
         data.Apply     (20161, Patch.Stormblood) // Hairless Barb
@@ -460,7 +460,7 @@ public static partial class Fish
         data.Apply     (20162, Patch.Stormblood) // Hatchetfish
             .Spear     (SpearfishSize.Small);
         data.Apply     (20163, Patch.Stormblood) // Threadfish
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20164, Patch.Stormblood) // Garden Eel
             .Spear     (SpearfishSize.Small);
         data.Apply     (20165, Patch.Stormblood) // Eastern Sea Pickle
@@ -468,7 +468,7 @@ public static partial class Fish
         data.Apply     (20166, Patch.Stormblood) // Brindlebass
             .Spear     (SpearfishSize.Large);
         data.Apply     (20167, Patch.Stormblood) // Demon Stonefish
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20168, Patch.Stormblood) // Armored Crayfish
             .Spear     (SpearfishSize.Small);
         data.Apply     (20169, Patch.Stormblood) // Bighead Carp
@@ -488,29 +488,29 @@ public static partial class Fish
         data.Apply     (20176, Patch.Stormblood) // Gauntlet Crab
             .Spear     (SpearfishSize.Small);
         data.Apply     (20177, Patch.Stormblood) // Hermit Goby
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20178, Patch.Stormblood) // Skythorn
             .Spear     (SpearfishSize.Large);
         data.Apply     (20179, Patch.Stormblood) // Swordtip
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20180, Patch.Stormblood) // False Scad
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20181, Patch.Stormblood) // Snow Crab
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20182, Patch.Stormblood) // Red-eyed Lates
             .Spear     (SpearfishSize.Large);
         data.Apply     (20183, Patch.Stormblood) // Common Bitterling
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20184, Patch.Stormblood) // Fifty-summer Cod
             .Spear     (SpearfishSize.Large);
         data.Apply     (20185, Patch.Stormblood) // Nagxian Mullet
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20186, Patch.Stormblood) // Redcoat
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20187, Patch.Stormblood) // Yanxian Tiger Prawn
             .Spear     (SpearfishSize.Small);
         data.Apply     (20188, Patch.Stormblood) // Tengu Fan
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20189, Patch.Stormblood) // Star Turban
             .Spear     (SpearfishSize.Small);
         data.Apply     (20190, Patch.Stormblood) // Blue-fish
@@ -520,13 +520,13 @@ public static partial class Fish
         data.Apply     (20192, Patch.Stormblood) // Cavalry Catfish
             .Spear     (SpearfishSize.Large);
         data.Apply     (20193, Patch.Stormblood) // Redfin
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20194, Patch.Stormblood) // Moondisc
             .Spear     (SpearfishSize.Small);
         data.Apply     (20195, Patch.Stormblood) // Bleached Bonytongue
             .Spear     (SpearfishSize.Large);
         data.Apply     (20196, Patch.Stormblood) // Salt Shark
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20197, Patch.Stormblood) // King's Mantle
             .Spear     (SpearfishSize.Large);
         data.Apply     (20198, Patch.Stormblood) // Sea Lamp
@@ -536,23 +536,23 @@ public static partial class Fish
         data.Apply     (20200, Patch.Stormblood) // Cherry Salmon
             .Spear     (SpearfishSize.Large);
         data.Apply     (20201, Patch.Stormblood) // Yu-no-hana Crab
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20202, Patch.Stormblood) // Dotharli Gudgeon
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20203, Patch.Stormblood) // River Clam
             .Spear     (SpearfishSize.Small);
         data.Apply     (20204, Patch.Stormblood) // Grass Shark
             .Spear     (SpearfishSize.Large);
         data.Apply     (20205, Patch.Stormblood) // Typhoon Shrimp
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20206, Patch.Stormblood) // Rock Oyster
             .Spear     (SpearfishSize.Small);
         data.Apply     (20207, Patch.Stormblood) // Salt Urchin
             .Spear     (SpearfishSize.Small);
         data.Apply     (20208, Patch.Stormblood) // Carpenter Crab
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20209, Patch.Stormblood) // Spiny Lobster
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20210, Patch.Stormblood) // Mitsukuri Shark
             .Spear     (SpearfishSize.Large)
             .Predators (data, 0, (20217, 7));
@@ -571,22 +571,22 @@ public static partial class Fish
         data.Apply     (20217, Patch.Stormblood) // Bashful Batfish
             .Spear     (SpearfishSize.Small);
         data.Apply     (20218, Patch.Stormblood) // River Bream
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20219, Patch.Stormblood) // Snipe Eel
             .Spear     (SpearfishSize.Large);
         data.Apply     (20220, Patch.Stormblood) // Cherubfish
-            .Spear     (SpearfishSize.Normal)
+            .Spear     (SpearfishSize.Average)
             .Predators (data, 0, (20228, 7));
         data.Apply     (20221, Patch.Stormblood) // Dusk Herald
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20222, Patch.Stormblood) // Glaring Perch
             .Spear     (SpearfishSize.Large);
         data.Apply     (20223, Patch.Stormblood) // Abalathian Pipira
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20224, Patch.Stormblood) // Steel Loach
             .Spear     (SpearfishSize.Small);
         data.Apply     (20225, Patch.Stormblood) // Ivory Sole
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20226, Patch.Stormblood) // Motley Beakfish
             .Spear     (SpearfishSize.Large);
         data.Apply     (20227, Patch.Stormblood) // Thousandfang
@@ -595,14 +595,14 @@ public static partial class Fish
         data.Apply     (20228, Patch.Stormblood) // Ichthyosaur
             .Spear     (SpearfishSize.Large);
         data.Apply     (20229, Patch.Stormblood) // Sailfin
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20230, Patch.Stormblood) // Fangshi
-            .Spear     (SpearfishSize.Normal)
+            .Spear     (SpearfishSize.Average)
             .Predators (data, 0, (20228, 7));
         data.Apply     (20231, Patch.Stormblood) // Flamefish
             .Spear     (SpearfishSize.Large);
         data.Apply     (20232, Patch.Stormblood) // Fickle Krait
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20233, Patch.Stormblood) // Eternal Eye
             .Spear     (SpearfishSize.Small)
             .Predators (data, 0, (20222, 7));
@@ -612,7 +612,7 @@ public static partial class Fish
         data.Apply     (20235, Patch.Stormblood) // Flood Tuna
             .Spear     (SpearfishSize.Large);
         data.Apply     (20236, Patch.Stormblood) // Mercenary Crab
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (20237, Patch.Stormblood) // Ashfish
             .Spear     (SpearfishSize.Small);
         data.Apply     (20238, Patch.Stormblood) // Silken Sunfish

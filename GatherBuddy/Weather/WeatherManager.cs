@@ -2,40 +2,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GatherBuddy.Classes;
-using GatherBuddy.SeFunctions;
 using GatherBuddy.Time;
+using Lumina.Excel.GeneratedSheets;
 
 namespace GatherBuddy.Weather;
 
 public partial class WeatherManager
 {
-    public Dictionary<Territory, WeatherTimeline> Forecast    { get; }
-    public List<WeatherTimeline>                  UniqueZones { get; } = new();
+    public Dictionary<uint, WeatherTimeline> Forecast    { get; }
+    public List<WeatherTimeline>             UniqueZones { get; } = new();
 
 
-    public WeatherManager()
+    public WeatherManager(GameData data)
     {
-        Forecast = GatherBuddy.GameData.WeatherTerritories.ToDictionary(t => t, t => new WeatherTimeline(t));
+        Forecast = data.WeatherTerritories.ToDictionary(t => t.Id, t => new WeatherTimeline(t));
         foreach (var t in Forecast.Values.Where(t => UniqueZones.All(l => l.Territory.Name != t.Territory.Name)))
             UniqueZones.Add(t);
     }
 
-    public static DateTime[] NextWeatherChangeTimes(int num, long offset = 0)
-    {
-        var currentWeatherTime = (SeTime.ServerTime + offset).SyncToEorzeaWeather();
-        var ret                = new DateTime[num];
-        for (var i = 0; i < num; ++i)
-            ret[i] = (currentWeatherTime + i * EorzeaTimeStampExtensions.MillisecondsPerEorzeaWeather).LocalTime;
-        return ret;
-    }
-
     private WeatherTimeline FindOrCreateForecast(Territory territory, uint increment)
     {
-        if (Forecast.TryGetValue(territory, out var values))
+        if (Forecast.TryGetValue(territory.Id, out var values))
             return values;
 
         var timeline = new WeatherTimeline(territory, increment);
-        Forecast[territory] = timeline;
+        Forecast[territory.Id] = timeline;
         return timeline;
     }
 
@@ -45,24 +36,38 @@ public partial class WeatherManager
         return list.Update(amount);
     }
 
-    public WeatherListing RequestForecast(Territory territory, IList<Structs.Weather> weather, long offset = 0, uint increment = 32)
-        => RequestForecast(territory, weather, Array.Empty<Structs.Weather>(), RepeatingInterval.Always, offset, increment);
+    public (Structs.Weather Last, Structs.Weather Current, Structs.Weather Next) FindLastCurrentNextWeather(uint territoryId)
+    {
+        if (Forecast.TryGetValue(territoryId, out var timeline))
+        {
+            timeline.Update(3);
+            return (timeline.LastWeather.Weather, timeline.CurrentWeather.Weather, timeline.List[2].Weather);
+        }
 
-    public WeatherListing RequestForecast(Territory territory, IList<Structs.Weather> weather, RepeatingInterval eorzeanHours, long offset = 0,
+        var territory = GatherBuddy.GameData.FindOrAddTerritory(Dalamud.GameData.GetExcelSheet<TerritoryType>()?.GetRow(territoryId));
+        if (territory == null || territory.WeatherRates.Rates.Length != 1 || territory.WeatherRates.Rates[0].CumulativeRate != 100)
+            return (Structs.Weather.Invalid, Structs.Weather.Invalid, Structs.Weather.Invalid);
+
+        return (territory.WeatherRates.Rates[0].Weather, territory.WeatherRates.Rates[0].Weather, territory.WeatherRates.Rates[0].Weather);
+    }
+
+    public WeatherListing RequestForecast(Territory territory, IList<Structs.Weather> weather, TimeStamp now, uint increment = 32)
+        => RequestForecast(territory, weather, Array.Empty<Structs.Weather>(), RepeatingInterval.Always, now, increment);
+
+    public WeatherListing RequestForecast(Territory territory, IList<Structs.Weather> weather, RepeatingInterval eorzeanHours, TimeStamp now,
         uint increment = 32)
-        => RequestForecast(territory, weather, Array.Empty<Structs.Weather>(), eorzeanHours, offset, increment);
+        => RequestForecast(territory, weather, Array.Empty<Structs.Weather>(), eorzeanHours, now, increment);
 
 
     public WeatherListing RequestForecast(Territory territory, IList<Structs.Weather> weather, IList<Structs.Weather> previousWeather,
-        RepeatingInterval eorzeanHours, long offset = 0, uint increment = 32)
+        RepeatingInterval eorzeanHours, TimeStamp now, uint increment = 32)
     {
         var values = FindOrCreateForecast(territory, increment);
-        return values.Find(weather, previousWeather, eorzeanHours, offset, increment);
+        return values.Find(weather, previousWeather, eorzeanHours, now, increment);
     }
 
     public TimeStamp ExtendedDuration(Territory territory, IList<Structs.Weather> weather, IList<Structs.Weather> previousWeather,
-        WeatherListing listing,
-        uint increment = 32)
+        WeatherListing listing, uint increment = 32)
     {
         var checkWeathers = weather.Any();
         var checkPrevious = previousWeather.Any();

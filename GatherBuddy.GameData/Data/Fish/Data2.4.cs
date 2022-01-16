@@ -111,9 +111,7 @@ public static partial class Fish
             .Weather   (data, 16);
         data.Apply     (8772, Patch.DreamsOfIce) // Shonisaurus
             .Bait      (data, 2605, 5040, 8771)
-            .Bite      (HookSet.Powerful, BiteType.Legendary)
-            .Transition(data, 1, 2)
-            .Weather   (data, 16);
+            .Bite      (HookSet.Powerful, BiteType.Legendary);
         data.Apply     (8773, Patch.DreamsOfIce) // Magicked Mushroom
             .Bait      (data, 2620, 4995)
             .Bite      (HookSet.Powerful, BiteType.Legendary)

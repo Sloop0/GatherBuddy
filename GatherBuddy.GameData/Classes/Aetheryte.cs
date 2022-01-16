@@ -15,11 +15,14 @@ public class Aetheryte : IComparable<Aetheryte>
     public int          XCoord    { get; set; }
     public int          YCoord    { get; set; }
 
-    public short XStream
-        => Data.AetherstreamX;
+    public ushort XStream
+        => Territory.XStream;
 
-    public short YStream
-        => Data.AetherstreamY;
+    public ushort YStream
+        => Territory.YStream;
+
+    public ushort Plane
+        => Territory.Plane;
 
     public uint Id
         => Data.RowId;
@@ -46,16 +49,19 @@ public class Aetheryte : IComparable<Aetheryte>
     public int CompareTo(Aetheryte? rhs)
         => Id.CompareTo(rhs?.Id ?? 0);
 
-    public int WorldDistance(uint mapId, int x, int y)
-        => mapId == Territory.Id
+    public int WorldDistance(uint territoryId, int x, int y)
+        => territoryId == Territory.Id
             ? Utility.Math.SquaredDistance(x, y, XCoord, YCoord)
             : int.MaxValue;
 
-    public int AetherDistance(int x, int y)
-        => Utility.Math.SquaredDistance(x, y, XStream, YStream);
+    public int AetherDistance(ushort x, ushort y, ushort plane)
+        => Utility.Math.SquaredDistance(x, y, plane, XStream, YStream, Plane);
 
     public double AetherDistance(Aetheryte rhs)
-        => AetherDistance(rhs.XStream, rhs.YStream);
+        => AetherDistance(rhs.XStream, rhs.YStream, rhs.Plane);
+
+    public double AetherDistance(Territory rhs)
+        => AetherDistance(rhs.XStream, rhs.YStream, rhs.Plane);
 
     public override string ToString()
         => $"{Name} - {Territory!.Name}-{XCoord / 100.0:F2}:{YCoord / 100.0:F2}";

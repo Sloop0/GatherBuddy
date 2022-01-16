@@ -389,7 +389,7 @@ public static partial class Fish
         data.Apply     (36530, Patch.Endwalker) // Mayavahana
             .Spear     (SpearfishSize.Unknown);
         data.Apply     (36531, Patch.Endwalker) // Hedonfish
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (36532, Patch.Endwalker) // Satrap Trapfish
             .Spear     (SpearfishSize.Unknown);
         data.Apply     (36533, Patch.Endwalker) // Blue Marlin

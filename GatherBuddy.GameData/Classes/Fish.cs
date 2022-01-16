@@ -13,8 +13,7 @@ namespace GatherBuddy.Classes;
 
 public partial class Fish : IComparable<Fish>, IGatherable
 {
-    public const uint    SpearfishOffset = 1u << 31;
-    public       ItemRow ItemData { get; init; }
+    public ItemRow ItemData { get; init; }
 
     private readonly object _fishData;
 
@@ -24,20 +23,22 @@ public partial class Fish : IComparable<Fish>, IGatherable
     public SpearFishRow? SpearfishData
         => _fishData as SpearFishRow;
 
-    public HashSet<FishingSpot> FishingSpots { get; init; } = new();
+    public IList<FishingSpot> FishingSpots { get; init; } = new List<FishingSpot>();
     public MultiString          Name         { get; init; }
 
     public IEnumerable<ILocation> Locations
         => FishingSpots;
 
+    public int InternalLocationId { get; internal set; } = 0;
+
     public uint ItemId
         => ItemData.RowId;
 
+    public ObjectType Type
+        => ObjectType.Fish;
+
     public uint FishId
         => FishData?.RowId ?? SpearfishData!.RowId;
-
-    public uint UniqueFishId
-        => FishData?.RowId ?? SpearfishData!.RowId | SpearfishOffset;
 
     public bool InLog
         => IsSpearFish || FishData!.IsInLog;

@@ -1,10 +1,8 @@
 ﻿using GatherBuddy.Classes;
 using GatherBuddy.Interfaces;
-using Newtonsoft.Json;
 
 namespace GatherBuddy.CustomInfo;
 
-[JsonConverter(typeof(LocationDataConverter))]
 public class LocationData
 {
     public ILocation  Location;

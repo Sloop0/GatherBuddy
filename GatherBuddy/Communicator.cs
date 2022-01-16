@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
-using GatherBuddy.Alarms;
 using GatherBuddy.Classes;
-using GatherBuddy.SeFunctions;
+using GatherBuddy.Interfaces;
 using GatherBuddy.Structs;
 using GatherBuddy.Time;
 
@@ -46,12 +46,13 @@ public static class Communicator
     }
 
     public static SeStringBuilder AddFullMapLink(SeStringBuilder builder, string name, Territory territory, float xCoord, float yCoord,
-        bool openMapLink = false, float fudgeFactor = 0.05f)
+        bool openMapLink = false, bool withCoordinates = true, float fudgeFactor = 0.05f)
     {
-        var mapPayload = new MapLinkPayload(territory.Id, territory.Data.RowId, xCoord, yCoord, fudgeFactor);
+        var mapPayload = new MapLinkPayload(territory.Id, territory.Data.Map.Row, xCoord, yCoord, fudgeFactor);
         if (openMapLink)
             Dalamud.GameGui.OpenMapWithMapLink(mapPayload);
-
+        if (withCoordinates)
+            name = $"{name} ({xCoord.ToString("00.0", CultureInfo.InvariantCulture)}, {yCoord.ToString("00.0", CultureInfo.InvariantCulture)})";
         return builder.Add(mapPayload)
             .AddUiForeground(500)
             .AddUiGlow(501)
@@ -62,13 +63,27 @@ public static class Communicator
             .Add(RawPayload.LinkTerminator);
     }
 
-    public static SeString FormatIdentifiedItemMessage(string format, string input, uint itemId)
+    public static SeStringBuilder AddFullItemLink(SeStringBuilder builder, uint itemId, string itemName)
+        => builder.AddUiForeground(0x0225)
+            .AddUiGlow(0x0226)
+            .AddItemLink(itemId, false)
+            .AddUiForeground(0x01F4)
+            .AddUiGlow(0x01F5)
+            .AddText($"{(char)SeIconChar.LinkMarker}")
+            .AddUiGlowOff()
+            .AddUiForegroundOff()
+            .AddText(itemName)
+            .Add(RawPayload.LinkTerminator)
+            .AddUiGlowOff()
+            .AddUiForegroundOff();
+
+    public static SeString FormatIdentifiedItemMessage(string format, string input, IGatherable item)
     {
         SeStringBuilder Replace(SeStringBuilder builder, string s)
             => s.ToLowerInvariant() switch
             {
-                "{id}"    => builder.AddText(itemId.ToString()),
-                "{name}"  => builder.AddItemLink(itemId, false),
+                "{id}"    => builder.AddText(item.ItemId.ToString()),
+                "{name}"  => AddFullItemLink(builder, item.ItemId, item.Name[GatherBuddy.Language]),
                 "{input}" => builder.AddText(input),
                 _         => builder.AddText(s),
             };
@@ -84,9 +99,9 @@ public static class Communicator
                 "{id}"       => builder.AddText(spot.Id.ToString()),
                 "{name}"     => AddFullMapLink(builder, spot.Name, spot.Territory, spot.XCoord, spot.YCoord),
                 "{fishid}"   => builder.AddText(fish.ItemId.ToString()),
-                "{fishname}" => builder.AddItemLink(fish.ItemId, false),
+                "{fishname}" => AddFullItemLink(builder, fish.ItemId, fish.Name[GatherBuddy.Language]),
                 "{input}"    => builder.AddText(s),
-                "{baitname}" => builder.AddItemLink(bait.Id, false),
+                "{baitname}" => AddFullItemLink(builder, bait.Id, bait.Name),
                 _            => builder.AddText(s),
             };
 
@@ -97,54 +112,54 @@ public static class Communicator
     {
         for (var i = 0; i < items.Count - 1; ++i)
         {
-            builder.AddItemLink(items[i].ItemId, false);
+            AddFullItemLink(builder, items[i].ItemId, items[i].Name[GatherBuddy.Language]);
             builder.AddText(", ");
         }
 
         if (items.Count > 0)
-            builder.AddItemLink(items.Last().ItemId, false);
+            AddFullItemLink(builder, items.Last().ItemId, items.Last().Name[GatherBuddy.Language]);
         return builder;
     }
 
-    public static SeString FormatNodeAlarmMessage(string format, NodeAlarm alarm, long timeDiff)
-    {
-        SeStringBuilder NodeReplace(SeStringBuilder builder, string s)
-            => s.ToLowerInvariant() switch
-            {
-                "{name}"        => builder.AddText(alarm.Name),
-                "{offset}"      => builder.AddText(alarm.SecondOffset.ToString()),
-                "{delaystring}" => builder.AddText(DelayString(timeDiff)),
-                "{timesshort}"  => builder.AddText(alarm.Node!.Times.PrintHours(true)),
-                "{timeslong}"   => builder.AddText(alarm.Node!.Times.PrintHours()),
-                "{location}" => AddFullMapLink(builder, alarm.Node!.Name, alarm.Node.Territory, (float)alarm.Node.XCoord,
-                    (float)alarm.Node.YCoord),
-                "{allitems}" => AddItemLinks(builder, alarm.Node!.Items),
-                _            => builder.AddText(s),
-            };
+    //public static SeString FormatNodeAlarmMessage(string format, NodeAlarm alarm, long timeDiff)
+    //{
+    //    SeStringBuilder NodeReplace(SeStringBuilder builder, string s)
+    //        => s.ToLowerInvariant() switch
+    //        {
+    //            "{name}"        => builder.AddText(alarm.Name),
+    //            "{offset}"      => builder.AddText(alarm.SecondOffset.ToString()),
+    //            "{delaystring}" => builder.AddText(DelayString(timeDiff)),
+    //            "{timesshort}"  => builder.AddText(alarm.Node!.Times.PrintHours(true)),
+    //            "{timeslong}"   => builder.AddText(alarm.Node!.Times.PrintHours()),
+    //            "{location}" => AddFullMapLink(builder, alarm.Node!.Name, alarm.Node.Territory, (float)alarm.Node.XCoord,
+    //                (float)alarm.Node.YCoord),
+    //            "{allitems}" => AddItemLinks(builder, alarm.Node!.Items),
+    //            _            => builder.AddText(s),
+    //        };
+    //
+    //    return Format(format, NodeReplace);
+    //}
 
-        return Format(format, NodeReplace);
-    }
-
-    public static SeString FormatFishAlarmMessage(string format, FishAlarm alarm, long timeDiff)
-    {
-        SeStringBuilder FishReplace(SeStringBuilder builder, string s)
-            => s.ToLowerInvariant() switch
-            {
-                "{name}"        => builder.AddText(alarm.Name),
-                "{offset}"      => builder.AddText(alarm.SecondOffset.ToString()),
-                "{delaystring}" => builder.AddText(DelayString(timeDiff)),
-                "{fishingspotname}" => AddFullMapLink(builder, alarm.Fish.Fish.FishingSpots.First().Name, alarm.Fish.Fish.FishingSpots.First().Territory,
-                    alarm.Fish.Fish.FishingSpots.First().XCoord,
-                    alarm.Fish.Fish.FishingSpots.First().YCoord),
-                "{baitname}" => alarm.Fish.Fish.InitialBait.Id == 0
-                    ? builder.AddText("Unknown Bait")
-                    : builder.AddItemLink(alarm.Fish.Fish.InitialBait.Id, false),
-                "{fishname}" => builder.AddItemLink(alarm.Fish.Fish.ItemId, false),
-                _            => builder.AddText(s),
-            };
-
-        return Format(format, FishReplace);
-    }
+    //public static SeString FormatFishAlarmMessage(string format, FishAlarm alarm, long timeDiff)
+    //{
+    //    SeStringBuilder FishReplace(SeStringBuilder builder, string s)
+    //        => s.ToLowerInvariant() switch
+    //        {
+    //            "{name}"        => builder.AddText(alarm.Name),
+    //            "{offset}"      => builder.AddText(alarm.SecondOffset.ToString()),
+    //            "{delaystring}" => builder.AddText(DelayString(timeDiff)),
+    //            "{fishingspotname}" => AddFullMapLink(builder, alarm.Fish.Fish.FishingSpots.First().Name, alarm.Fish.Fish.FishingSpots.First().Territory,
+    //                alarm.Fish.Fish.FishingSpots.First().XCoord,
+    //                alarm.Fish.Fish.FishingSpots.First().YCoord),
+    //            "{baitname}" => alarm.Fish.Fish.InitialBait.Id == 0
+    //                ? builder.AddText("Unknown Bait")
+    //                : builder.AddItemLink(alarm.Fish.Fish.InitialBait.Id, false),
+    //            "{fishname}" => builder.AddItemLink(alarm.Fish.Fish.ItemId, false),
+    //            _            => builder.AddText(s),
+    //        };
+    //
+    //    return Format(format, FishReplace);
+    //}
 
     private static string DelayString(long timeDiff)
         => timeDiff <= 0

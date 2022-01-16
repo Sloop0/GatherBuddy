@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
@@ -12,7 +14,7 @@ namespace GatherBuddy.Managers;
 public unsafe class MacroManager : IDisposable
 {
     public const int NumMacroLines    = 15;
-    public const int NumRequiredLines = 3;
+    public const int NumRequiredLines = 5;
 
     public RaptureShellModule* Module
         => Framework.Instance()->GetUiModule()->GetRaptureShellModule();
@@ -21,8 +23,9 @@ public unsafe class MacroManager : IDisposable
 
     public MacroManager()
     {
-        Macro = (RaptureMacroModule.Macro*)Marshal.AllocHGlobal(sizeof(RaptureMacroModule.Macro));
+        Macro = (RaptureMacroModule.Macro*)(Marshal.AllocHGlobal(sizeof(RaptureMacroModule.Macro) + 8) + 8);
         PrepareMacro(Macro);
+        PrepareDefault();
     }
 
     public void Dispose()
@@ -49,9 +52,9 @@ public unsafe class MacroManager : IDisposable
 
     public static void CreateTempString(Utf8String* ret)
     {
-        ret->BufSize             = 128;
+        ret->BufSize             = 256;
         ret->IsUsingInlineBuffer = 0;
-        ret->StringPtr           = (byte*)Marshal.AllocHGlobal(128);
+        ret->StringPtr           = (byte*)Marshal.AllocHGlobal(256);
         ClearString(ret);
     }
 
@@ -62,9 +65,8 @@ public unsafe class MacroManager : IDisposable
         CreateEmptyString(ret);
     }
 
-    public static bool CopyString(string text, Utf8String* ret)
+    private static bool CopyBytes(byte[] bytes, Utf8String* ret)
     {
-        var bytes = Encoding.UTF8.GetBytes(text);
         if (bytes.Length + 1 >= ret->BufSize)
             return false;
 
@@ -73,6 +75,18 @@ public unsafe class MacroManager : IDisposable
         ret->StringLength            = bytes.Length;
         ret->StringPtr[bytes.Length] = 0;
         return true;
+    }
+
+    public static bool CopyString(string text, Utf8String* ret)
+    {
+        var bytes = Encoding.UTF8.GetBytes(text);
+        return CopyBytes(bytes, ret);
+    }
+
+    public static bool CopyString(SeString text, Utf8String* ret)
+    {
+        var bytes = text.Encode();
+        return CopyBytes(bytes, ret);
     }
 
     public static void PrepareMacro(RaptureMacroModule.Macro* macro)
@@ -90,16 +104,34 @@ public unsafe class MacroManager : IDisposable
             DisposeString(macro->Line[i]);
     }
 
-    public bool ExecuteMacroLines(params string[] lines)
+    public bool ExecuteMacroLines(IList<SeString> lines)
     {
-        Debug.Assert(lines.Length <= 3);
-        for (var i = 0; i < lines.Length; ++i)
+        Debug.Assert(lines.Count <= NumRequiredLines);
+        for (var i = 0; i < lines.Count; ++i)
         {
             if (!CopyString(lines[i], Macro->Line[i]))
                 return false;
         }
 
+        for (var i = lines.Count; i < NumRequiredLines; ++i)
+            ClearString(Macro->Line[i]);
+
         Module->ExecuteMacro(Macro);
         return true;
     }
+
+    public bool ExecuteMacroLines(params SeString[] lines)
+        => ExecuteMacroLines((IList<SeString>)lines);
+
+    public void PrepareDefault()
+    {
+        CopyString(GatherBuddy.FullIdentify,       Macro->Line[0]);
+        CopyString(GatherBuddy.FullMapMarker,      Macro->Line[1]);
+        CopyString(GatherBuddy.FullGearChange,     Macro->Line[2]);
+        CopyString(GatherBuddy.FullTeleport,       Macro->Line[3]);
+        CopyString(GatherBuddy.FullAdditionalInfo, Macro->Line[4]);
+    }
+
+    public void Execute()
+        => Module->ExecuteMacro((RaptureMacroModule.Macro*) (((byte*) Macro)-8));
 }

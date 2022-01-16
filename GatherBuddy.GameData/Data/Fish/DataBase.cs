@@ -11,7 +11,10 @@ public static partial class Fish
     private static Classes.Fish? Apply(this GameData data, uint id, Patch patch)
     {
         if (data.Fishes.TryGetValue(id, out var fish))
+        {
+            fish.Patch = patch;
             return fish;
+        }
 
         PluginLog.Error($"Could not find fish {id}.");
         return null;

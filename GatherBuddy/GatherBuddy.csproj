@@ -78,10 +78,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\GatherBuddy.GameData\GatherBuddy.GameData.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Gatherable\" />
+	  <ProjectReference Include="..\ImGuiRaii\ImGuiOtter.csproj" />
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

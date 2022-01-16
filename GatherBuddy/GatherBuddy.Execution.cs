@@ -1,290 +1,313 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Logging;
-using GatherBuddy.Alarms;
 using GatherBuddy.Classes;
+using GatherBuddy.Config;
 using GatherBuddy.Enums;
 using GatherBuddy.Interfaces;
+using GatherBuddy.Managers;
 using GatherBuddy.SeFunctions;
-using GatherBuddy.Structs;
-using ImGuiNET;
+using GatherBuddy.Time;
+using GatherBuddy.Utility;
+using CommandManager = GatherBuddy.Managers.CommandManager;
 using GatheringType = GatherBuddy.Enums.GatheringType;
 
 namespace GatherBuddy;
 
-public partial class GatherBuddy
+public class Executor
 {
-    private const int ActionDelay = 200;
-
-    private Gatherable? FindGatherableLogged(string itemName)
+    private enum IdentifyType
     {
-        var item = Identificator.IdentifyGatherable(itemName);
-        if (item == null)
-        {
-            var output = $"Could not find corresponding item to \"{itemName}\".";
-            Dalamud.Chat.Print(output);
-            PluginLog.Verbose(output);
-            return null;
-        }
-
-        if (Config.IdentifiedItemFormat.Length > 0)
-            Dalamud.Chat.Print(Communicator.FormatIdentifiedItemMessage(Config.IdentifiedItemFormat, itemName, item.ItemId));
-        PluginLog.Verbose(GatherBuddyConfiguration.DefaultIdentifiedItemFormat, item.ItemId, item.Name[Language], itemName);
-        return item;
+        None,
+        Item,
+        Fish,
     }
 
-    private Fish? FindFishLogged(string fishName)
-    {
-        var fish = Identificator.IdentifyFish(fishName);
-        if (fish == null)
-        {
-            var output = $"Could not find corresponding item to \"{fishName}\".";
-            Dalamud.Chat.PrintError(output);
-            PluginLog.Verbose(output);
-            return null;
-        }
+    private readonly CommandManager _commandManager = new(Dalamud.GameGui, Dalamud.SigScanner);
+    private readonly MacroManager   _macroManager   = new();
+    public readonly  Identificator  Identificator   = new();
 
-        if (Config.IdentifiedFishFormat.Length > 0)
-            Dalamud.Chat.Print(Communicator.FormatIdentifiedItemMessage(Config.IdentifiedFishFormat, fishName, fish.ItemId));
-        PluginLog.Verbose(GatherBuddyConfiguration.DefaultIdentifiedFishFormat, fish.ItemId, fish.Name[Language], fishName);
-        return fish;
+    private IdentifyType _identifyType = IdentifyType.None;
+    private string       _name         = string.Empty;
+
+    private IGatherable? _item = null;
+
+    private GatheringType? _gatheringType = null;
+    private ILocation?     _location      = null;
+    private TimeInterval   _uptime        = TimeInterval.Always;
+
+    private static void ItemNotFound(string itemName)
+    {
+        var output = $"Could not find corresponding item to \"{itemName}\".";
+        Dalamud.Chat.Print(output);
+        PluginLog.Verbose(output);
     }
 
-    private static ILocation? FindClosestAetheryte(IGatherable item, GatheringType? type = null)
+    private void LocationNotFound()
     {
-        var location =  Config.AetherytePreference switch
-        {
-            AetherytePreference.Distance => Identificator.FindClosestAetheryteTravel(item, type),
-            AetherytePreference.Cost     => Identificator.FindClosestAetheryteCost(item, type),
-            _                            => throw new ArgumentException(),
-        };
-
-        if (location != null)
-            return location;
-
-        var output = $"No associated location or attuned aetheryte found for {item.Name[Language]}.";
+        var output =
+            $"No associated location or attuned aetheryte found for {_item?.Name[GatherBuddy.Language] ?? "Unknown"}{(_gatheringType == null ? "." : $" with condition {_gatheringType.Value}.")}";
         Dalamud.Chat.PrintError(output);
         PluginLog.Debug(output);
-        return null;
-
     }
 
-    private GatheringNode? FindClosestGatheringNode(string itemName, GatheringType? type = null)
+    private void FindGatherableLogged(string itemName)
     {
-        var item = FindGatherableLogged(itemName);
-        if (item == null)
-            return null;
-
-        var closestLocation = FindClosestAetheryte(item, type);
-        if (closestLocation == null)
-            return null;
-
-        var node = (GatheringNode)closestLocation;
-        if (!Config.PrintUptime || node.Times.AlwaysUp())
-            return node;
-
-        var uptime = node.Times.NextUptime();
-        if (uptime.Start > SeTime.ServerTime)
+        _item = Identificator.IdentifyGatherable(itemName);
+        if (_item == null)
         {
-            var diff    = uptime.Start.AddMilliseconds(-SeTime.ServerTime);
-            var minutes = diff.CurrentMinuteOfDay;
-            var seconds = diff.CurrentSecond;
-            Dalamud.Chat.Print(minutes > 0
-                ? $"Node is up at {node.Times.PrintHours()} (in {minutes}:{seconds:D2} Minutes)."
-                : $"Node is up at {node.Times.PrintHours()} (in {seconds} Seconds).");
+            ItemNotFound(itemName);
+            return;
         }
+
+        if (GatherBuddy.Config.IdentifiedItemFormat.Length > 0)
+            Dalamud.Chat.Print(Communicator.FormatIdentifiedItemMessage(GatherBuddy.Config.IdentifiedItemFormat, itemName, _item));
+        PluginLog.Verbose(Configuration.DefaultIdentifiedItemFormat, _item.ItemId, _item.Name[GatherBuddy.Language], itemName);
+    }
+
+    private void FindFishLogged(string fishName)
+    {
+        _item = Identificator.IdentifyFish(fishName);
+        if (_item == null)
+        {
+            ItemNotFound(fishName);
+            return;
+        }
+
+        if (GatherBuddy.Config.IdentifiedFishFormat.Length > 0)
+            Dalamud.Chat.Print(Communicator.FormatIdentifiedItemMessage(GatherBuddy.Config.IdentifiedFishFormat, fishName, _item));
+        PluginLog.Verbose(Configuration.DefaultIdentifiedFishFormat, _item.ItemId, _item.Name[GatherBuddy.Language], fishName);
+    }
+
+    private void DoIdentify()
+    {
+        if (_name.Length == 0)
+            return;
+
+        switch (_identifyType)
+        {
+            case IdentifyType.None: return;
+            case IdentifyType.Item:
+                FindGatherableLogged(_name);
+                return;
+            case IdentifyType.Fish:
+                FindFishLogged(_name);
+                return;
+            default: throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void FindClosestLocation()
+    {
+        if (_item == null)
+            return;
+
+        _location = null;
+        if (_gatheringType == null || _item is Fish)
+            (_location, _uptime) = GatherBuddy.UptimeManager.BestLocation(_item);
         else
-        {
-            var diff    = uptime.End.AddMilliseconds(-SeTime.ServerTime);
-            var minutes = diff.CurrentMinuteOfDay;
-            var seconds = diff.CurrentSecond;
-            Dalamud.Chat.Print(minutes > 0
-                ? $"Node is up at {node.Times.PrintHours()} (for the next {minutes}:{seconds:D2} Minutes)."
-                : $"Node is up at {node.Times.PrintHours()} (for the next {seconds} Seconds).");
-        }
+            (_location, _uptime) = GatherBuddy.UptimeManager.NextUptime((Gatherable)_item, _gatheringType.Value, GatherBuddy.Time.ServerTime);
 
-        return node;
+        if (_location == null)
+            LocationNotFound();
     }
 
-    private static async Task<bool> TeleportToLocation(ITeleportable location)
+    private void DoTeleport()
     {
-        if (!Config.UseTeleport)
-            return true;
+        if (!GatherBuddy.Config.UseTeleport || _location?.ClosestAetheryte == null)
+            return;
 
-        try
+        if (GatherBuddy.Config.SkipTeleportIfClose
+         && Dalamud.ClientState.TerritoryType == _location.Territory.Id
+         && Dalamud.ClientState.LocalPlayer != null)
         {
-            if (location.ClosestAetheryte == null)
-            {
-                PluginLog.Debug("No valid aetheryte found for {data}.", location switch
-                {
-                    GatheringNode n => $"gathering node {n.BaseId}",
-                    FishingSpot s   => $"fishing spot {s.Id}",
-                    _               => "unknown location",
-                });
-                return false;
-            }
-
-
-            Teleporter.Teleport(location.ClosestAetheryte.Id);
-            await Task.Delay(ActionDelay);
-        }
-        catch (Exception e)
-        {
-            PluginLog.Error($"Error while teleporting:\n{e}");
-            return false;
+            // TODO verify
+            var posX = Maps.NodeToMap(Dalamud.ClientState.LocalPlayer.Position.X, _location.Territory.SizeFactor);
+            var posY = Maps.NodeToMap(Dalamud.ClientState.LocalPlayer.Position.Y, _location.Territory.SizeFactor);
+            if (_location.ClosestAetheryte.WorldDistance(_location.Territory.Id, posX, posY)
+              < _location.ClosestAetheryte.WorldDistance(_location.Territory.Id, _location.IntegralXCoord, _location.IntegralYCoord) * 1.5)
+                return;
         }
 
-        return true;
+        TeleportToAetheryte(_location.ClosestAetheryte);
     }
 
-    private static string GearForType(GatheringType type)
-        => type.ToGroup() switch
+    private void DoGearChange()
+    {
+        if (!GatherBuddy.Config.UseGearChange || _location == null)
+            return;
+
+        var set = _location.GatheringType.ToGroup() switch
         {
-            GatheringType.Miner    => Config.MinerSetName,
-            GatheringType.Botanist => Config.BotanistSetName,
-            GatheringType.Fisher   => Config.FisherSetName,
+            GatheringType.Fisher   => GatherBuddy.Config.FisherSetName,
+            GatheringType.Botanist => GatherBuddy.Config.BotanistSetName,
+            GatheringType.Miner    => GatherBuddy.Config.MinerSetName,
             _                      => string.Empty,
         };
-
-    private static async Task<bool> EquipGear(GatheringType type)
-    {
-        if (!Config.UseGearChange)
-            return true;
-
-        try
+        if (set.Length == 0)
         {
-            var set = GearForType(type);
-            if (set.Length == 0)
+            PluginLog.Debug("No job type associated with location or no gearset configured.");
+            Dalamud.Chat.PrintError("No job type associated with location or no gearset configured.");
+            return;
+        }
+
+        _commandManager.Execute($"/gearset change \"{set}\"");
+    }
+
+
+    private void DoMapFlag()
+    {
+        if (!GatherBuddy.Config.WriteCoordinates && !GatherBuddy.Config.UseCoordinates || _location == null)
+            return;
+
+        if (_location.IntegralXCoord == 100 || _location.IntegralYCoord == 100)
+            return;
+
+        var link = Communicator
+            .AddFullMapLink(new SeStringBuilder(), _location.Name, _location.Territory, _location.XCoord, _location.YCoord, true).BuiltString;
+        if (GatherBuddy.Config.WriteCoordinates)
+            Dalamud.Chat.Print(link);
+    }
+
+    private void DoAdditionalInfo()
+    {
+        if (GatherBuddy.Config.PrintSpearfishInfo && _item is Fish { IsSpearFish: true } f)
+            Dalamud.Chat.Print($"Catch {f.Size} sized fish moving {f.Speed}.");
+
+        if (GatherBuddy.Config.PrintUptime && !_uptime.Equals(TimeInterval.Always))
+        {
+            if (_uptime.Start > GatherBuddy.Time.ServerTime)
             {
-                PluginLog.Debug("No job type associated with location or no gearset configured.");
-                return false;
+                var diff    = _uptime.Start.AddMilliseconds(-GatherBuddy.Time.ServerTime);
+                var minutes = diff.CurrentMinuteOfDay;
+                var seconds = diff.CurrentSecond;
+                Dalamud.Chat.Print(minutes > 0
+                    ? $"Next up in {minutes}:{seconds:D2} Minutes."
+                    : $"Next up in {seconds} Seconds.");
             }
-
-            CommandManager.Execute($"/gearset change \"{set}\"");
-            await Task.Delay(ActionDelay);
+            else
+            {
+                var diff    = _uptime.End.AddMilliseconds(-GatherBuddy.Time.ServerTime);
+                var minutes = diff.CurrentMinuteOfDay;
+                var seconds = diff.CurrentSecond;
+                Dalamud.Chat.Print(minutes > 0
+                    ? $"Currently up for the next {minutes}:{seconds:D2} Minutes."
+                    : $"Currently up for the next {seconds} Seconds.");
+            }
         }
-        catch (Exception e)
-        {
-            PluginLog.Error($"Error while equipping gearset:\n{e}");
-            return false;
-        }
-
-        return true;
     }
 
-    private static async Task<bool> SetLocationFlag(IMarkable location)
+    public bool DoCommand(string argument)
     {
-        if (!(Config.WriteCoordinates || Config.UseCoordinates) || location.IntegralXCoord == 100 || location.IntegralYCoord == 100)
-            return true;
-
-        try
+        switch (argument)
         {
-            var link = Communicator.AddFullMapLink(new SeStringBuilder(), location.Name, location.Territory, location.XCoord, location.YCoord,
-                true).BuiltString;
-            if (Config.WriteCoordinates)
-                Dalamud.Chat.Print(link);
-            await Task.Delay(ActionDelay);
+            case GatherBuddy.IdentifyCommand:
+                DoIdentify();
+                FindClosestLocation();
+                return true;
+            case GatherBuddy.MapMarkerCommand:
+                DoMapFlag();
+                return true;
+            case GatherBuddy.GearChangeCommand:
+                DoGearChange();
+                return true;
+            case GatherBuddy.TeleportCommand:
+                DoTeleport();
+                return true;
+            case GatherBuddy.AdditionalInfoCommand:
+                DoAdditionalInfo();
+                return true;
+            default: return false;
         }
-        catch (Exception e)
-        {
-            PluginLog.Error($"Error while setting location flag:\n{e}");
-            return false;
-        }
-
-        return true;
     }
 
-    public async Task GatherLocation(ILocation location)
+    public void GatherLocation(ILocation location)
     {
-        var type = location is GatheringNode n ? n.GatheringType : GatheringType.Fisher;
-        if (!await EquipGear(type))
-            return;
-        if (!await TeleportToLocation(location))
-            return;
+        _identifyType  = IdentifyType.None;
+        _name          = string.Empty;
+        _item          = null;
+        _gatheringType = location.GatheringType.ToGroup();
+        _location      = location;
+        if (location is GatheringNode n)
+            _uptime = n.Times.NextUptime(GatherBuddy.Time.ServerTime);
+        else
+            _uptime = TimeInterval.Always;
 
-        await SetLocationFlag(location);
+        _macroManager.Execute();
     }
 
-    public void CopyAndLinkBait(Bait bait)
-    {
-        if (bait.Id == 0)
-            return;
-
-        ImGui.SetClipboardText(bait.Name);
-        Dalamud.Chat.Print(SeString.CreateItemLink(bait.Id, false).Append(new TextPayload(" copied to clipboard.")));
-    }
-
-    public async Task GatherItem(IGatherable? item, GatheringType? type = null)
+    public void GatherItem(IGatherable? item, GatheringType? type = null)
     {
         if (item == null)
             return;
 
-        if (Config.PrintSpearfishInfo && item is Fish { IsSpearFish: true } f)
-            Dalamud.Chat.Print($"Catch {f.Size} sized fish moving {f.Speed}.");
+        _identifyType  = IdentifyType.None;
+        _name          = string.Empty;
+        _item          = item;
+        _location      = null;
+        _gatheringType = type?.ToGroup();
+        _uptime        = TimeInterval.Always;
 
-        var closestSpot = FindClosestAetheryte(item, type);
-        if (closestSpot != null)
-            await GatherLocation(closestSpot);
+        _macroManager.Execute();
     }
 
-    private async Task<bool> HandleAlarmAction(string name, Alarm? alarm)
+    public void GatherFishByName(string fishName)
     {
-        if (!Utility.Util.CompareCi(name, "alarm"))
-            return false;
-
-        if (alarm == null)
-        {
-            Dalamud.Chat.PrintError("No active alarm was triggered, yet.");
-            return true;
-        }
-
-        SeStringBuilder builder = new();
-        if (alarm.Type == AlarmType.Fish && alarm.Fish != null)
-        {
-            builder.AddText($"Teleporting to [Alarm {alarm.Name}] (");
-            builder.AddItemLink(alarm.Fish.ItemId, false);
-            builder.AddText(")");
-            Dalamud.Chat.Print(builder.BuiltString);
-            await GatherItem(alarm.Fish);
-        }
-        else if (alarm.Node != null)
-        {
-            builder.AddText($"Teleporting to [Alarm {alarm.Name}] ({alarm.Node.Times.PrintHours()}):\n    ");
-            foreach (var item in alarm.Node.Items)
-            {
-                builder.AddItemLink(item.ItemId, false);
-                builder.AddText(", ");
-            }
-
-            var se = builder.BuiltString;
-            if (se.Payloads.Count > 1)
-                se.Payloads[^1] = new TextPayload(".");
-            Dalamud.Chat.Print(se);
-            await GatherLocation(alarm.Node);
-        }
-
-        return true;
-    }
-
-    public async Task GatherFishByName(string fishName)
-    {
-        if (await HandleAlarmAction(fishName, Alarms.LastFishAlarm))
+        if (fishName.Length == 0)
             return;
 
-        var fish = FindFishLogged(fishName);
-        await GatherItem(fish);
+        _identifyType  = IdentifyType.Fish;
+        _name          = fishName;
+        _item          = null;
+        _location      = null;
+        _gatheringType = null;
+        _uptime        = TimeInterval.Always;
+
+        _macroManager.Execute();
     }
 
-    public async Task GatherItemByName(string itemName, GatheringType? type = null)
+    public void GatherItemByName(string itemName, GatheringType? type = null)
     {
-        if (await HandleAlarmAction(itemName, Alarms.LastNodeAlarm))
+        if (itemName.Length == 0)
             return;
 
-        var item = FindGatherableLogged(itemName);
-        await GatherItem(item, type);
+        _identifyType  = IdentifyType.Item;
+        _name          = itemName;
+        _item          = null;
+        _location      = null;
+        _gatheringType = type;
+        _uptime        = TimeInterval.Always;
+
+        _macroManager.Execute();
+    }
+
+    public static void TeleportToAetheryte(Aetheryte aetheryte)
+    {
+        if (aetheryte.Id == 0)
+            return;
+
+        if (Teleporter.IsAttuned(aetheryte.Id))
+            Teleporter.TeleportUnchecked(aetheryte.Id);
+        else
+            Dalamud.Chat.PrintError($"Not attuned to chosen aetheryte {aetheryte.Name}.");
+    }
+
+    public static void TeleportToTerritory(Territory territory)
+    {
+        if (territory.Aetherytes.Count == 0)
+        {
+            Dalamud.Chat.PrintError($"{territory.Name} has no valid aetheryte.");
+            return;
+        }
+
+        var aetheryte = territory.Aetherytes.FirstOrDefault(a => Teleporter.IsAttuned(a.Id));
+        if (aetheryte == null)
+        {
+            Dalamud.Chat.PrintError($"Not attuned to any aetheryte in {territory.Name}.");
+            return;
+        }
+
+        Teleporter.TeleportUnchecked(aetheryte.Id);
     }
 }

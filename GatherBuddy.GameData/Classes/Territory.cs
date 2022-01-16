@@ -2,41 +2,40 @@ using System;
 using System.Collections.Generic;
 using GatherBuddy.Structs;
 using GatherBuddy.Utility;
+using Lumina.Excel.GeneratedSheets;
 using TerritoryType = Lumina.Excel.GeneratedSheets.TerritoryType;
 
 namespace GatherBuddy.Classes;
 
-public class Territory : IComparable<Territory>
+public class Territory : IComparable<Territory>, IEquatable<Territory>
 {
     public static readonly Territory Invalid = new();
 
     public TerritoryType          Data         { get; }       = new();
     public string                 Name         { get; }       = string.Empty;
     public HashSet<Aetheryte>     Aetherytes   { get; }       = new();
-    public CumulativeWeatherRates WeatherRates { get; init; } = CumulativeWeatherRates.StaticWeather;
+    public CumulativeWeatherRates WeatherRates { get; init; } = CumulativeWeatherRates.InvalidWeather;
     public float                  SizeFactor   { get; init; }
-    public int                    XStream      { get; init; }
-    public int                    YStream      { get; init; }
+    public ushort                 XStream      { get; init; }
+    public ushort                 YStream      { get; init; }
+    public ushort                 Plane        { get; init; }
 
 
     public uint Id
         => Data.RowId;
 
-    public Territory(GameData gameData, TerritoryType data)
+    public Territory(GameData gameData, TerritoryType data, TerritoryTypeTelepo? aether)
     {
         Data       = data;
         Name       = MultiString.ParseSeStringLumina(data.PlaceName.Value?.Name);
         SizeFactor = (data.Map.Value?.SizeFactor ?? 100f) / 100f;
-        var aetheryte = data.Aetheryte.Value;
-        if (aetheryte != null)
-        {
-            XStream = aetheryte.AetherstreamX;
-            YStream = aetheryte.AetherstreamY;
-        }
+        XStream    = aether?.Unknown0 ?? 0;
+        YStream    = aether?.Unknown1 ?? 0;
+        Plane      = aether?.Unknown2 ?? 0;
 
-        WeatherRates = (gameData.CumulativeWeatherRates?.TryGetValue(data.WeatherRate, out var wr) ?? false) && wr.Rates.Length > 1
+        WeatherRates = gameData.CumulativeWeatherRates.TryGetValue(data.WeatherRate, out var wr)
             ? wr
-            : CumulativeWeatherRates.StaticWeather;
+            : CumulativeWeatherRates.InvalidWeather;
     }
 
     private Territory()
@@ -47,4 +46,25 @@ public class Territory : IComparable<Territory>
 
     public int CompareTo(Territory? other)
         => Id.CompareTo(other?.Id ?? 0);
+
+    public bool Equals(Territory? other)
+        => Id.Equals(other?.Id);
+
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj))
+            return false;
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        return obj switch
+        {
+            Territory t => Equals(t),
+            _           => false,
+        };
+    }
+
+    public override int GetHashCode()
+        => Id.GetHashCode();
 }

@@ -6,11 +6,12 @@ namespace GatherBuddy.Structs;
 
 public readonly struct Bait : IComparable<Bait>
 {
-    public const  uint FishingTackleRow = 30;
-    public static Bait Unknown { get; } = new(new Item());
+    public const uint FishingTackleRow = 30;
+
+    public static Bait Unknown { get; } = new(new Item { Icon = 60027 });
 
     public readonly Item   Data;
-    public readonly string Name;
+    public readonly string Name = "Unknown";
 
     public uint Id
         => Data.RowId;
@@ -18,7 +19,8 @@ public readonly struct Bait : IComparable<Bait>
     public Bait(Item data)
     {
         Data = data;
-        Name = MultiString.ParseSeStringLumina(data.Name);
+        if (data.RowId != 0)
+            Name = MultiString.ParseSeStringLumina(data.Name);
     }
 
     public int CompareTo(Bait other)

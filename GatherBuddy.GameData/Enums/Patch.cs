@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+
 namespace GatherBuddy.Enums;
 
 public enum Patch : ushort
@@ -28,6 +31,36 @@ public enum Patch : ushort
     FuturesRewritten           = 540,
     DeathUntoDawn              = 550,
     Endwalker                  = 600,
+}
+
+[Flags]
+public enum PatchFlag : ulong
+{
+    ARealmReborn               = 1 << 0,
+    ARealmAwoken               = 1 << 1,
+    ThroughTheMaelstrom        = 1 << 2,
+    DefendersOfEorzea          = 1 << 3,
+    DreamsOfIce                = 1 << 4,
+    BeforeTheFall              = 1 << 5,
+    Heavensward                = 1 << 6,
+    AsGoesLightSoGoesDarkness  = 1 << 7,
+    TheGearsOfChange           = 1 << 8,
+    RevengeOfTheHorde          = 1 << 9,
+    SoulSurrender              = 1 << 10,
+    TheFarEdgeOfFate           = 1 << 11,
+    Stormblood                 = 1 << 12,
+    TheLegendReturns           = 1 << 13,
+    RiseOfANewSun              = 1 << 14,
+    UnderTheMoonlight          = 1 << 15,
+    PreludeInViolet            = 1 << 16,
+    ARequiemForHeroes          = 1 << 17,
+    Shadowbringers             = 1 << 18,
+    VowsOfVirtueDeedsOfCruelty = 1 << 19,
+    EchoesOfAFallenStar        = 1 << 20,
+    ReflectionsInCrystal       = 1 << 21,
+    FuturesRewritten           = 1 << 22,
+    DeathUntoDawn              = 1 << 23,
+    Endwalker                  = 1 << 24,
 }
 
 public static class PatchExtensions
@@ -80,6 +113,72 @@ public static class PatchExtensions
             55 => "Death Unto Dawn",
             60 => "Endwalker",
             _  => "Unknown",
+        };
+    }
+
+    public static PatchFlag ToPatchFlag(this Patch value)
+    {
+        return value switch
+        {
+            Patch.ARealmReborn               => PatchFlag.ARealmReborn,
+            Patch.ARealmAwoken               => PatchFlag.ARealmAwoken,
+            Patch.ThroughTheMaelstrom        => PatchFlag.ThroughTheMaelstrom,
+            Patch.DefendersOfEorzea          => PatchFlag.DefendersOfEorzea,
+            Patch.DreamsOfIce                => PatchFlag.DreamsOfIce,
+            Patch.BeforeTheFall              => PatchFlag.BeforeTheFall,
+            Patch.Heavensward                => PatchFlag.Heavensward,
+            Patch.AsGoesLightSoGoesDarkness  => PatchFlag.AsGoesLightSoGoesDarkness,
+            Patch.TheGearsOfChange           => PatchFlag.TheGearsOfChange,
+            Patch.RevengeOfTheHorde          => PatchFlag.RevengeOfTheHorde,
+            Patch.SoulSurrender              => PatchFlag.SoulSurrender,
+            Patch.TheFarEdgeOfFate           => PatchFlag.TheFarEdgeOfFate,
+            Patch.Stormblood                 => PatchFlag.Stormblood,
+            Patch.TheLegendReturns           => PatchFlag.TheLegendReturns,
+            Patch.RiseOfANewSun              => PatchFlag.RiseOfANewSun,
+            Patch.UnderTheMoonlight          => PatchFlag.UnderTheMoonlight,
+            Patch.PreludeInViolet            => PatchFlag.PreludeInViolet,
+            Patch.ARequiemForHeroes          => PatchFlag.ARequiemForHeroes,
+            Patch.Shadowbringers             => PatchFlag.Shadowbringers,
+            Patch.VowsOfVirtueDeedsOfCruelty => PatchFlag.VowsOfVirtueDeedsOfCruelty,
+            Patch.EchoesOfAFallenStar        => PatchFlag.EchoesOfAFallenStar,
+            Patch.ReflectionsInCrystal       => PatchFlag.ReflectionsInCrystal,
+            Patch.FuturesRewritten           => PatchFlag.FuturesRewritten,
+            Patch.DeathUntoDawn              => PatchFlag.DeathUntoDawn,
+            Patch.Endwalker                  => PatchFlag.Endwalker,
+            _                                => 0,
+        };
+    }
+
+    public static Patch ToPatch(this PatchFlag value)
+    {
+        return value switch
+        {
+            PatchFlag.ARealmReborn               => Patch.ARealmReborn,
+            PatchFlag.ARealmAwoken               => Patch.ARealmAwoken,
+            PatchFlag.ThroughTheMaelstrom        => Patch.ThroughTheMaelstrom,
+            PatchFlag.DefendersOfEorzea          => Patch.DefendersOfEorzea,
+            PatchFlag.DreamsOfIce                => Patch.DreamsOfIce,
+            PatchFlag.BeforeTheFall              => Patch.BeforeTheFall,
+            PatchFlag.Heavensward                => Patch.Heavensward,
+            PatchFlag.AsGoesLightSoGoesDarkness  => Patch.AsGoesLightSoGoesDarkness,
+            PatchFlag.TheGearsOfChange           => Patch.TheGearsOfChange,
+            PatchFlag.RevengeOfTheHorde          => Patch.RevengeOfTheHorde,
+            PatchFlag.SoulSurrender              => Patch.SoulSurrender,
+            PatchFlag.TheFarEdgeOfFate           => Patch.TheFarEdgeOfFate,
+            PatchFlag.Stormblood                 => Patch.Stormblood,
+            PatchFlag.TheLegendReturns           => Patch.TheLegendReturns,
+            PatchFlag.RiseOfANewSun              => Patch.RiseOfANewSun,
+            PatchFlag.UnderTheMoonlight          => Patch.UnderTheMoonlight,
+            PatchFlag.PreludeInViolet            => Patch.PreludeInViolet,
+            PatchFlag.ARequiemForHeroes          => Patch.ARequiemForHeroes,
+            PatchFlag.Shadowbringers             => Patch.Shadowbringers,
+            PatchFlag.VowsOfVirtueDeedsOfCruelty => Patch.VowsOfVirtueDeedsOfCruelty,
+            PatchFlag.EchoesOfAFallenStar        => Patch.EchoesOfAFallenStar,
+            PatchFlag.ReflectionsInCrystal       => Patch.ReflectionsInCrystal,
+            PatchFlag.FuturesRewritten           => Patch.FuturesRewritten,
+            PatchFlag.DeathUntoDawn              => Patch.DeathUntoDawn,
+            PatchFlag.Endwalker                  => Patch.Endwalker,
+            _                                    => Patch.Unknown,
         };
     }
 }

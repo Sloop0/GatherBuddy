@@ -5,6 +5,7 @@ using ImGuiNET;
 
 namespace GatherBuddy.Gui;
 
+// TODO check
 public static class Colors
 {
     public struct FishTimer

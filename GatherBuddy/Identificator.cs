@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Dalamud;
-using GatherBuddy.Utility;
 using GatherBuddy.Classes;
 using GatherBuddy.Interfaces;
-using GatherBuddy.SeFunctions;
-using Lumina.Excel.GeneratedSheets;
+using GatherBuddy.Weather;
 using GatheringType = GatherBuddy.Enums.GatheringType;
 
 namespace GatherBuddy;
@@ -71,6 +69,9 @@ public class Identificator
 
     public Gatherable? IdentifyGatherable(string itemName)
     {
+        if (itemName.Length == 0)
+            return null;
+
         // Check for full matches in current language first, by initialization order.
         var itemNameLower = itemName.ToLowerInvariant();
         foreach (var dict in _gatherableFromLanguage)
@@ -90,6 +91,9 @@ public class Identificator
 
     public Fish? IdentifyFish(string itemName)
     {
+        if (itemName.Length == 0)
+            return null;
+
         // Same as for gatherables.
         var itemNameLower = itemName.ToLowerInvariant();
         foreach (var dict in _fishFromLanguage)
@@ -102,37 +106,5 @@ public class Identificator
             return ret;
 
         return _data.FishTrie.FuzzyFind(itemNameLower, MaxDistance, out var data) < MaxDistance ? data : null;
-    }
-
-    // Tries to find the aetheryte with the lowest teleport cost that is available for this node.
-    public static ILocation? FindClosestAetheryteCost(IGatherable item, GatheringType? type = null)
-    {
-        if (Dalamud.ClientState.LocalPlayer == null || Dalamud.ClientState.TerritoryType == 0)
-            return null;
-
-        var (xStream, yStream) = GetCurrentStream();
-        var enumerable = type == null ? item.Locations : item.Locations.Where(l => l is GatheringNode n && n.GatheringType == type);
-        return enumerable
-            .Where(a => a.ClosestAetheryte != null && Teleporter.IsAttuned(a.ClosestAetheryte.Id))
-            .ArgMin(a => a.ClosestAetheryte!.AetherDistance(xStream, yStream));
-    }
-
-    // Tries to find the node with the closest available aetheryte in world distance.
-    public static ILocation? FindClosestAetheryteTravel(IGatherable item, GatheringType? type = null)
-    {
-        var enumerable = type == null ? item.Locations : item.Locations.Where(l => l is GatheringNode n && n.GatheringType == type);
-        return enumerable
-            .Where(l => l.ClosestAetheryte != null && Teleporter.IsAttuned(l.ClosestAetheryte.Id))
-            .ArgMin(l => l.AetheryteDistance());
-    }
-
-
-    // Get the aetherstream position of the player character, i.e. the aetherstream coordinates of the aetheryte corresponding to the current territory.
-    private static (int, int) GetCurrentStream()
-    {
-        var rawT = Dalamud.GameData.GetExcelSheet<TerritoryType>()!.GetRow(Dalamud.ClientState.TerritoryType);
-        var rawA = rawT?.Aetheryte?.Value;
-
-        return (rawA?.AetherstreamX ?? 0, rawA?.AetherstreamY ?? 0);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace GatherBuddy.Time;
 
@@ -18,6 +19,9 @@ public readonly struct TimeInterval : IEquatable<TimeInterval>
 
     public long SecondDuration
         => this == Always ? long.MaxValue : this == Invalid ? 0 : (End - Start) / RealTime.MillisecondsPerSecond;
+
+    public string DurationString(bool shortString = false)
+        => DurationString(Start, End, shortString);
 
     public TimeInterval Overlap(TimeInterval rhs)
     {
@@ -100,5 +104,60 @@ public readonly struct TimeInterval : IEquatable<TimeInterval>
 
         var diff2 = Start - rhs.Start;
         return diff2.CompareTo(0);
+    }
+
+    public static string DurationString(TimeStamp a, TimeStamp b, bool shortString)
+    {
+        (a, b) = a < b ? (a, b) : (b, a);
+        var tmp = new TimeStamp(b - a);
+        return tmp.Time switch
+        {
+            > RealTime.MillisecondsPerDay => shortString
+                ? $">{tmp.TotalDays}d"
+                : $"{((float)tmp.Time / RealTime.MillisecondsPerDay).ToString("F2", CultureInfo.InvariantCulture)} Days",
+            > RealTime.MillisecondsPerHour => shortString
+                ? $">{tmp.TotalHours}h"
+                : $"{tmp.TotalHours:D2}:{tmp.CurrentMinute:D2} Hours",
+            _ => shortString
+                ? $"{tmp.TotalMinutes}:{tmp.CurrentSecond:D2}m"
+                : $"{tmp.TotalMinutes:D2}:{tmp.CurrentSecond:D2} Minutes",
+        };
+    }
+
+    // Returns true if currently active and false otherwise.
+    public bool ToTimeString(TimeStamp now, bool shortString, out string timeString)
+    {
+        if (this == Always)
+        {
+            timeString = "Always";
+            return true;
+        }
+
+        if (this == Never)
+        {
+            timeString = "Never";
+            return false;
+        }
+
+        if (this == Invalid)
+        {
+            timeString = "Invalid";
+            return false;
+        }
+
+        if (Start < now)
+        {
+            if (End < now)
+            {
+                timeString = "Never";
+                return false;
+            }
+
+            timeString = DurationString(End, now, shortString);
+            return true;
+        }
+
+        timeString = DurationString(Start, now, shortString);
+        return false;
     }
 }

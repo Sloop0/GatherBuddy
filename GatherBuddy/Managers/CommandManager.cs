@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using Dalamud.Game;
+using Dalamud.Game.Gui;
 using Dalamud.Logging;
 using GatherBuddy.SeFunctions;
 
@@ -12,15 +13,14 @@ public class CommandManager
     private readonly ProcessChatBox _processChatBox;
     private readonly IntPtr         _uiModulePtr;
 
-    public CommandManager(SeAddressBase baseUiObject, GetUiModule getUiModule, ProcessChatBox processChatBox)
+    public CommandManager(GameGui gameGui, ProcessChatBox processChatBox)
     {
         _processChatBox = processChatBox;
-        _uiModulePtr    = getUiModule.Invoke(Marshal.ReadIntPtr(baseUiObject.Address));
+        _uiModulePtr    = gameGui.GetUIModule();
     }
 
-    public CommandManager(SigScanner sigScanner)
-        : this(new BaseUiObject(sigScanner), new GetUiModule(sigScanner),
-            new ProcessChatBox(sigScanner))
+    public CommandManager(GameGui gameGui, SigScanner sigScanner)
+        : this(gameGui, new ProcessChatBox(sigScanner))
     { }
 
     public bool Execute(string message)

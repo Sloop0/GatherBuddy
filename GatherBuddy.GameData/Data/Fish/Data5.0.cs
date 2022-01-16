@@ -364,9 +364,9 @@ public static partial class Fish
         data.Apply     (27518, Patch.Shadowbringers) // Purple Ghost
             .Spear     (SpearfishSize.Small);
         data.Apply     (27519, Patch.Shadowbringers) // Lakelouse
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27520, Patch.Shadowbringers) // Gazing Glass
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27521, Patch.Shadowbringers) // Source Octopus
             .Spear     (SpearfishSize.Large);
         data.Apply     (27522, Patch.Shadowbringers) // Elven Spear
@@ -374,9 +374,9 @@ public static partial class Fish
         data.Apply     (27523, Patch.Shadowbringers) // Shade Gudgeon
             .Spear     (SpearfishSize.Small);
         data.Apply     (27524, Patch.Shadowbringers) // Lakethistle
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27525, Patch.Shadowbringers) // Platinum Bream
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27526, Patch.Shadowbringers) // Wardenfish
             .Spear     (SpearfishSize.Large);
         data.Apply     (27527, Patch.Shadowbringers) // Finned Eggplant
@@ -386,9 +386,9 @@ public static partial class Fish
         data.Apply     (27529, Patch.Shadowbringers) // Viola Clam
             .Spear     (SpearfishSize.Small);
         data.Apply     (27530, Patch.Shadowbringers) // Geayi
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27531, Patch.Shadowbringers) // Noblefish
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27532, Patch.Shadowbringers) // Misteye
             .Spear     (SpearfishSize.Large);
         data.Apply     (27533, Patch.Shadowbringers) // Lakeland Cod
@@ -400,15 +400,15 @@ public static partial class Fish
             .Spear     (SpearfishSize.Large)
             .Predators (data, 0, (27531, 10));
         data.Apply     (27536, Patch.Shadowbringers) // Big-eye
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27537, Patch.Shadowbringers) // Jenanna's Tear
             .Spear     (SpearfishSize.Small);
         data.Apply     (27538, Patch.Shadowbringers) // Daisy Turban
             .Spear     (SpearfishSize.Small);
         data.Apply     (27539, Patch.Shadowbringers) // Shade Axolotl
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27540, Patch.Shadowbringers) // Little Flirt
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27541, Patch.Shadowbringers) // Peallaidh
             .Spear     (SpearfishSize.Large);
         data.Apply     (27542, Patch.Shadowbringers) // Voeburt Bichir
@@ -418,9 +418,9 @@ public static partial class Fish
         data.Apply     (27544, Patch.Shadowbringers) // Gilded Batfish
             .Spear     (SpearfishSize.Small);
         data.Apply     (27545, Patch.Shadowbringers) // Petalfish
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27546, Patch.Shadowbringers) // Mirrorfish
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27547, Patch.Shadowbringers) // Glass Eel
             .Spear     (SpearfishSize.Large);
         data.Apply     (27548, Patch.Shadowbringers) // Voeburt Salamander
@@ -430,9 +430,9 @@ public static partial class Fish
         data.Apply     (27550, Patch.Shadowbringers) // Dandyfish
             .Spear     (SpearfishSize.Small);
         data.Apply     (27551, Patch.Shadowbringers) // Sauldia Ruby
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27552, Patch.Shadowbringers) // Mock Pixie
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27553, Patch.Shadowbringers) // Hunter's Arrow
             .Spear     (SpearfishSize.Large);
         data.Apply     (27554, Patch.Shadowbringers) // Fuathgobbler
@@ -442,9 +442,9 @@ public static partial class Fish
         data.Apply     (27556, Patch.Shadowbringers) // Saint Fathric's Ire
             .Spear     (SpearfishSize.Small);
         data.Apply     (27557, Patch.Shadowbringers) // Queensgown
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27558, Patch.Shadowbringers) // Flowering Kelpie
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27559, Patch.Shadowbringers) // Ghoulfish
             .Spear     (SpearfishSize.Large);
         data.Apply     (27560, Patch.Shadowbringers) // Measan Deala
@@ -454,25 +454,25 @@ public static partial class Fish
         data.Apply     (27562, Patch.Shadowbringers) // Aquabloom
             .Spear     (SpearfishSize.Small);
         data.Apply     (27563, Patch.Shadowbringers) // Jester Fish
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27564, Patch.Shadowbringers) // Blue Lightning
             .Spear     (SpearfishSize.Large);
         data.Apply     (27565, Patch.Shadowbringers) // Maidenhair
             .Spear     (SpearfishSize.Large);
         data.Apply     (27566, Patch.Shadowbringers) // Blue Mountain Bubble
-            .Spear     (SpearfishSize.Normal)
+            .Spear     (SpearfishSize.Average)
             .Predators (data, 0, (27551, 10));
         data.Apply     (27567, Patch.Shadowbringers) // Elder Pixie
-            .Spear     (SpearfishSize.Normal)
+            .Spear     (SpearfishSize.Average)
             .Predators (data, 0, (27551, 10));
         data.Apply     (27568, Patch.Shadowbringers) // Ankle Snipper
             .Spear     (SpearfishSize.Small);
         data.Apply     (27569, Patch.Shadowbringers) // Treescale
             .Spear     (SpearfishSize.Small);
         data.Apply     (27570, Patch.Shadowbringers) // Ronkan Pleco
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27571, Patch.Shadowbringers) // Gourmand Crab
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27572, Patch.Shadowbringers) // Gatorl's Bead
             .Spear     (SpearfishSize.Large);
         data.Apply     (27573, Patch.Shadowbringers) // Diamondtongue
@@ -482,9 +482,9 @@ public static partial class Fish
         data.Apply     (27575, Patch.Shadowbringers) // Hermit Crab
             .Spear     (SpearfishSize.Small);
         data.Apply     (27576, Patch.Shadowbringers) // Megapiranha
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27577, Patch.Shadowbringers) // Everdark Bass
-            .Spear     (SpearfishSize.Normal);
+            .Spear     (SpearfishSize.Average);
         data.Apply     (27578, Patch.Shadowbringers) // Lozatl Pirarucu
             .Spear     (SpearfishSize.Large);
         data.Apply     (27579, Patch.Shadowbringers) // Anpa's Handmaid

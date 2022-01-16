@@ -7,8 +7,8 @@ public static unsafe class Teleporter
 {
     public static bool IsAttuned(uint aetheryte)
     {
-        if (Dalamud.ClientState.LocalPlayer == null)
-            return false;
+        if (!Dalamud.ClientState.IsLoggedIn)
+            return true;
 
         var teleport = Telepo.Instance();
         if (teleport == null)

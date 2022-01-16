@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using Dalamud.Logging;
 using GatherBuddy.Classes;
 using GatherBuddy.SeFunctions;
@@ -36,7 +37,9 @@ public partial class WeatherManager
                 return w;
         }
 
-        Debug.Assert(false, "Should never be reached, weather rates not adding up to 100.");
+#if DEBUG
+        PluginLog.Warning($"Should never be reached, weather rates not adding up to 100. {rates.Rates.Last().CumulativeRate}");
+#endif
         return rates.Rates[^1].Weather;
     }
 
@@ -65,11 +68,11 @@ public partial class WeatherManager
     }
 
     public static WeatherListing[] GetForecast(Territory territory, uint amount)
-        => GetForecast(territory, amount, TimeStamp.UtcNow);
+        => GetForecast(territory, amount, GatherBuddy.Time.ServerTime);
 
     public static WeatherListing GetForecast(Territory territory, TimeStamp timestamp)
         => GetForecast(territory, 1, timestamp)[0];
 
     public static WeatherListing[] GetForecastOffset(Territory territory, uint amount, long millisecondOffset)
-        => GetForecast(territory, amount, SeTime.ServerTime.AddMilliseconds(millisecondOffset));
+        => GetForecast(territory, amount, GatherBuddy.Time.ServerTime.AddMilliseconds(millisecondOffset));
 }

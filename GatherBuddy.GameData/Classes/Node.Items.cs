@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using Dalamud;
+using GatherBuddy.Enums;
 
 namespace GatherBuddy.Classes;
 
@@ -16,13 +19,30 @@ public partial class GatheringNode
     public bool HasItems(params Gatherable[] it)
         => it.Length == 0 || Items.Any(it.Contains);
 
+    private void AddNodeToItem(Gatherable item)
+    {
+        item.NodeList.Add(this);
+        if (item.NodeType == NodeType.Unknown)
+            item.NodeType = NodeType;
+        else if (item.NodeType != NodeType.Regular && NodeType == NodeType.Regular)
+            item.NodeType = NodeType.Regular;
+        item.GatheringType = item.GatheringType.Add(GatheringType);
+        item.ExpansionIdx  = Math.Min(item.ExpansionIdx, Territory.Data.ExVersion.Row);
+    }
+
     public bool AddItem(Gatherable item)
     {
         if (Items.Contains(item))
-            return item.NodeList.Add(this);
+        {
+            if (item.NodeList.Contains(this))
+                return false;
+
+            AddNodeToItem(item);
+            return true;
+        }
 
         Items.Add(item);
-        item.NodeList.Add(this);
+        AddNodeToItem(item);
         return true;
     }
 }

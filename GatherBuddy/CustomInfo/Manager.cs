@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using Dalamud.Logging;
+using GatherBuddy.Classes;
 using GatherBuddy.Interfaces;
 using Newtonsoft.Json;
 
@@ -42,15 +44,24 @@ public class Manager
         Save();
     }
 
+    public void MoveLocation(int idx1, int idx2)
+    {
+        if (Utility.Functions.Swap(CustomLocations, idx1, idx2))
+            Save();
+    }
+
     public void Save()
     {
-        var file = Utility.Util.ObtainSaveFile(FileName);
+        var file = Utility.Functions.ObtainSaveFile(FileName);
         if (file == null)
             return;
 
         try
         {
-            File.WriteAllText(file.FullName, JsonConvert.SerializeObject(CustomLocations, Formatting.Indented));
+            IEnumerable<(Type Type, uint Id, uint AetheryteId, float X, float Y)> locations = CustomLocations.Select(l
+                => (l.Location.GetType(), l.Location.Id, l.Location.ClosestAetheryte?.Id ?? 0, l.XCoord, l.YCoord));
+            var text = JsonConvert.SerializeObject(locations, Formatting.Indented);
+            File.WriteAllText(file.FullName, text);
         }
         catch (Exception e)
         {
@@ -60,7 +71,7 @@ public class Manager
 
     public static Manager Load()
     {
-        var     file = Utility.Util.ObtainSaveFile(FileName);
+        var     file = Utility.Functions.ObtainSaveFile(FileName);
         Manager ret  = new();
         if (file is not { Exists: true })
         {
@@ -70,18 +81,39 @@ public class Manager
 
         try
         {
-            var changes = false;
-            var text    = File.ReadAllText(file.FullName);
-            var locations = JsonConvert.DeserializeObject<List<LocationData>>(text, new JsonSerializerSettings()
+            var changes   = false;
+            var text      = File.ReadAllText(file.FullName);
+            var locations = JsonConvert.DeserializeObject<(Type Type, uint Id, uint AetheryteId, float X, float Y)[]>(text);
+            ret.CustomLocations.Capacity = locations.Length;
+            foreach (var location in locations)
             {
-                Error = (_, args) =>
+                Aetheryte? aetheryte = null;
+                if (location.AetheryteId != 0 && !GatherBuddy.GameData.Aetherytes.TryGetValue(location.AetheryteId, out aetheryte))
                 {
-                    changes                   = true;
-                    args.ErrorContext.Handled = true;
-                },
-            });
-            ret.CustomLocations = locations ?? new List<LocationData>();
-            if (changes || locations == null)
+                    changes = true;
+                    PluginLog.Error($"Invalid aetheryte id {location.AetheryteId} in custom locations.");
+                    continue;
+                }
+
+                if (location.Type == typeof(FishingSpot) && GatherBuddy.GameData.FishingSpots.TryGetValue(location.Id, out var spot))
+                    ret.CustomLocations.Add(new LocationData(spot)
+                    {
+                        Aetheryte = aetheryte,
+                        XCoord    = location.X,
+                        YCoord    = location.Y,
+                    });
+                else if (location.Type == typeof(GatheringNode) && GatherBuddy.GameData.GatheringNodes.TryGetValue(location.Id, out var node))
+                    ret.CustomLocations.Add(new LocationData(node)
+                    {
+                        Aetheryte = aetheryte,
+                        XCoord    = location.X,
+                        YCoord    = location.Y,
+                    });
+                else
+                    changes = true;
+            }
+
+            if (changes)
                 ret.Save();
         }
         catch (Exception e)
