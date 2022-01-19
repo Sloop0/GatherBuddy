@@ -422,211 +422,211 @@ public static partial class Fish
             .Bite      (HookSet.Powerful, BiteType.Strong)
             .Weather   (data, 7, 8);
         data.Apply     (20144, Patch.Stormblood) // Wentletrap
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20145, Patch.Stormblood) // Black Boxfish
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20146, Patch.Stormblood) // Glass Manta
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (20147, Patch.Stormblood) // Regal Silverside
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Slow);
         data.Apply     (20148, Patch.Stormblood) // Snowflake Moray
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20149, Patch.Stormblood) // Hoppfish
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average);
         data.Apply     (20150, Patch.Stormblood) // Lightscale
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (20151, Patch.Stormblood) // Grass Fugu
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20152, Patch.Stormblood) // Giant Eel
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (20153, Patch.Stormblood) // Kamina Crab
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (20154, Patch.Stormblood) // Spider Crab
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (20155, Patch.Stormblood) // Little Dragonfish
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20156, Patch.Stormblood) // Black Fanfish
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (20157, Patch.Stormblood) // Zebra Shark
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.HyperFast);
         data.Apply     (20158, Patch.Stormblood) // Nophica's Comb
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (20159, Patch.Stormblood) // Warty Wartfish
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20160, Patch.Stormblood) // Common Whelk
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20161, Patch.Stormblood) // Hairless Barb
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VeryFast);
         data.Apply     (20162, Patch.Stormblood) // Hatchetfish
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Slow);
         data.Apply     (20163, Patch.Stormblood) // Threadfish
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (20164, Patch.Stormblood) // Garden Eel
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (20165, Patch.Stormblood) // Eastern Sea Pickle
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20166, Patch.Stormblood) // Brindlebass
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.ExtremelyFast);
         data.Apply     (20167, Patch.Stormblood) // Demon Stonefish
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20168, Patch.Stormblood) // Armored Crayfish
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Slow);
         data.Apply     (20169, Patch.Stormblood) // Bighead Carp
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast);
         data.Apply     (20170, Patch.Stormblood) // Zeni Clam
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20171, Patch.Stormblood) // Corpse-eater
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VeryFast);
         data.Apply     (20172, Patch.Stormblood) // Ronin Trevally
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VeryFast);
         data.Apply     (20173, Patch.Stormblood) // Toothsome Grouper
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.SuperFast);
         data.Apply     (20174, Patch.Stormblood) // Horned Turban
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20175, Patch.Stormblood) // Ruby Sea Star
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20176, Patch.Stormblood) // Gauntlet Crab
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (20177, Patch.Stormblood) // Hermit Goby
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (20178, Patch.Stormblood) // Skythorn
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (20179, Patch.Stormblood) // Swordtip
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (20180, Patch.Stormblood) // False Scad
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (20181, Patch.Stormblood) // Snow Crab
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (20182, Patch.Stormblood) // Red-eyed Lates
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast);
         data.Apply     (20183, Patch.Stormblood) // Common Bitterling
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (20184, Patch.Stormblood) // Fifty-summer Cod
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (20185, Patch.Stormblood) // Nagxian Mullet
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (20186, Patch.Stormblood) // Redcoat
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (20187, Patch.Stormblood) // Yanxian Tiger Prawn
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average);
         data.Apply     (20188, Patch.Stormblood) // Tengu Fan
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20189, Patch.Stormblood) // Star Turban
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20190, Patch.Stormblood) // Blue-fish
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (20191, Patch.Stormblood) // Steppe Bullfrog
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20192, Patch.Stormblood) // Cavalry Catfish
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (20193, Patch.Stormblood) // Redfin
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (20194, Patch.Stormblood) // Moondisc
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (20195, Patch.Stormblood) // Bleached Bonytongue
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20196, Patch.Stormblood) // Salt Shark
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VeryFast);
         data.Apply     (20197, Patch.Stormblood) // King's Mantle
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (20198, Patch.Stormblood) // Sea Lamp
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20199, Patch.Stormblood) // Amberjack
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast);
         data.Apply     (20200, Patch.Stormblood) // Cherry Salmon
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (20201, Patch.Stormblood) // Yu-no-hana Crab
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20202, Patch.Stormblood) // Dotharli Gudgeon
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (20203, Patch.Stormblood) // River Clam
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20204, Patch.Stormblood) // Grass Shark
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (20205, Patch.Stormblood) // Typhoon Shrimp
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20206, Patch.Stormblood) // Rock Oyster
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20207, Patch.Stormblood) // Salt Urchin
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20208, Patch.Stormblood) // Carpenter Crab
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20209, Patch.Stormblood) // Spiny Lobster
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20210, Patch.Stormblood) // Mitsukuri Shark
-            .Spear     (SpearfishSize.Large)
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast)
             .Predators (data, 0, (20217, 7));
         data.Apply     (20211, Patch.Stormblood) // Doman Bubble Eye
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (20212, Patch.Stormblood) // Dragon Squeaker
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Slow);
         data.Apply     (20213, Patch.Stormblood) // Dawn Herald
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average);
         data.Apply     (20214, Patch.Stormblood) // Salt Cellar
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20215, Patch.Stormblood) // White Sturgeon
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (20216, Patch.Stormblood) // Tithe Collector
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (20217, Patch.Stormblood) // Bashful Batfish
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (20218, Patch.Stormblood) // River Bream
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Fast);
         data.Apply     (20219, Patch.Stormblood) // Snipe Eel
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (20220, Patch.Stormblood) // Cherubfish
-            .Spear     (SpearfishSize.Average)
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average)
             .Predators (data, 0, (20228, 7));
         data.Apply     (20221, Patch.Stormblood) // Dusk Herald
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (20222, Patch.Stormblood) // Glaring Perch
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast);
         data.Apply     (20223, Patch.Stormblood) // Abalathian Pipira
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (20224, Patch.Stormblood) // Steel Loach
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Slow);
         data.Apply     (20225, Patch.Stormblood) // Ivory Sole
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.ExtremelySlow);
         data.Apply     (20226, Patch.Stormblood) // Motley Beakfish
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (20227, Patch.Stormblood) // Thousandfang
-            .Spear     (SpearfishSize.Large)
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.SuperFast)
             .Predators (data, 0, (20217, 7));
         data.Apply     (20228, Patch.Stormblood) // Ichthyosaur
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.ExtremelyFast);
         data.Apply     (20229, Patch.Stormblood) // Sailfin
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VeryFast);
         data.Apply     (20230, Patch.Stormblood) // Fangshi
-            .Spear     (SpearfishSize.Average)
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow)
             .Predators (data, 0, (20228, 7));
         data.Apply     (20231, Patch.Stormblood) // Flamefish
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VeryFast);
         data.Apply     (20232, Patch.Stormblood) // Fickle Krait
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20233, Patch.Stormblood) // Eternal Eye
-            .Spear     (SpearfishSize.Small)
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VeryFast)
             .Predators (data, 0, (20222, 7));
         data.Apply     (20234, Patch.Stormblood) // Soul of the Stallion
-            .Spear     (SpearfishSize.Small)
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average)
             .Predators (data, 0, (20222, 7));
         data.Apply     (20235, Patch.Stormblood) // Flood Tuna
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.ExtremelyFast);
         data.Apply     (20236, Patch.Stormblood) // Mercenary Crab
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (20237, Patch.Stormblood) // Ashfish
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Slow);
         data.Apply     (20238, Patch.Stormblood) // Silken Sunfish
-            .Spear     (SpearfishSize.Large)
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow)
             .Predators (data, 0, (20236, 7));
         data.Apply     (20239, Patch.Stormblood) // Mosasaur
-            .Spear     (SpearfishSize.Large)
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.SuperFast)
             .Predators (data, 0, (20236, 7));
         data.Apply     (20524, Patch.Stormblood) // Castaway Chocobo Chick
             .Bait      (data, 2585, 4869, 4904)
             .Bite      (HookSet.Powerful, BiteType.Legendary)
             .Time      (480, 960);
         data.Apply     (20528, Patch.Stormblood) // Tiny Tatsunoko
-            .Spear     (SpearfishSize.Large)
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average)
             .Predators (data, 0, (20217, 7));
     }
     // @formatter:on

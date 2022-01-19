@@ -8,7 +8,7 @@ namespace ImGuiOtter.Table;
 
 public class HeaderConfigFlags<T, TItem> : HeaderConfig<TItem> where T : struct, Enum
 {
-    protected T AllFlags = default;
+    public T AllFlags = default;
 
     protected virtual IReadOnlyList<T> Values
         => Enum.GetValues<T>();
@@ -27,7 +27,8 @@ public class HeaderConfigFlags<T, TItem> : HeaderConfig<TItem> where T : struct,
         using var id    = ImGuiRaii.PushId(FilterLabel);
         using var style = ImGuiRaii.PushStyle(ImGuiStyleVar.FrameRounding, 0);
         ImGui.SetNextItemWidth(-Table.ArrowWidth * ImGuiHelpers.GlobalScale);
-        using var color = ImGuiRaii.PushColor(ImGuiCol.FrameBg, 0x803030A0, !FilterValue.HasFlag(AllFlags));
+        var       all   = FilterValue.HasFlag(AllFlags);
+        using var color = ImGuiRaii.PushColor(ImGuiCol.FrameBg, 0x803030A0, !all);
         if (!ImGui.BeginCombo(string.Empty, Label, ImGuiComboFlags.NoArrowButton))
             return false;
 
@@ -36,6 +37,13 @@ public class HeaderConfigFlags<T, TItem> : HeaderConfig<TItem> where T : struct,
         using var end = ImGuiRaii.DeferredEnd(ImGui.EndCombo);
 
         var ret = false;
+        if (ImGui.Checkbox("Enable All", ref all))
+        {
+            SetValue(AllFlags, all);
+            ret = true;
+        }
+
+        using var indent = ImGuiRaii.PushIndent(10f);
         for (var i = 0; i < Names.Length; ++i)
         {
             var tmp = FilterValue.HasFlag(Values[i]);

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using Dalamud.Interface;
-using GatherBuddy.Caching;
 using GatherBuddy.Config;
 using GatherBuddy.Time;
 using ImGuiNET;

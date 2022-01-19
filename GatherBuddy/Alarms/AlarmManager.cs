@@ -5,6 +5,7 @@ using System.Linq;
 using Dalamud.Logging;
 using GatherBuddy.GatherGroup;
 using GatherBuddy.Interfaces;
+using GatherBuddy.Plugin;
 using GatherBuddy.SeFunctions;
 using GatherBuddy.Time;
 using Newtonsoft.Json;
@@ -76,7 +77,7 @@ public partial class AlarmManager : IDisposable
 
     public void Save()
     {
-        var file = Utility.Functions.ObtainSaveFile(FileName);
+        var file = Functions.ObtainSaveFile(FileName);
         if (file == null)
             return;
     

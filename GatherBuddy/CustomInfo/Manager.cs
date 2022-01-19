@@ -6,6 +6,7 @@ using System.Linq;
 using Dalamud.Logging;
 using GatherBuddy.Classes;
 using GatherBuddy.Interfaces;
+using GatherBuddy.Plugin;
 using Newtonsoft.Json;
 
 namespace GatherBuddy.CustomInfo;
@@ -46,13 +47,13 @@ public class Manager
 
     public void MoveLocation(int idx1, int idx2)
     {
-        if (Utility.Functions.Swap(CustomLocations, idx1, idx2))
+        if (Functions.Swap(CustomLocations, idx1, idx2))
             Save();
     }
 
     public void Save()
     {
-        var file = Utility.Functions.ObtainSaveFile(FileName);
+        var file = Functions.ObtainSaveFile(FileName);
         if (file == null)
             return;
 
@@ -71,7 +72,7 @@ public class Manager
 
     public static Manager Load()
     {
-        var     file = Utility.Functions.ObtainSaveFile(FileName);
+        var     file = Functions.ObtainSaveFile(FileName);
         Manager ret  = new();
         if (file is not { Exists: true })
         {

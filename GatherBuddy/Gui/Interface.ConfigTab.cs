@@ -199,9 +199,9 @@ public partial class Interface
 
         if (ImGui.CollapsingHeader("Set Names"))
         {
-            ConfigFunctions.DrawSetInput("Miner",    GatherBuddy.Config.MinerSetName,    s => GatherBuddy.Config.MinerSetName    = s);
-            ConfigFunctions.DrawSetInput("Botanist", GatherBuddy.Config.BotanistSetName, s => GatherBuddy.Config.BotanistSetName = s);
-            ConfigFunctions.DrawSetInput("Fisher",   GatherBuddy.Config.FisherSetName,   s => GatherBuddy.Config.FisherSetName   = s);
+            ConfigFunctions.DrawSetInput("Miner",    GatherBuddy.Config.MinerSetName, s => GatherBuddy.Config.MinerSetName    = s);
+            ConfigFunctions.DrawSetInput("Botanist", GatherBuddy.Config.BotanistSetName,     s => GatherBuddy.Config.BotanistSetName = s);
+            ConfigFunctions.DrawSetInput("Fisher",   GatherBuddy.Config.FisherSetName,       s => GatherBuddy.Config.FisherSetName   = s);
             ImGui.NewLine();
         }
 

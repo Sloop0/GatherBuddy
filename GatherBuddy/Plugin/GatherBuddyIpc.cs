@@ -2,7 +2,7 @@
 using Dalamud.Logging;
 using Dalamud.Plugin.Ipc;
 
-namespace GatherBuddy;
+namespace GatherBuddy.Plugin;
 
 public class GatherBuddyIpc : IDisposable
 {
@@ -10,7 +10,7 @@ public class GatherBuddyIpc : IDisposable
     public const string VersionName  = $"{GatherBuddy.InternalName}.Version";
     public const string IdentifyName = $"{GatherBuddy.InternalName}.Identify";
 
-    private readonly  GatherBuddy                      _plugin;
+    private readonly  GatherBuddy  _plugin;
     internal readonly ICallGateProvider<int>?          _versionProvider;
     internal readonly ICallGateProvider<string, uint>? _identifyProvider;
 

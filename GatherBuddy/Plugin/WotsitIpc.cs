@@ -2,7 +2,7 @@
 using Dalamud.Plugin.Ipc;
 using Dalamud.Plugin.Ipc.Exceptions;
 
-namespace GatherBuddy;
+namespace GatherBuddy.Plugin;
 
 public class WotsitIpc : IDisposable
 {

@@ -8,6 +8,7 @@ using Dalamud.Interface;
 using GatherBuddy.Config;
 using GatherBuddy.Enums;
 using GatherBuddy.Interfaces;
+using GatherBuddy.Plugin;
 using GatherBuddy.Time;
 using ImGuiNET;
 using ImGuiOtter;
@@ -397,9 +398,9 @@ public partial class Interface
                 _levelColumn, _jobColumn, _typeColumn, _expansionColumn, _folkloreColumn, _uptimesColumn, _bestNodeColumn, _bestZoneColumn,
                 _itemIdColumn, _gatheringIdColumn)
         {
-            Sortable                               =  true;
+            Sortable                                      =  true;
             GatherBuddy.UptimeManager.UptimeChange += OnUptimeChange;
-            Flags                                  |= ImGuiTableFlags.Hideable | ImGuiTableFlags.Reorderable | ImGuiTableFlags.Resizable;
+            Flags                                         |= ImGuiTableFlags.Hideable | ImGuiTableFlags.Reorderable | ImGuiTableFlags.Resizable;
         }
 
 

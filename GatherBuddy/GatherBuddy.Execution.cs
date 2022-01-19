@@ -6,11 +6,11 @@ using GatherBuddy.Classes;
 using GatherBuddy.Config;
 using GatherBuddy.Enums;
 using GatherBuddy.Interfaces;
-using GatherBuddy.Managers;
+using GatherBuddy.Plugin;
 using GatherBuddy.SeFunctions;
 using GatherBuddy.Time;
 using GatherBuddy.Utility;
-using CommandManager = GatherBuddy.Managers.CommandManager;
+using CommandManager = GatherBuddy.SeFunctions.CommandManager;
 using GatheringType = GatherBuddy.Enums.GatheringType;
 
 namespace GatherBuddy;

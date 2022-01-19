@@ -13,15 +13,15 @@ using Lumina.Excel.GeneratedSheets;
 using FishingSpot = GatherBuddy.Classes.FishingSpot;
 using GatheringType = GatherBuddy.Enums.GatheringType;
 
-namespace GatherBuddy;
+namespace GatherBuddy.Plugin;
 
 public class UptimeManager : IDisposable
 {
     // We only cache the best uptime regarding current server time and corresponding location per item.
     private readonly (ILocation Location, TimeInterval Interval)[] _bestUptime;
     private readonly (ILocation Location, uint Reset)[]            _bestLocation;
-    private          uint                                          _lastReset        = 1;
-    private          ushort                                        _currentTerritory = 0;
+    private          uint                                          _lastReset = 1;
+    private          ushort                                        _currentTerritory;
     private          ushort                                        _aetherStreamX;
     private          ushort                                        _aetherStreamY;
     private          ushort                                        _aetherPlane;
@@ -37,7 +37,7 @@ public class UptimeManager : IDisposable
         for (var i = 0; i < _bestUptime.Length; ++i)
             _bestUptime[i] = (null!, TimeInterval.Never);
 
-        // No +1 due to just bitflipping negative values.
+        // No +1 due to just bit flipping negative values.
         _bestLocation = new (ILocation, uint)[gameData.MultiNodeGatherables];
         for (var i = 0; i < _bestLocation.Length; ++i)
             _bestLocation[i] = (null!, 0);
@@ -51,7 +51,7 @@ public class UptimeManager : IDisposable
 
     // Get the best location if nothing has reset locations,
     // otherwise update the best aetheryte and return that.
-    private ILocation? GetLocation(IGatherable item)
+    private ILocation GetLocation(IGatherable item)
     {
         Debug.Assert(item.InternalLocationId < 0);
 
@@ -174,14 +174,12 @@ public class UptimeManager : IDisposable
     }
 
     public (ILocation Location, TimeInterval Interval) BestLocation(IGatherable item)
-    {
-        switch (item.InternalLocationId)
+        => item.InternalLocationId switch
         {
-            case > 0: return UpdateUptime(item);
-            case < 0: return (GetLocation(item)!, TimeInterval.Always);
-            default:  return (item.Locations.First(), TimeInterval.Always);
-        }
-    }
+            > 0 => UpdateUptime(item),
+            < 0 => (GetLocation(item), TimeInterval.Always),
+            _   => (item.Locations.First(), TimeInterval.Always),
+        };
 
     public TimeInterval NextUptime(Fish fish, Territory territory, TimeStamp now)
     {

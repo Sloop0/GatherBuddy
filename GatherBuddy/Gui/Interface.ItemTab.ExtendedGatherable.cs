@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using GatherBuddy.Caching;
 using GatherBuddy.Classes;
 using GatherBuddy.Enums;
 using GatherBuddy.Interfaces;

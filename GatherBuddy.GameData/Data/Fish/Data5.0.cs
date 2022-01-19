@@ -358,142 +358,142 @@ public static partial class Fish
             .Bait      (data, 27590)
             .Bite      (HookSet.Powerful, BiteType.Strong);
         data.Apply     (27516, Patch.Shadowbringers) // Grey Carp
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (27517, Patch.Shadowbringers) // Lilac Goby
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (27518, Patch.Shadowbringers) // Purple Ghost
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average);
         data.Apply     (27519, Patch.Shadowbringers) // Lakelouse
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (27520, Patch.Shadowbringers) // Gazing Glass
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.ExtremelySlow);
         data.Apply     (27521, Patch.Shadowbringers) // Source Octopus
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (27522, Patch.Shadowbringers) // Elven Spear
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast);
         data.Apply     (27523, Patch.Shadowbringers) // Shade Gudgeon
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average);
         data.Apply     (27524, Patch.Shadowbringers) // Lakethistle
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (27525, Patch.Shadowbringers) // Platinum Bream
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (27526, Patch.Shadowbringers) // Wardenfish
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.ExtremelySlow);
         data.Apply     (27527, Patch.Shadowbringers) // Finned Eggplant
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (27528, Patch.Shadowbringers) // Skykisser
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (27529, Patch.Shadowbringers) // Viola Clam
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (27530, Patch.Shadowbringers) // Geayi
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (27531, Patch.Shadowbringers) // Noblefish
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (27532, Patch.Shadowbringers) // Misteye
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VeryFast);
         data.Apply     (27533, Patch.Shadowbringers) // Lakeland Cod
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (27534, Patch.Shadowbringers) // Little Bismarck
-            .Spear     (SpearfishSize.Large)
-            .Predators (data, 0, (27531, 10));
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VeryFast)
+            .Predators (data, 0, (27531, 7));
         data.Apply     (27535, Patch.Shadowbringers) // Bothriolepis
-            .Spear     (SpearfishSize.Large)
-            .Predators (data, 0, (27531, 10));
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow)
+            .Predators (data, 0, (27531, 7));
         data.Apply     (27536, Patch.Shadowbringers) // Big-eye
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Fast);
         data.Apply     (27537, Patch.Shadowbringers) // Jenanna's Tear
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (27538, Patch.Shadowbringers) // Daisy Turban
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (27539, Patch.Shadowbringers) // Shade Axolotl
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (27540, Patch.Shadowbringers) // Little Flirt
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (27541, Patch.Shadowbringers) // Peallaidh
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (27542, Patch.Shadowbringers) // Voeburt Bichir
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast);
         data.Apply     (27543, Patch.Shadowbringers) // Poecilia
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (27544, Patch.Shadowbringers) // Gilded Batfish
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average);
         data.Apply     (27545, Patch.Shadowbringers) // Petalfish
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Fast);
         data.Apply     (27546, Patch.Shadowbringers) // Mirrorfish
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (27547, Patch.Shadowbringers) // Glass Eel
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (27548, Patch.Shadowbringers) // Voeburt Salamander
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.ExtremelySlow);
         data.Apply     (27549, Patch.Shadowbringers) // Bedskipper
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Fast);
         data.Apply     (27550, Patch.Shadowbringers) // Dandyfish
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (27551, Patch.Shadowbringers) // Sauldia Ruby
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (27552, Patch.Shadowbringers) // Mock Pixie
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.ExtremelySlow);
         data.Apply     (27553, Patch.Shadowbringers) // Hunter's Arrow
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (27554, Patch.Shadowbringers) // Fuathgobbler
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (27555, Patch.Shadowbringers) // Paradise Crab
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (27556, Patch.Shadowbringers) // Saint Fathric's Ire
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (27557, Patch.Shadowbringers) // Queensgown
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (27558, Patch.Shadowbringers) // Flowering Kelpie
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (27559, Patch.Shadowbringers) // Ghoulfish
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast);
         data.Apply     (27560, Patch.Shadowbringers) // Measan Deala
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (27561, Patch.Shadowbringers) // Dohn Horn
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (27562, Patch.Shadowbringers) // Aquabloom
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (27563, Patch.Shadowbringers) // Jester Fish
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (27564, Patch.Shadowbringers) // Blue Lightning
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.ExtremelyFast);
         data.Apply     (27565, Patch.Shadowbringers) // Maidenhair
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (27566, Patch.Shadowbringers) // Blue Mountain Bubble
-            .Spear     (SpearfishSize.Average)
-            .Predators (data, 0, (27551, 10));
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Fast)
+            .Predators (data, 0, (27551, 7));
         data.Apply     (27567, Patch.Shadowbringers) // Elder Pixie
-            .Spear     (SpearfishSize.Average)
-            .Predators (data, 0, (27551, 10));
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow)
+            .Predators (data, 0, (27551, 7));
         data.Apply     (27568, Patch.Shadowbringers) // Ankle Snipper
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (27569, Patch.Shadowbringers) // Treescale
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (27570, Patch.Shadowbringers) // Ronkan Pleco
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (27571, Patch.Shadowbringers) // Gourmand Crab
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (27572, Patch.Shadowbringers) // Gatorl's Bead
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (27573, Patch.Shadowbringers) // Diamondtongue
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast);
         data.Apply     (27574, Patch.Shadowbringers) // Hermit's Hood
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (27575, Patch.Shadowbringers) // Hermit Crab
-            .Spear     (SpearfishSize.Small);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (27576, Patch.Shadowbringers) // Megapiranha
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Fast);
         data.Apply     (27577, Patch.Shadowbringers) // Everdark Bass
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (27578, Patch.Shadowbringers) // Lozatl Pirarucu
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (27579, Patch.Shadowbringers) // Anpa's Handmaid
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (27580, Patch.Shadowbringers) // Viis Ear
-            .Spear     (SpearfishSize.Small)
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VeryFast)
             .Predators (data, 0, (27569, 10));
         data.Apply     (27581, Patch.Shadowbringers) // Rak'tika Goby
-            .Spear     (SpearfishSize.Small)
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average)
             .Predators (data, 0, (27569, 10));
     }
     // @formatter:on

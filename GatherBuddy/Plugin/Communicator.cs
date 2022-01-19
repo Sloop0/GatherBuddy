@@ -10,7 +10,7 @@ using GatherBuddy.Interfaces;
 using GatherBuddy.Structs;
 using GatherBuddy.Time;
 
-namespace GatherBuddy;
+namespace GatherBuddy.Plugin;
 
 public static class Communicator
 {

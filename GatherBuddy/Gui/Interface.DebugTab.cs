@@ -6,6 +6,7 @@ using System.Linq;
 using Dalamud;
 using GatherBuddy.Classes;
 using GatherBuddy.Levenshtein;
+using GatherBuddy.Plugin;
 using GatherBuddy.Structs;
 using ImGuiNET;
 using ImGuiOtter;
@@ -115,6 +116,25 @@ public partial class Interface
         }
     }
 
+    private void DrawDebugEventFramework()
+    {
+        if (!ImGui.CollapsingHeader("EventFramework"))
+            return;
+
+        if (!ImGui.BeginTable("##Framework", 2))
+            return;
+
+        using var end = ImGuiRaii.DeferredEnd(ImGui.EndTable);
+        ImGuiUtil.DrawTableColumn("Event Framework Address");
+        ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework.Address.ToString("X"));
+        ImGuiUtil.DrawTableColumn("Fishing Manager Address");
+        ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework._fishingManager.ToString("X"));
+        ImGuiUtil.DrawTableColumn("Fishing State Address");
+        ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework._fishingState.ToString("X"));
+        ImGuiUtil.DrawTableColumn("Fishing State");
+        ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework.FishingState.ToString());
+    }
+
     private void DrawUptimeManagerTable()
     {
         if (!ImGui.CollapsingHeader($"Uptimes ({GatherBuddy.GameData.TimedGatherables})"))
@@ -167,6 +187,7 @@ public partial class Interface
         const ImGuiTableFlags flags = ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit;
 
         DrawDebugButtons();
+        DrawDebugEventFramework();
         ImGuiTable.DrawTabbedTable($"Aetherytes ({GatherBuddy.GameData.Aetherytes.Count})", GatherBuddy.GameData.Aetherytes.Values,
             DrawDebugAetheryte, flags, "Id", "Name", "Territory", "Coords", "Aetherstream");
         ImGuiTable.DrawTabbedTable($"Territories ({GatherBuddy.GameData.WeatherTerritories.Length})", GatherBuddy.GameData.WeatherTerritories,

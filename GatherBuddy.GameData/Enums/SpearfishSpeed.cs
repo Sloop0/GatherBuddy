@@ -2,17 +2,22 @@ using System;
 
 namespace GatherBuddy.Enums;
 
-public enum SpearfishSpeed : byte
+public enum SpearfishSpeed : ushort
 {
     Unknown       = 0,
-    ExtremelySlow = 1,
-    VerySlow      = 2,
-    Slow          = 3,
-    Fast          = 4,
-    VeryFast      = 5,
-    ExtremelyFast = 6,
+    SuperSlow     = 100,
+    ExtremelySlow = 150,
+    VerySlow      = 200,
+    Slow          = 250,
+    Average       = 300,
+    Fast          = 350,
+    VeryFast      = 400,
+    ExtremelyFast = 450,
+    SuperFast     = 500,
+    HyperFast     = 550,
+    LynFast       = 600,
 
-    None = 255,
+    None = ushort.MaxValue,
 }
 
 public static class SpearFishSpeedExtensions
@@ -21,13 +26,18 @@ public static class SpearFishSpeedExtensions
         => speed switch
         {
             SpearfishSpeed.Unknown       => "Unknown Speed",
+            SpearfishSpeed.SuperSlow     => "Super Slow",
             SpearfishSpeed.ExtremelySlow => "Extremely Slow",
             SpearfishSpeed.VerySlow      => "Very Slow",
             SpearfishSpeed.Slow          => "Slow",
+            SpearfishSpeed.Average       => "Average",
             SpearfishSpeed.Fast          => "Fast",
             SpearfishSpeed.VeryFast      => "Very Fast",
             SpearfishSpeed.ExtremelyFast => "Extremely Fast",
+            SpearfishSpeed.SuperFast     => "Super Fast",
+            SpearfishSpeed.HyperFast     => "Hyper Fast",
+            SpearfishSpeed.LynFast       => "Mega Fast",
             SpearfishSpeed.None          => "No Speed",
-            _                            => throw new ArgumentOutOfRangeException(nameof(speed), speed, null),
+            _                            => $"{(ushort)speed}",
         };
 }

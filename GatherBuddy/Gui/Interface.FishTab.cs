@@ -7,6 +7,8 @@ using GatherBuddy.Classes;
 using GatherBuddy.Config;
 using GatherBuddy.Enums;
 using GatherBuddy.Interfaces;
+using GatherBuddy.Plugin;
+using GatherBuddy.SeFunctions;
 using ImGuiNET;
 using ImGuiOtter;
 using ImGuiOtter.Table;
@@ -66,6 +68,8 @@ public partial class Interface
                 _itemIdColumnWidth           = Math.Max(TextWidth("999999") / Scale, TextWidth(_itemIdColumn.Label) / Scale + Table.ArrowWidth);
                 _fishIdColumnWidth           = Math.Max(TextWidth("99999") / Scale,  TextWidth(_fishIdColumn.Label) / Scale + Table.ArrowWidth);
             }
+
+            GatherBuddy.FishLog.CheckForChanges();
         }
 
         public FishTable()
@@ -76,9 +80,10 @@ public partial class Interface
                 _baitColumn, _bestSpotColumn, _typeColumn, _patchColumn, _folkloreColumn, _aetheryteColumn, _bestZoneColumn, _itemIdColumn,
                 _fishIdColumn)
         {
-            Sortable                               =  true;
+            Sortable                                      =  true;
             GatherBuddy.UptimeManager.UptimeChange += OnUptimeChange;
-            Flags                                  |= ImGuiTableFlags.Hideable | ImGuiTableFlags.Reorderable | ImGuiTableFlags.Resizable;
+            Flags                                         |= ImGuiTableFlags.Hideable | ImGuiTableFlags.Reorderable | ImGuiTableFlags.Resizable;
+            GatherBuddy.FishLog.Change             += OnLogChange;
         }
 
         private static readonly NameColumn       _nameColumn       = new() { Label = "Item Name..." };
@@ -180,8 +185,7 @@ public partial class Interface
                     return;
                 }
 
-                var caught = (fish.Data.ItemId & 1) == 0; // TODO
-                if (caught)
+                if (fish.Unlocked)
                 {
                     using var color = ImGuiRaii.PushColor(ImGuiCol.Text, 0xFF008000);
                     ImGuiUtil.Center(FontAwesomeIcon.Check.ToIconString());
@@ -198,10 +202,17 @@ public partial class Interface
                 if (!fish.Data.InLog)
                     return FilterValue.HasFlag(FishFilter.NotInLog);
 
-                var caught = (fish.Data.ItemId & 1) == 0; // TODO
-                return caught
+                return fish.Unlocked
                     ? FilterValue.HasFlag(FishFilter.AlreadyCaught)
                     : FilterValue.HasFlag(FishFilter.Uncaught);
+            }
+
+            public override int Compare(ExtendedFish lhs, ExtendedFish rhs)
+            {
+                if (!lhs.Data.InLog)
+                    return rhs.Data.InLog ? 1 : 0;
+
+                return lhs.Unlocked ? rhs.Unlocked ? 0 : 1 : -1;
             }
         }
 
@@ -286,6 +297,9 @@ public partial class Interface
 
         private sealed class PatchColumn : HeaderConfigFlags<PatchFlag, ExtendedFish>
         {
+            public PatchColumn()
+                => AllFlags = Enum.GetValues<PatchFlag>().Aggregate((l, r) => l | r);
+
             private static readonly string[] FlagNames = Enum.GetValues<PatchFlag>()
                 .Select(p => $"{p.ToPatch().ToVersionString()} - {p.ToPatch().ToPatchName()}")
                 .ToArray();
@@ -300,11 +314,11 @@ public partial class Interface
                 => _patchColumnWidth * ImGuiHelpers.GlobalScale;
 
             public override PatchFlag FilterValue
-                => ~GatherBuddy.Config.HideFishPatch;
+                => GatherBuddy.Config.HideFishPatch;
 
             protected override void SetValue(PatchFlag f, bool v)
             {
-                var tmp = v ? GatherBuddy.Config.HideFishPatch & ~f : GatherBuddy.Config.HideFishPatch | f;
+                var tmp = v ? GatherBuddy.Config.HideFishPatch | f : GatherBuddy.Config.HideFishPatch & ~f;
                 if (tmp == GatherBuddy.Config.HideFishPatch)
                     return;
 
@@ -472,6 +486,17 @@ public partial class Interface
         public void Dispose()
         {
             GatherBuddy.UptimeManager.UptimeChange -= OnUptimeChange;
+            GatherBuddy.FishLog.Change             -= OnLogChange;
+        }
+
+        private void OnLogChange()
+        {
+            foreach (var fish in Items)
+                fish.Unlocked = GatherBuddy.FishLog.IsUnlocked(fish.Data);
+            if (_caughtColumn.FilterValue != _caughtColumn.AllFlags)
+                FilterDirty = true;
+            else if (SortIdx == 1)
+                SortDirty = true;
         }
 
         private void OnUptimeChange(IGatherable item)

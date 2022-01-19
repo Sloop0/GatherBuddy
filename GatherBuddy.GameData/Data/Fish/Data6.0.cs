@@ -371,141 +371,141 @@ public static partial class Fish
             .Bite      (HookSet.Powerful, BiteType.Legendary)
             .Time      (1320, 240);
         data.Apply     (36522, Patch.Endwalker) // Thavnairian Cucumber
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (36523, Patch.Endwalker) // Spiny King Crab
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (36524, Patch.Endwalker) // Thavnairian Eel
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (36525, Patch.Endwalker) // Gilled Topknot
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Fast);
         data.Apply     (36526, Patch.Endwalker) // Purusa Fish
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (36527, Patch.Endwalker) // Giantsgall Jaw
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VeryFast);
         data.Apply     (36528, Patch.Endwalker) // Akyaali Sardine
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Slow);
         data.Apply     (36529, Patch.Endwalker) // Spicy Pickle
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (36530, Patch.Endwalker) // Mayavahana
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (36531, Patch.Endwalker) // Hedonfish
-            .Spear     (SpearfishSize.Average);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (36532, Patch.Endwalker) // Satrap Trapfish
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (36533, Patch.Endwalker) // Blue Marlin
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.HyperFast);
         data.Apply     (36534, Patch.Endwalker) // Satrap's Whisper
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (36535, Patch.Endwalker) // Tebqeyiq Smelt
-            .Spear     (SpearfishSize.Small)
-            .Predators (data, 0, (36531, 10), (36547, 3), (36546, 2));
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.SuperFast)
+            .Predators (data, 0, (36531, 10), (36546, 2), (36547, 3));
         data.Apply     (36536, Patch.Endwalker) // Shallows Cod
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (36537, Patch.Endwalker) // Meyhane Reveler
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Slow);
         data.Apply     (36538, Patch.Endwalker) // Daemir's Alloy
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.ExtremelyFast);
         data.Apply     (36539, Patch.Endwalker) // Rasa Fish
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (36540, Patch.Endwalker) // Agama's Palm
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (36541, Patch.Endwalker) // Rummy-nosed Tetra
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average);
         data.Apply     (36542, Patch.Endwalker) // Monksblade
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (36543, Patch.Endwalker) // Atamra Cichlid
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Fast);
         data.Apply     (36544, Patch.Endwalker) // Root of Maya
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (36545, Patch.Endwalker) // Floral Snakehead
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (36546, Patch.Endwalker) // Xiphactinus
-            .Spear     (SpearfishSize.Large)
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average)
             .Predators (data, 0, (36531, 10));
         data.Apply     (36547, Patch.Endwalker) // Dusky Shark
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast);
         data.Apply     (36548, Patch.Endwalker) // Coffer Shell
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (36549, Patch.Endwalker) // Onihige
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average);
         data.Apply     (36550, Patch.Endwalker) // Onokoro Carp
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (36551, Patch.Endwalker) // Ruby-spotted Crab
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.ExtremelySlow);
         data.Apply     (36552, Patch.Endwalker) // Marrow-eater
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (36553, Patch.Endwalker) // Cloudy Catshark
-            .Spear     (SpearfishSize.Large);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VeryFast);
         data.Apply     (36554, Patch.Endwalker) // Red Gurnard
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (36555, Patch.Endwalker) // Dream Pickle
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (36556, Patch.Endwalker) // Ruby Haddock
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (36557, Patch.Endwalker) // Crown Fish
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Fast);
         data.Apply     (36558, Patch.Endwalker) // Sword of Isari 
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (36559, Patch.Endwalker) // Blue Shark
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (36560, Patch.Endwalker) // Barb of Exile
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Slow);
         data.Apply     (36561, Patch.Endwalker) // Smooth Lumpfish
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.ExtremelySlow);
         data.Apply     (36562, Patch.Endwalker) // Hells' Cap
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (36563, Patch.Endwalker) // Keeled Fugu
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (36564, Patch.Endwalker) // Eastern Seerfish
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (36565, Patch.Endwalker) // False Fusilier
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VerySlow);
         data.Apply     (36566, Patch.Endwalker) // Skipping Stone
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (36567, Patch.Endwalker) // Red-spotted Blenny
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Fast);
         data.Apply     (36568, Patch.Endwalker) // Othardian Wrasse
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.ExtremelyFast);
         data.Apply     (36569, Patch.Endwalker) // Grey Mullet
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (36570, Patch.Endwalker) // Prayer Cushion
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VeryFast);
         data.Apply     (36571, Patch.Endwalker) // Deepbody Boarfish
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (36572, Patch.Endwalker) // Jointed Razorfish
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Slow);
         data.Apply     (36573, Patch.Endwalker) // Pipefish
-            .Spear     (SpearfishSize.Small)
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Fast)
             .Predators (data, 0, (36553, 10));
         data.Apply     (36574, Patch.Endwalker) // Righteye Flounder
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (36575, Patch.Endwalker) // Mini Yasha
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.Average);
         data.Apply     (36576, Patch.Endwalker) // Sawshark
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Fast);
         data.Apply     (36577, Patch.Endwalker) // Othardian Lumpsucker
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Slow);
         data.Apply     (36578, Patch.Endwalker) // Shogun's Kabuto
-            .Spear     (SpearfishSize.Large)
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow)
             .Predators (data, 0, (36553, 10));
         data.Apply     (36579, Patch.Endwalker) // Bluefin Trevally
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (36580, Patch.Endwalker) // Kitefin Shark
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (36581, Patch.Endwalker) // Uzumaki
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Average);
         data.Apply     (36582, Patch.Endwalker) // Natron Puffer
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VerySlow);
         data.Apply     (36583, Patch.Endwalker) // Diamond Dagger
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Small, SpearfishSpeed.VeryFast);
         data.Apply     (36584, Patch.Endwalker) // Queenly Fan
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.VerySlow);
         data.Apply     (36585, Patch.Endwalker) // Pale Panther
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Average, SpearfishSpeed.Average);
         data.Apply     (36586, Patch.Endwalker) // Saltsquid
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.Slow);
         data.Apply     (36587, Patch.Endwalker) // Platinum Hammerhead
-            .Spear     (SpearfishSize.Unknown);
+            .Spear     (SpearfishSize.Large, SpearfishSpeed.VeryFast);
     }
     // @formatter:on
 }

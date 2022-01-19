@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Dalamud.Logging;
 using GatherBuddy.Interfaces;
+using GatherBuddy.Plugin;
 using Newtonsoft.Json;
 
 namespace GatherBuddy.GatherWindow;
@@ -33,13 +34,13 @@ public class GatherWindow
 
     public void MoveLocation(int idx1, int idx2)
     {
-        if (Utility.Functions.Swap(Items, idx1, idx2))
+        if (Functions.Swap(Items, idx1, idx2))
             Save();
     }
 
     public void Save()
     {
-        var file = Utility.Functions.ObtainSaveFile(FileName);
+        var file = Functions.ObtainSaveFile(FileName);
         if (file == null)
             return;
 
@@ -59,7 +60,7 @@ public class GatherWindow
     public static GatherWindow Load()
     {
         var ret  = new GatherWindow();
-        var file = Utility.Functions.ObtainSaveFile(FileName);
+        var file = Functions.ObtainSaveFile(FileName);
         if (file is not { Exists: true })
         {
             ret.Save();

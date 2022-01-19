@@ -9,7 +9,7 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Client.UI.Shell;
 
-namespace GatherBuddy.Managers;
+namespace GatherBuddy.SeFunctions;
 
 public unsafe class MacroManager : IDisposable
 {
@@ -133,5 +133,5 @@ public unsafe class MacroManager : IDisposable
     }
 
     public void Execute()
-        => Module->ExecuteMacro((RaptureMacroModule.Macro*) (((byte*) Macro)-8));
+        => Module->ExecuteMacro((RaptureMacroModule.Macro*)((byte*)Macro - 8));
 }

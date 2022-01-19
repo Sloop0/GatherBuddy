@@ -4,15 +4,15 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Dalamud.Logging;
 
-namespace GatherBuddy.Utility;
+namespace GatherBuddy.Plugin;
 
 public static class Functions
 {
     // Clamps invalid indices to valid indices.
     public static bool Swap<T>(IList<T> list, int idx1, int idx2)
     {
-        idx1 = System.Math.Clamp(idx1, 0, list.Count);
-        idx2 = System.Math.Clamp(idx2, 0, list.Count);
+        idx1 = Math.Clamp(idx1, 0, list.Count);
+        idx2 = Math.Clamp(idx2, 0, list.Count);
         if (idx1 == idx2)
             return false;
 

@@ -4,9 +4,8 @@ using System.Text;
 using Dalamud.Game;
 using Dalamud.Game.Gui;
 using Dalamud.Logging;
-using GatherBuddy.SeFunctions;
 
-namespace GatherBuddy.Managers;
+namespace GatherBuddy.SeFunctions;
 
 public class CommandManager
 {

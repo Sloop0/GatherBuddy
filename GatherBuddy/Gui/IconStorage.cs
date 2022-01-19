@@ -4,7 +4,7 @@ using Dalamud.Utility;
 using ImGuiScene;
 using Lumina.Data.Files;
 
-namespace GatherBuddy.Caching;
+namespace GatherBuddy.Gui;
 
 internal class Icons : IDisposable
 {

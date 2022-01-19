@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dalamud.Game.Command;
+using Dalamud.Logging;
 using GatherBuddy.Enums;
 using GatherBuddy.Time;
 
@@ -148,7 +151,9 @@ public partial class GatherBuddy
                 }
                 else
                 {
-                    var node = group.CurrentNode((uint)(Time.EorzeaMinuteOfDay + (int.TryParse(argumentParts[1], out var offset) ? offset : 0)) % RealTime.MinutesPerDay);
+                    var node = group.CurrentNode(
+                        (uint)(Time.EorzeaMinuteOfDay + (int.TryParse(argumentParts[1], out var offset) ? offset : 0))
+                      % RealTime.MinutesPerDay);
                     if (node == null)
                         Dalamud.Chat.Print($"Nope");
                     else
@@ -166,7 +171,12 @@ public partial class GatherBuddy
         if (argumentParts.Length == 0)
             return;
 
+        var sums = Enum.GetValues<SpearfishSpeed>().ToDictionary(s => s, _ => 0);
+        foreach (var fish in GatherBuddy.GameData.Fishes.Values)
+            sums[fish.Speed]++;
 
+        foreach(var (speed, sum) in sums.Where(s => s.Key != SpearfishSpeed.None && s.Key != SpearfishSpeed.Unknown))
+            PluginLog.Information($"{speed.ToName(),-20} ({(ushort) speed,3}) - {sum,4}");
         //if (Util.CompareCi(argumentParts[0], "dump"))
         //    switch (argumentParts[1].ToLowerInvariant())
         //    {

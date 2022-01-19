@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using Dalamud.Logging;
 using GatherBuddy.Classes;
-using GatherBuddy.SeFunctions;
 using GatherBuddy.Structs;
 using GatherBuddy.Time;
 
@@ -21,7 +20,7 @@ public partial class WeatherManager
         var shiftedHour = (uint)(hour + 8 - hour % 8) % RealTime.HoursPerDay;
         var day         = seconds / EorzeaTimeStampExtensions.SecondsPerEorzeaDay;
 
-        var ret = (uint) day * 100 + shiftedHour;
+        var ret = (uint)day * 100 + shiftedHour;
         ret =  (ret << 11) ^ ret;
         ret =  (ret >> 8) ^ ret;
         ret %= 100;
@@ -61,7 +60,7 @@ public partial class WeatherManager
             var target  = CalculateTarget(root);
             var weather = GetWeather(target, territory.WeatherRates);
             ret[i] =  new WeatherListing(weather, root);
-            root += EorzeaTimeStampExtensions.MillisecondsPerEorzeaWeather;
+            root   += EorzeaTimeStampExtensions.MillisecondsPerEorzeaWeather;
         }
 
         return ret;

@@ -63,8 +63,8 @@ public class FishingSpot : IComparable<FishingSpot>, ILocation
         Territory = data.FindOrAddTerritory(spot.TerritoryType.Value) ?? Territory.Invalid;
         Name      = MultiString.ParseSeStringLumina(spot.PlaceName.Value?.Name);
 
-        IntegralXCoord = Maps.NodeToMap(spot.X, Territory.SizeFactor);
-        IntegralYCoord = Maps.NodeToMap(spot.Z, Territory.SizeFactor);
+        IntegralXCoord = Maps.MarkerToMap(spot.X, Territory.SizeFactor);
+        IntegralYCoord = Maps.MarkerToMap(spot.Z, Territory.SizeFactor);
         ClosestAetheryte = Territory.Aetherytes.Count > 0
             ? Territory.Aetherytes.ArgMin(a => a.WorldDistance(Territory.Id, IntegralXCoord, IntegralYCoord))
             : null;
@@ -83,8 +83,8 @@ public class FishingSpot : IComparable<FishingSpot>, ILocation
         Territory = data.FindOrAddTerritory(spot.TerritoryType.Value) ?? Territory.Invalid;
         Name      = MultiString.ParseSeStringLumina(spot.PlaceName.Value?.Name);
 
-        IntegralXCoord = Maps.NodeToMap(spot.X, Territory.SizeFactor);
-        IntegralYCoord = Maps.NodeToMap(spot.Y, Territory.SizeFactor);
+        IntegralXCoord = Maps.MarkerToMap(spot.X, Territory.SizeFactor);
+        IntegralYCoord = Maps.MarkerToMap(spot.Y, Territory.SizeFactor);
         ClosestAetheryte = Territory.Aetherytes.Count > 0
             ? Territory.Aetherytes.ArgMin(a => a.WorldDistance(Territory.Id, IntegralXCoord, IntegralYCoord))
             : null;

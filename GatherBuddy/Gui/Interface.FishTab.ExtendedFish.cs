@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
-using GatherBuddy.Caching;
 using GatherBuddy.Classes;
 using GatherBuddy.Enums;
 using GatherBuddy.Interfaces;
@@ -70,6 +69,7 @@ public partial class Interface
         public string        FishType;
         public bool          UptimeDependency;
         public ushort        UptimePercent;
+        public bool          Unlocked = false;
 
         public (ILocation, TimeInterval) Uptime
             => GatherBuddy.UptimeManager.BestLocation(Data);
@@ -257,6 +257,7 @@ public partial class Interface
             Snagging         = SetSnagging(data, Bait);
             UptimeDependency = SetUptimeDependency(data, Bait);
             Intuition        = SetIntuition(data);
+            Unlocked         = GatherBuddy.FishLog.IsUnlocked(data);
         }
 
         private static void PrintTime(ExtendedFish fish)
@@ -428,43 +429,6 @@ public partial class Interface
             PrintBait(this, iconSize, smallIconSize);
             PrintPredators(this, iconSize);
             PrintFolklore(this);
-        }
-
-        public void Draw(Vector2 lineIconSize, Vector2 iconSize, Vector2 smallIconSize, Vector2 weatherIconSize)
-        {
-            var (location, uptime) = Uptime;
-
-            ImGui.TableNextColumn();
-            ImGuiUtil.HoverIcon(Icon, lineIconSize);
-            ImGui.SameLine();
-            ImGui.Selectable(Data.Name[GatherBuddy.Language]);
-            if (ImGui.IsItemHovered())
-                SetTooltip(iconSize, smallIconSize, weatherIconSize);
-            ImGui.TableNextColumn();
-            DrawTimeInterval(uptime, UptimeDependency);
-
-            //ImGui.TableNextColumn();
-            //ImGui.Text(Level);
-            //
-            //ImGui.TableNextColumn();
-            //ImGui.Text(Data.GatheringType.ToString());
-            //ImGui.TableNextColumn();
-            //ImGui.Text(Data.NodeType.ToString());
-            //ImGui.TableNextColumn();
-            //ImGui.Text(Uptimes);
-            //ImGui.TableNextColumn();
-            //ImGui.Text(Folklore);
-            //
-            //ImGui.TableNextColumn();
-            //ImGui.Selectable(location.Name);
-            //ImGuiUtil.HoverTooltip($"All locations:\n{string.Join("\n", Data.NodeList.Select(n => n.Name))}");
-            //
-            //ImGui.TableNextColumn();
-            //ImGui.Text(location.Territory.Name);
-            //ImGuiUtil.HoverTooltip($"All zones:\n{string.Join("\n", Data.NodeList.Select(n => n.Territory.Name).Distinct())}");
-            //
-            //ImGui.TableNextColumn();
-            //ImGui.Selectable(location.ClosestAetheryte?.Name ?? "None");
         }
     }
 }

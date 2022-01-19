@@ -36,8 +36,8 @@ public class GameData
     public PatriciaTrie<Gatherable> GatherablesTrie { get; init; } = new();
     public PatriciaTrie<Fish>       FishTrie        { get; init; } = new();
 
-    public int TimedGatherables     { get; init; } = 0;
-    public int MultiNodeGatherables { get; init; } = 0;
+    public int TimedGatherables     { get; init; }
+    public int MultiNodeGatherables { get; init; }
 
 
     public GameData(DataManager gameData)

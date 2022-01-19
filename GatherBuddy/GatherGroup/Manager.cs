@@ -5,6 +5,7 @@ using System.Linq;
 using Dalamud.Logging;
 using GatherBuddy.Classes;
 using GatherBuddy.Interfaces;
+using GatherBuddy.Plugin;
 using GatherBuddy.Time;
 using Newtonsoft.Json;
 
@@ -128,7 +129,7 @@ public class Manager
 
     public void Save()
     {
-        var file = Utility.Functions.ObtainSaveFile(FileName);
+        var file = Functions.ObtainSaveFile(FileName);
         if (file == null)
             return;
 
@@ -169,7 +170,7 @@ public class Manager
     public static Manager Load()
     {
         var manager = new Manager();
-        var file    = Utility.Functions.ObtainSaveFile(FileName);
+        var file    = Functions.ObtainSaveFile(FileName);
         if (file is not { Exists: true })
         {
             manager.SetDefaults();

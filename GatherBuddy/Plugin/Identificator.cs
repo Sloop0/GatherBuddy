@@ -2,11 +2,8 @@
 using System.Linq;
 using Dalamud;
 using GatherBuddy.Classes;
-using GatherBuddy.Interfaces;
-using GatherBuddy.Weather;
-using GatheringType = GatherBuddy.Enums.GatheringType;
 
-namespace GatherBuddy;
+namespace GatherBuddy.Plugin;
 
 public class Identificator
 {
