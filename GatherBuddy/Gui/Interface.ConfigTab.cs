@@ -1,8 +1,12 @@
 ﻿using System;
-using Dalamud.Interface;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using Dalamud.Game.Text;
 using GatherBuddy.Config;
 using ImGuiNET;
 using ImGuiOtter;
+using Lumina.Excel.GeneratedSheets;
 
 namespace GatherBuddy.Gui;
 
@@ -29,32 +33,11 @@ public partial class Interface
                 GatherBuddy.Config.Save();
         }
 
-        public static ItemFilter SetShowItems(ItemFilter oldValue, ItemFilter flag, bool value)
+        private static void DrawChatTypeSelector(string label, string description, XivChatType currentValue, Action<XivChatType> setter)
         {
-            if (value)
-                return oldValue | flag;
-
-            return oldValue & ~flag;
-        }
-
-        public static FishFilter SetShowFish(FishFilter oldValue, FishFilter flag, bool value)
-        {
-            if (value)
-                return oldValue | flag;
-
-            return oldValue & ~flag;
-        }
-
-        public static void DrawVisibilityBox<T>(T flag, T oldValue, string label, string tooltip, Action<T, bool> setFlag) where T : Enum
-        {
-            var tmp = oldValue.HasFlag(flag);
-            if (ImGui.Checkbox(label, ref tmp))
-            {
-                setFlag(flag, tmp);
+            ImGui.SetNextItemWidth(SetInputWidth);
+            if (ImGuiUtil.DrawChatTypeSelector(label, description, currentValue, setter))
                 GatherBuddy.Config.Save();
-            }
-
-            ImGuiUtil.HoverTooltip(tooltip);
         }
 
 
@@ -99,6 +82,21 @@ public partial class Interface
                 "Skips teleports if you are in the same map and closer to the target than the selected aetheryte already.",
                 GatherBuddy.Config.SkipTeleportIfClose, b => GatherBuddy.Config.SkipTeleportIfClose = b);
 
+        private const string ChatInformationString =
+            "Note that the message only gets printed to your chat log, regardless of the selected channel"
+          + " - other people will not see your 'Say' message.";
+
+        public static void DrawPrintTypeSelector()
+            => DrawChatTypeSelector("Chat Type for Messages",
+                "The chat type used to print regular messages issued by GatherBuddy.\n"
+              + ChatInformationString,
+                GatherBuddy.Config.ChatTypeMessage, t => GatherBuddy.Config.ChatTypeMessage = t);
+
+        public static void DrawErrorTypeSelector()
+            => DrawChatTypeSelector("Chat Type for Errors",
+                "The chat type used to print error messages issued by GatherBuddy.\n"
+              + ChatInformationString,
+                GatherBuddy.Config.ChatTypeError, t => GatherBuddy.Config.ChatTypeError = t);
 
         // Weather Tab
         public static void DrawWeatherTabNamesBox()
@@ -136,6 +134,37 @@ public partial class Interface
             => DrawCheckbox("Show Uptimes in Fish Timer",
                 "Show the uptimes for restricted fish in the fish timer window.",
                 GatherBuddy.Config.ShowFishTimerUptimes, b => GatherBuddy.Config.ShowFishTimerUptimes = b);
+
+        // Spearfishing Helper
+        public static void DrawSpearfishHelperBox()
+            => DrawCheckbox("Show Spearfishing Helper",
+                "Toggle whether to show the Spearfishing Helper while spearfishing.",
+                GatherBuddy.Config.ShowSpearfishHelper, b => GatherBuddy.Config.ShowSpearfishHelper = b);
+
+        public static void DrawSpearfishNamesBox()
+            => DrawCheckbox("Show Fish Name Overlay",
+                "Toggle whether to show the identified names of fish in the spearfishing window.",
+                GatherBuddy.Config.ShowSpearfishNames, b => GatherBuddy.Config.ShowSpearfishNames = b);
+
+        public static void DrawAvailableSpearfishBox()
+            => DrawCheckbox("Show List of Available Fish",
+                "Toggle whether to show the list of fish available in your current spearfishing spot on the side of the spearfishing window.",
+                GatherBuddy.Config.ShowAvailableSpearfish, b => GatherBuddy.Config.ShowAvailableSpearfish = b);
+
+        public static void DrawSpearfishSpeedBox()
+            => DrawCheckbox("Show Speed of Fish in Overlay",
+                "Toggle whether to show the speed of fish in the spearfishing window in addition to their names.",
+                GatherBuddy.Config.ShowSpearfishSpeed, b => GatherBuddy.Config.ShowSpearfishSpeed = b);
+
+        public static void DrawSpearfishCenterLineBox()
+            => DrawCheckbox("Show Center Line",
+                "Toggle whether to show a straight line up from the center of the spearfishing gig in the spearfishing window.",
+                GatherBuddy.Config.ShowSpearfishCenterLine, b => GatherBuddy.Config.ShowSpearfishCenterLine = b);
+
+        public static void DrawSpearfishIconsAsTextBox()
+            => DrawCheckbox("Show Speed and Size as Text",
+                "Toggle whether to show the speed and size of available fish as text instead of icons.",
+                GatherBuddy.Config.ShowSpearfishListIconsAsText, b => GatherBuddy.Config.ShowSpearfishListIconsAsText = b);
 
         // Gather Window
         public static void DrawShowGatherWindowBox()
@@ -194,14 +223,16 @@ public partial class Interface
             ConfigFunctions.DrawAetherytePreference();
             ConfigFunctions.DrawSkipTeleportBox();
             ConfigFunctions.DrawAlarmToggle();
+            ConfigFunctions.DrawPrintTypeSelector();
+            ConfigFunctions.DrawErrorTypeSelector();
             ImGui.NewLine();
         }
 
         if (ImGui.CollapsingHeader("Set Names"))
         {
-            ConfigFunctions.DrawSetInput("Miner",    GatherBuddy.Config.MinerSetName, s => GatherBuddy.Config.MinerSetName    = s);
-            ConfigFunctions.DrawSetInput("Botanist", GatherBuddy.Config.BotanistSetName,     s => GatherBuddy.Config.BotanistSetName = s);
-            ConfigFunctions.DrawSetInput("Fisher",   GatherBuddy.Config.FisherSetName,       s => GatherBuddy.Config.FisherSetName   = s);
+            ConfigFunctions.DrawSetInput("Miner",    GatherBuddy.Config.MinerSetName,    s => GatherBuddy.Config.MinerSetName    = s);
+            ConfigFunctions.DrawSetInput("Botanist", GatherBuddy.Config.BotanistSetName, s => GatherBuddy.Config.BotanistSetName = s);
+            ConfigFunctions.DrawSetInput("Fisher",   GatherBuddy.Config.FisherSetName,   s => GatherBuddy.Config.FisherSetName   = s);
             ImGui.NewLine();
         }
 
@@ -209,14 +240,24 @@ public partial class Interface
         {
             ConfigFunctions.DrawOpenOnStartBox();
             ConfigFunctions.DrawWeatherTabNamesBox();
+
             ConfigFunctions.DrawFishTimerBox();
             ConfigFunctions.DrawFishTimerEditBox();
             ConfigFunctions.DrawFishTimerHideBox();
             ConfigFunctions.DrawFishTimerHideBox2();
             ConfigFunctions.DrawFishTimerUptimesBox();
+
             ConfigFunctions.DrawShowGatherWindowBox();
             ConfigFunctions.DrawGatherWindowTimersBox();
             ConfigFunctions.DrawGatherWindowAlarmsBox();
+
+            ConfigFunctions.DrawSpearfishHelperBox();
+            ConfigFunctions.DrawSpearfishNamesBox();
+            ConfigFunctions.DrawSpearfishSpeedBox();
+            ConfigFunctions.DrawAvailableSpearfishBox();
+            ConfigFunctions.DrawSpearfishIconsAsTextBox();
+            ConfigFunctions.DrawSpearfishCenterLineBox();
+
             ImGui.NewLine();
         }
 
@@ -237,6 +278,18 @@ public partial class Interface
                 if (ImGuiUtil.ColorPicker(name, description, currentColor, c => GatherBuddy.Config.Colors[color] = c, defaultColor))
                     GatherBuddy.Config.Save();
             }
+
+            ImGui.NewLine();
+
+            if (ImGuiUtil.PaletteColorPicker("Names in Chat", Vector2.One * ImGui.GetFrameHeight(), GatherBuddy.Config.SeColorHighlight1,
+                    Configuration.DefaultSeColorHighlight1, Configuration.ForegroundColors, out var idx))
+                GatherBuddy.Config.SeColorHighlight1 = idx;
+            if (ImGuiUtil.PaletteColorPicker("Commands in Chat", Vector2.One * ImGui.GetFrameHeight(), GatherBuddy.Config.SeColorHighlight2,
+                    Configuration.DefaultSeColorHighlight2, Configuration.ForegroundColors, out idx))
+                GatherBuddy.Config.SeColorHighlight2 = idx;
+            if (ImGuiUtil.PaletteColorPicker("Arguments in Chat", Vector2.One * ImGui.GetFrameHeight(), GatherBuddy.Config.SeColorHighlight3,
+                    Configuration.DefaultSeColorHighlight3, Configuration.ForegroundColors, out idx))
+                GatherBuddy.Config.SeColorHighlight3 = idx;
 
             ImGui.NewLine();
         }

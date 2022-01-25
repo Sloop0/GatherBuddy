@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using GatherBuddy.Plugin;
 using Newtonsoft.Json;
 
 namespace GatherBuddy.GatherGroup;
@@ -59,7 +60,7 @@ public class TimedGroup
         {
             var json  = JsonConvert.SerializeObject(this);
             var bytes = Encoding.UTF8.GetBytes(json).Prepend(CurrentVersion).ToArray();
-            return Convert.ToBase64String(bytes);
+            return Functions.CompressedBase64(bytes);
         }
 
         internal static bool FromBase64(string data, out Config cfg)
@@ -67,7 +68,7 @@ public class TimedGroup
             cfg = default;
             try
             {
-                var bytes = Convert.FromBase64String(data);
+                var bytes = Functions.DecompressedBase64(data);
                 if (bytes.Length == 0 || bytes[0] != CurrentVersion)
                     return false;
 

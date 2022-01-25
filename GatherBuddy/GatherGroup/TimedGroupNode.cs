@@ -18,10 +18,24 @@ public class TimedGroupNode
 
     public bool IsUp(uint eorzeaMinuteOfDay)
     {
-        if (EorzeaStartMinute <= EorzeaEndMinute)
+        if (EorzeaStartMinute == EorzeaEndMinute)
+            return true;
+
+        if (EorzeaStartMinute < EorzeaEndMinute)
             return eorzeaMinuteOfDay >= EorzeaStartMinute && eorzeaMinuteOfDay < EorzeaEndMinute;
 
         return eorzeaMinuteOfDay >= EorzeaStartMinute || eorzeaMinuteOfDay < EorzeaEndMinute;
+    }
+
+    public int Length()
+    {
+        if (EorzeaStartMinute == EorzeaEndMinute)
+            return RealTime.MinutesPerDay;
+
+        if (EorzeaStartMinute < EorzeaEndMinute)
+            return EorzeaEndMinute - EorzeaStartMinute;
+
+        return RealTime.MinutesPerDay - EorzeaStartMinute + EorzeaEndMinute;
     }
 
     public TimedGroupNode Clone()
@@ -68,8 +82,8 @@ public class TimedGroupNode
 
         timedGroupNode = new TimedGroupNode(item)
         {
-            EorzeaStartMinute = Math.Clamp(cfg.StartMinute, 0, RealTime.MinutesPerDay),
-            EorzeaEndMinute   = Math.Clamp(cfg.EndMinute,   0, RealTime.MinutesPerDay),
+            EorzeaStartMinute = Math.Clamp(cfg.StartMinute, 0, RealTime.MinutesPerDay - 1),
+            EorzeaEndMinute   = Math.Clamp(cfg.EndMinute,   0, RealTime.MinutesPerDay - 1),
             Annotation        = cfg.Annotation,
         };
         return true;

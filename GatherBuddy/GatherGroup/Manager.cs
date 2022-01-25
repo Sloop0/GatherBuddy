@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Logging;
-using GatherBuddy.Classes;
+using GatherBuddy.Config;
 using GatherBuddy.Interfaces;
 using GatherBuddy.Plugin;
 using GatherBuddy.Time;
@@ -11,12 +12,45 @@ using Newtonsoft.Json;
 
 namespace GatherBuddy.GatherGroup;
 
+internal static class SeStringBuilderExtension
+{
+    public static SeStringBuilder ColoredText(this SeStringBuilder builder, string text, int colorIdx)
+    {
+        if (!Configuration.ForegroundColors.ContainsKey(colorIdx))
+            return builder.AddText(text);
+
+        return builder.AddUiForeground((ushort)colorIdx).AddText(text).AddUiForegroundOff();
+    }
+}
+
 public class Manager
 {
     public const string FileName = "gather_groups.json";
 
     public SortedList<string, TimedGroup> Groups { get; init; } = new();
 
+    public TimedGroup? this[string value]
+        => TryGetValue(value, out var ret) ? ret : null;
+
+    public bool TryGetValue(string value, out TimedGroup ret)
+        => Groups.TryGetValue(value.ToLowerInvariant().Trim(), out ret!);
+
+    public SeString CreateHelp()
+    {
+        SeStringBuilder b = new();
+        b.AddText("Please use with ")
+            .ColoredText("/gathergroup ",                      GatherBuddy.Config.SeColorHighlight2)
+            .ColoredText("[Name] ",                            GatherBuddy.Config.SeColorHighlight1)
+            .ColoredText("[optional: Eorzea Minute Offset]\n", GatherBuddy.Config.SeColorHighlight3)
+            .AddText("Available groups are:\n");
+        foreach (var value in Groups.Values)
+        {
+            b.ColoredText($"          {value.Name}", GatherBuddy.Config.SeColorHighlight1)
+                .AddText($" - {value.Description}\n");
+        }
+
+        return b.BuiltString;
+    }
 
     public bool AddGroup(string name, TimedGroup group)
     {
@@ -57,7 +91,7 @@ public class Manager
 
     public bool ChangeGroupNode(TimedGroup group, int idx, IGatherable? item, int? start, int? end, string? annotation, bool delete)
     {
-        if (idx < 0 || group.Nodes.Count > idx)
+        if (idx < 0 || group.Nodes.Count < idx)
             return false;
 
         if (delete)
@@ -73,8 +107,8 @@ public class Manager
         {
             var newNode = new TimedGroupNode(item)
             {
-                EorzeaStartMinute = start == null ? 0 : Math.Clamp(start.Value, 0, RealTime.MinutesPerDay),
-                EorzeaEndMinute   = end == null ? 0 : Math.Clamp(end.Value,     0, RealTime.MinutesPerDay),
+                EorzeaStartMinute = start == null ? 0 : Math.Clamp(start.Value,                  0, RealTime.MinutesPerDay - 1),
+                EorzeaEndMinute   = end == null ? 0 : Math.Clamp(end.Value, 0, RealTime.MinutesPerDay - 1),
                 Annotation        = annotation ?? string.Empty,
             };
             group.Nodes.Add(newNode);
@@ -92,7 +126,7 @@ public class Manager
 
         if (start != null)
         {
-            start = Math.Clamp(start.Value, 0, RealTime.MinutesPerDay);
+            start = Math.Clamp(start.Value, 0, RealTime.MinutesPerDay - 1);
             if (start.Value != node.EorzeaStartMinute)
                 changes = true;
             node.EorzeaStartMinute = start.Value;
@@ -100,7 +134,7 @@ public class Manager
 
         if (end != null)
         {
-            end = Math.Clamp(end.Value, 0, RealTime.MinutesPerDay);
+            end = Math.Clamp(end.Value, 0, RealTime.MinutesPerDay - 1);
             if (end.Value != node.EorzeaEndMinute)
                 changes = true;
             node.EorzeaEndMinute = end.Value;

@@ -5,12 +5,13 @@ using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using GatherBuddy.Alarms;
 using GatherBuddy.Config;
+using GatherBuddy.CustomInfo;
 using GatherBuddy.FishTimer.Parser;
 using GatherBuddy.Gui;
 using GatherBuddy.Plugin;
 using GatherBuddy.SeFunctions;
+using GatherBuddy.Spearfishing;
 using GatherBuddy.Weather;
-using Lumina.Excel.GeneratedSheets;
 
 namespace GatherBuddy;
 
@@ -36,6 +37,7 @@ public partial class GatherBuddy : IDalamudPlugin
     public static FishingParser  FishingParser  { get; private set; } = null!;
 
     internal readonly GatherGroup.Manager GatherGroupManager;
+    internal readonly LocationManager     LocationManager;
     internal readonly AlarmManager        AlarmManager;
     internal readonly WindowSystem        WindowSystem;
     internal readonly Interface           Interface;
@@ -61,6 +63,7 @@ public partial class GatherBuddy : IDalamudPlugin
         FishingParser      = new FishingParser();
         Executor           = new Executor();
         GatherGroupManager = GatherGroup.Manager.Load();
+        LocationManager    = LocationManager.Load();
         AlarmManager       = new AlarmManager();
 
         SpearfishingHelper = new SpearfishingHelper(GameData);
@@ -76,6 +79,7 @@ public partial class GatherBuddy : IDalamudPlugin
 
         Ipc = new GatherBuddyIpc(this);
         //Wotsit = new WotsitIpc();
+        new FishingRecords();
     }
 
     void IDisposable.Dispose()

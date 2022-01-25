@@ -97,7 +97,7 @@ public static class Communicator
             => s.ToLowerInvariant() switch
             {
                 "{id}"       => builder.AddText(spot.Id.ToString()),
-                "{name}"     => AddFullMapLink(builder, spot.Name, spot.Territory, spot.XCoord, spot.YCoord),
+                "{name}"     => AddFullMapLink(builder, spot.Name, spot.Territory, spot.IntegralXCoord / 100f, spot.IntegralYCoord / 100f),
                 "{fishid}"   => builder.AddText(fish.ItemId.ToString()),
                 "{fishname}" => AddFullItemLink(builder, fish.ItemId, fish.Name[GatherBuddy.Language]),
                 "{input}"    => builder.AddText(s),

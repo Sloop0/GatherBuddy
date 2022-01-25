@@ -20,7 +20,7 @@ public static class GroupData
                     Type        = ObjectType.Gatherable,
                     ItemId      = i.Item1,
                     StartMinute = i.Item2 * RealTime.MinutesPerHour,
-                    EndMinute   = (i.Item2 + 2) * RealTime.MinutesPerHour,
+                    EndMinute   = (i.Item2 + 2) * RealTime.MinutesPerHour % RealTime.MinutesPerDay,
                     Annotation  = string.Empty,
                 }).ToArray(),
         };
@@ -36,7 +36,7 @@ public static class GroupData
                     Type        = ObjectType.Gatherable,
                     ItemId      = i.Item1,
                     StartMinute = i.Item2 * RealTime.MinutesPerHour,
-                    EndMinute   = (i.Item2 + 4) * RealTime.MinutesPerHour,
+                    EndMinute   = (i.Item2 + 4) * RealTime.MinutesPerHour % RealTime.MinutesPerDay,
                     Annotation  = string.Empty,
                 }).ToArray(),
         };

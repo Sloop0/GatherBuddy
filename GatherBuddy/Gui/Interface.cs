@@ -3,29 +3,24 @@ using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Windowing;
 using GatherBuddy.Config;
-using GatherBuddy.Weather;
 using ImGuiNET;
 using ImGuiOtter;
-using ImGuiScene;
 
 namespace GatherBuddy.Gui;
 
 public partial class Interface : Window, IDisposable
 {
-    private const string PluginName             = "GatherBuddy";
-    private const float  DefaultHorizontalSpace = 0;
-    private const float  MinSize                = 450;
+    private const string PluginName = "GatherBuddy";
+    private const float  MinSize    = 550;
 
     private static GatherBuddy _plugin = null!;
-
-    private static WeatherManager Weather
-        => GatherBuddy.WeatherManager;
 
     public Interface(GatherBuddy plugin)
         : base(GatherBuddy.Version.Length > 0 ? $"{PluginName} v{GatherBuddy.Version}###GatherBuddyMain" : PluginName)
     {
         _plugin           = plugin;
         _gatherGroupCache = new GatherGroupCache(_plugin.GatherGroupManager);
+        _locationTable    = new LocationTable();
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(MinSize,     17 * ImGui.GetTextLineHeightWithSpacing() / ImGuiHelpers.GlobalScale),
@@ -50,7 +45,7 @@ public partial class Interface : Window, IDisposable
         if (!ImGui.BeginTabBar("ConfigTabs"))
             return;
 
-        
+
         using var end = ImGuiRaii.DeferredEnd(ImGui.EndTabBar);
         VerifyTabOrder();
         (Action, Action, Action) tabs = GatherBuddy.Config.TabSortOrder switch
@@ -69,6 +64,7 @@ public partial class Interface : Window, IDisposable
         DrawAlarmTab();
         DrawGatherGroupTab();
         DrawConfigTab();
+        DrawLocationsTab();
         DrawDebugTab();
     }
 

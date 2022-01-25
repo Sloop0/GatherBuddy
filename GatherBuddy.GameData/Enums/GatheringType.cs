@@ -4,16 +4,16 @@ namespace GatherBuddy.Enums;
 
 public enum GatheringType : byte
 {
-    Unknown      = 0,
-    Mining       = 1,
-    Quarrying    = 2,
-    Logging      = 3,
-    Harvesting   = 4,
-    Spearfishing = 5,
-    Botanist     = 6,
-    Miner        = 7,
-    Fisher       = 8,
-    Multiple     = 9,
+    Mining       = 0,
+    Quarrying    = 1,
+    Logging      = 2,
+    Harvesting   = 3,
+    Spearfishing = 4,
+    Botanist     = 5,
+    Miner        = 6,
+    Fisher       = 7,
+    Multiple     = 8,
+    Unknown      = byte.MaxValue,
 };
 
 public static class GatheringTypeExtension

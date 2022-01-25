@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GatherBuddy.Enums;
 using GatherBuddy.Interfaces;
@@ -18,6 +19,9 @@ public partial class GatheringNode : IComparable<GatheringNode>, ILocation
 
     public uint Id
         => BaseNodeData.RowId;
+
+    public IEnumerable<IGatherable> Gatherables
+        => Items;
 
     public ObjectType Type
         => ObjectType.Gatherable;
@@ -50,9 +54,14 @@ public partial class GatheringNode : IComparable<GatheringNode>, ILocation
         var coordRow = coords?.GetRow(node.RowId);
         IntegralXCoord = coordRow != null ? Maps.NodeToMap(coordRow.X, Territory.SizeFactor) : 100;
         IntegralYCoord = coordRow != null ? Maps.NodeToMap(coordRow.Y, Territory.SizeFactor) : 100;
+
         ClosestAetheryte = Territory.Aetherytes.Count > 0
             ? Territory.Aetherytes.ArgMin(a => a.WorldDistance(Territory.Id, IntegralXCoord, IntegralYCoord))
             : null;
+
+        DefaultXCoord    = IntegralXCoord;
+        DefaultYCoord    = IntegralYCoord;
+        DefaultAetheryte = ClosestAetheryte;
 
         // Obtain additional information.
         Folklore = MultiString.ParseSeStringLumina(nodeRow?.GatheringSubCategory.Value?.FolkloreBook);

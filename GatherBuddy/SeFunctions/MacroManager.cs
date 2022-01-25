@@ -13,6 +13,7 @@ namespace GatherBuddy.SeFunctions;
 
 public unsafe class MacroManager : IDisposable
 {
+    public const int DefaultLineSize  = 256;
     public const int NumMacroLines    = 15;
     public const int NumRequiredLines = 5;
 
@@ -52,15 +53,15 @@ public unsafe class MacroManager : IDisposable
 
     public static void CreateTempString(Utf8String* ret)
     {
-        ret->BufSize             = 256;
+        ret->BufSize             = DefaultLineSize;
         ret->IsUsingInlineBuffer = 0;
-        ret->StringPtr           = (byte*)Marshal.AllocHGlobal(256);
+        ret->StringPtr           = (byte*)Marshal.AllocHGlobal(DefaultLineSize);
         ClearString(ret);
     }
 
     public static void DisposeString(Utf8String* ret)
     {
-        if (ret->BufSize == 128)
+        if (ret->BufSize == DefaultLineSize)
             Marshal.FreeHGlobal((IntPtr)ret->StringPtr);
         CreateEmptyString(ret);
     }

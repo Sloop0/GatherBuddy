@@ -22,9 +22,6 @@ public static class ForcedAetherytes
 
     public static void ApplyMissingAetherytes(GameData data)
     {
-        if (data.Territories == null)
-            return;
-
         var sheet = data.DataManager.GetExcelSheet<TerritoryType>();
         if (sheet == null)
             return;
@@ -76,6 +73,7 @@ public static class ForcedAetherytes
             }
 
             node.ClosestAetheryte = aetheryte;
+            node.DefaultAetheryte = aetheryte;
         }
     }
 }

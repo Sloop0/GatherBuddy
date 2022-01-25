@@ -40,7 +40,7 @@ public class Executor
     private static void ItemNotFound(string itemName)
     {
         var output = $"Could not find corresponding item to \"{itemName}\".";
-        Dalamud.Chat.Print(output);
+        Functions.Print(output);
         PluginLog.Verbose(output);
     }
 
@@ -48,7 +48,7 @@ public class Executor
     {
         var output =
             $"No associated location or attuned aetheryte found for {_item?.Name[GatherBuddy.Language] ?? "Unknown"}{(_gatheringType == null ? "." : $" with condition {_gatheringType.Value}.")}";
-        Dalamud.Chat.PrintError(output);
+        Functions.PrintError(output);
         PluginLog.Debug(output);
     }
 
@@ -62,7 +62,7 @@ public class Executor
         }
 
         if (GatherBuddy.Config.IdentifiedItemFormat.Length > 0)
-            Dalamud.Chat.Print(Communicator.FormatIdentifiedItemMessage(GatherBuddy.Config.IdentifiedItemFormat, itemName, _item));
+            Functions.Print(Communicator.FormatIdentifiedItemMessage(GatherBuddy.Config.IdentifiedItemFormat, itemName, _item));
         PluginLog.Verbose(Configuration.DefaultIdentifiedItemFormat, _item.ItemId, _item.Name[GatherBuddy.Language], itemName);
     }
 
@@ -76,7 +76,7 @@ public class Executor
         }
 
         if (GatherBuddy.Config.IdentifiedFishFormat.Length > 0)
-            Dalamud.Chat.Print(Communicator.FormatIdentifiedItemMessage(GatherBuddy.Config.IdentifiedFishFormat, fishName, _item));
+            Functions.Print(Communicator.FormatIdentifiedItemMessage(GatherBuddy.Config.IdentifiedFishFormat, fishName, _item));
         PluginLog.Verbose(Configuration.DefaultIdentifiedFishFormat, _item.ItemId, _item.Name[GatherBuddy.Language], fishName);
     }
 
@@ -148,7 +148,7 @@ public class Executor
         if (set.Length == 0)
         {
             PluginLog.Debug("No job type associated with location or no gearset configured.");
-            Dalamud.Chat.PrintError("No job type associated with location or no gearset configured.");
+            Functions.PrintError("No job type associated with location or no gearset configured.");
             return;
         }
 
@@ -165,36 +165,22 @@ public class Executor
             return;
 
         var link = Communicator
-            .AddFullMapLink(new SeStringBuilder(), _location.Name, _location.Territory, _location.XCoord, _location.YCoord, true).BuiltString;
+            .AddFullMapLink(new SeStringBuilder(), _location.Name, _location.Territory, _location.IntegralXCoord / 100f, _location.IntegralYCoord / 100f, true).BuiltString;
         if (GatherBuddy.Config.WriteCoordinates)
-            Dalamud.Chat.Print(link);
+            Functions.Print(link);
     }
 
     private void DoAdditionalInfo()
     {
         if (GatherBuddy.Config.PrintSpearfishInfo && _item is Fish { IsSpearFish: true } f)
-            Dalamud.Chat.Print($"Catch {f.Size} sized fish moving {f.Speed}.");
+            Functions.Print($"Catch {f.Size} sized fish moving {f.Speed}.");
 
         if (GatherBuddy.Config.PrintUptime && !_uptime.Equals(TimeInterval.Always))
         {
             if (_uptime.Start > GatherBuddy.Time.ServerTime)
-            {
-                var diff    = _uptime.Start.AddMilliseconds(-GatherBuddy.Time.ServerTime);
-                var minutes = diff.CurrentMinuteOfDay;
-                var seconds = diff.CurrentSecond;
-                Dalamud.Chat.Print(minutes > 0
-                    ? $"Next up in {minutes}:{seconds:D2} Minutes."
-                    : $"Next up in {seconds} Seconds.");
-            }
+                Functions.Print($"Next up in {TimeInterval.DurationString(_uptime.Start, GatherBuddy.Time.ServerTime, false)}.");
             else
-            {
-                var diff    = _uptime.End.AddMilliseconds(-GatherBuddy.Time.ServerTime);
-                var minutes = diff.CurrentMinuteOfDay;
-                var seconds = diff.CurrentSecond;
-                Dalamud.Chat.Print(minutes > 0
-                    ? $"Currently up for the next {minutes}:{seconds:D2} Minutes."
-                    : $"Currently up for the next {seconds} Seconds.");
-            }
+                Functions.Print($"Currently up for the next {TimeInterval.DurationString(_uptime.End, GatherBuddy.Time.ServerTime, false)}.");
         }
     }
 
@@ -290,21 +276,21 @@ public class Executor
         if (Teleporter.IsAttuned(aetheryte.Id))
             Teleporter.TeleportUnchecked(aetheryte.Id);
         else
-            Dalamud.Chat.PrintError($"Not attuned to chosen aetheryte {aetheryte.Name}.");
+            Functions.PrintError($"Not attuned to chosen aetheryte {aetheryte.Name}.");
     }
 
     public static void TeleportToTerritory(Territory territory)
     {
         if (territory.Aetherytes.Count == 0)
         {
-            Dalamud.Chat.PrintError($"{territory.Name} has no valid aetheryte.");
+            Functions.PrintError($"{territory.Name} has no valid aetheryte.");
             return;
         }
 
         var aetheryte = territory.Aetherytes.FirstOrDefault(a => Teleporter.IsAttuned(a.Id));
         if (aetheryte == null)
         {
-            Dalamud.Chat.PrintError($"Not attuned to any aetheryte in {territory.Name}.");
+            Functions.PrintError($"Not attuned to any aetheryte in {territory.Name}.");
             return;
         }
 

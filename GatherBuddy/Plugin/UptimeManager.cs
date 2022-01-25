@@ -200,7 +200,7 @@ public class UptimeManager : IDisposable
         if (item.InternalLocationId < 0)
             return (FindClosestAetheryte(item, type), TimeInterval.Always);
 
-        return GetBestUptime(item.NodeList.Where(n => n.GatheringType == type), now);
+        return GetBestUptime(item.NodeList.Where(n => n.GatheringType.ToGroup() == type), now);
     }
 
 
@@ -212,7 +212,7 @@ public class UptimeManager : IDisposable
 
         var enumerable = type == null
             ? item.Locations.Where(l => l is FishingSpot || ((GatheringNode)l).Times.AlwaysUp())
-            : item.Locations.Where(l => l is GatheringNode n && n.GatheringType == type);
+            : item.Locations.Where(l => l is GatheringNode n && n.GatheringType.ToGroup() == type);
         return enumerable
             .Where(a => a.ClosestAetheryte != null && Teleporter.IsAttuned(a.ClosestAetheryte.Id))
             .ArgMin(a => a.ClosestAetheryte!.AetherDistance(_aetherStreamX, _aetherStreamY, _aetherPlane));
@@ -221,7 +221,7 @@ public class UptimeManager : IDisposable
     // Tries to find the node with the closest available aetheryte in world distance.
     private static ILocation? FindClosestAetheryteTravel(IGatherable item, GatheringType? type = null)
     {
-        var enumerable = type == null ? item.Locations : item.Locations.Where(l => l is GatheringNode n && n.GatheringType == type);
+        var enumerable = type == null ? item.Locations : item.Locations.Where(l => l is GatheringNode n && n.GatheringType.ToGroup() == type);
         return enumerable
             .Where(l => l.ClosestAetheryte != null && Teleporter.IsAttuned(l.ClosestAetheryte.Id))
             .ArgMin(l => l.AetheryteDistance());

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
@@ -100,7 +101,6 @@ public class ItemSelector<T>
         ImGui.SetDragDropPayload(DragDropLabel, IntPtr.Zero, 0);
     }
 
-
     public void SetFilterDirty()
         => FilterDirty = true;
 
@@ -112,6 +112,13 @@ public class ItemSelector<T>
     {
         CurrentIdx = -1;
         Current    = default;
+    }
+
+    public void TryRestoreCurrent()
+    {
+        CurrentIdx = Current == null ? -1 : Items.IndexOf(Current);
+        if (CurrentIdx == -1)
+            Current = default;
     }
 
     private void SetCurrent(int idx)
@@ -262,7 +269,10 @@ public class ItemSelector<T>
             return;
 
         if (OnAdd(newName))
+        {
+            TryRestoreCurrent();
             SetFilterDirty();
+        }
     }
 
     private void DrawImportButton(float width)
@@ -278,32 +288,24 @@ public class ItemSelector<T>
             return;
 
         if (OnClipboardImport(newName, ImGui.GetClipboardText()))
+        {
+            TryRestoreCurrent();
             SetFilterDirty();
+        }
     }
 
     // The popup to enter a name used by all Creation-buttons.
     private bool OpenNameField(string popupName, out string newName)
     {
         newName = string.Empty;
-        if (!ImGui.BeginPopup(popupName))
-            return false;
+        if (ImGuiUtil.OpenNameField(popupName, ref _newName))
+        {
+            newName  = _newName;
+            _newName = string.Empty;
+            return true;
+        }
 
-        if (ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Escape)))
-            ImGui.CloseCurrentPopup();
-
-        using var end = ImGuiRaii.DeferredEnd(ImGui.EndPopup);
-        ImGui.SetNextItemWidth(300 * ImGuiHelpers.GlobalScale);
-        var enterPressed = ImGui.InputTextWithHint("##newName", "Enter New Name...", ref _newName, 64, ImGuiInputTextFlags.EnterReturnsTrue);
-        if (ImGui.IsWindowAppearing())
-            ImGui.SetKeyboardFocusHere();
-
-        if (!enterPressed)
-            return false;
-
-        newName  = _newName;
-        _newName = string.Empty;
-        ImGui.CloseCurrentPopup();
-        return true;
+        return false;
     }
 
     private void DrawDuplicateButton(float width)
@@ -320,7 +322,10 @@ public class ItemSelector<T>
             return;
 
         if (OnDuplicate(newName, CurrentIdx))
+        {
+            TryRestoreCurrent();
             SetFilterDirty();
+        }
     }
 
     private void DrawDeleteButton(float width)
@@ -375,7 +380,7 @@ public class ItemSelector<T>
         using var id    = ImGuiRaii.PushId(Label);
         using var style = ImGuiRaii.PushStyle(ImGuiStyleVar.WindowPadding, Vector2.Zero);
         using var _     = ImGuiRaii.NewGroup();
-        if (!ImGui.BeginChild(string.Empty, new Vector2(width, -ImGui.GetFrameHeightWithSpacing()), true))
+        if (!ImGui.BeginChild(string.Empty, new Vector2(width, -ImGui.GetFrameHeight()), true))
         {
             ImGui.EndChild();
             return;
@@ -393,5 +398,36 @@ public class ItemSelector<T>
             .Push(ImGuiStyleVar.ItemSpacing,   Vector2.Zero);
         end.Pop();
         DrawButtons(width);
+    }
+}
+
+public static class ItemDetailsWindow
+{
+    public static void Draw(string label, Action drawHeader, Action drawDetails)
+    {
+        using var group = ImGuiRaii.NewGroup();
+        using var style = ImGuiRaii.PushStyle(ImGuiStyleVar.WindowPadding, Vector2.Zero);
+        using var id    = ImGuiRaii.PushId(label);
+        if (!ImGui.BeginChild(string.Empty, ImGui.GetContentRegionAvail(), true, ImGuiWindowFlags.MenuBar))
+        {
+            ImGui.EndChild();
+            return;
+        }
+        style.Pop();
+        using var end        = ImGuiRaii.DeferredEnd(ImGui.EndChild);
+        var       headerSize = new Vector2(ImGui.GetContentRegionAvail().X, ImGui.GetFrameHeight());
+
+        if (ImGui.BeginMenuBar())
+        {
+            drawHeader();
+            ImGui.EndMenuBar();
+        }
+
+        ImGui.Dummy(ImGui.GetStyle().WindowPadding * Vector2.UnitY);
+        ImGui.Dummy(ImGui.GetStyle().WindowPadding);
+        ImGui.SameLine();
+        ImGui.BeginGroup();
+        group.Push(ImGui.EndGroup);
+        drawDetails();
     }
 }

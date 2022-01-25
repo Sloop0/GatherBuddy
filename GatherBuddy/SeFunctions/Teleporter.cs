@@ -1,5 +1,6 @@
 using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using GatherBuddy.Plugin;
 
 namespace GatherBuddy.SeFunctions;
 
@@ -38,7 +39,7 @@ public static unsafe class Teleporter
             return true;
         }
 
-        Dalamud.Chat.PrintError("Could not teleport, not attuned.");
+        Functions.PrintError("Could not teleport, not attuned.");
         return false;
     }
 

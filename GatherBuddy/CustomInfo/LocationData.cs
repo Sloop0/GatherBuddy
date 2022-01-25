@@ -7,14 +7,14 @@ public class LocationData
 {
     public ILocation  Location;
     public Aetheryte? Aetheryte;
-    public float      XCoord;
-    public float      YCoord;
+    public int      XCoord;
+    public int      YCoord;
 
     public LocationData(ILocation loc)
     {
         Location  = loc;
         Aetheryte = loc.ClosestAetheryte;
-        XCoord    = loc.IntegralXCoord / 100f;
-        YCoord    = loc.IntegralYCoord / 100f;
+        XCoord    = loc.IntegralXCoord;
+        YCoord    = loc.IntegralYCoord;
     }
 }

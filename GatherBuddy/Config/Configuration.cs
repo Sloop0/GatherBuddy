@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Configuration;
+using Dalamud.Game.Text;
 using GatherBuddy.Enums;
 
 namespace GatherBuddy.Config;
@@ -28,19 +29,20 @@ public partial class Configuration : IPluginConfiguration
     public ItemFilter          ShowItems           { get; set; } = ItemFilter.All;
     public FishFilter          ShowFish            { get; set; } = FishFilter.All;
     public PatchFlag           HideFishPatch       { get; set; } = 0;
-    public ItemSortOrder       ItemSortOrder       { get; set; } = ItemSortOrder.EndTime;
-    public FishSortOrder       FishSortOder        { get; set; } = FishSortOrder.EndTime;
+    public JobFlags            LocationFilter      { get; set; } = (JobFlags)0x3F;
 
 
     // General Config
-    public bool OpenOnStart         { get; set; } = false;
-    public bool UseGearChange       { get; set; } = true;
-    public bool UseTeleport         { get; set; } = true;
-    public bool UseCoordinates      { get; set; } = true;
-    public bool WriteCoordinates    { get; set; } = true;
-    public bool PrintUptime         { get; set; } = true;
-    public bool PrintSpearfishInfo  { get; set; } = true;
-    public bool SkipTeleportIfClose { get; set; } = true;
+    public bool        OpenOnStart         { get; set; } = false;
+    public bool        UseGearChange       { get; set; } = true;
+    public bool        UseTeleport         { get; set; } = true;
+    public bool        UseCoordinates      { get; set; } = true;
+    public bool        WriteCoordinates    { get; set; } = true;
+    public bool        PrintUptime         { get; set; } = true;
+    public bool        PrintSpearfishInfo  { get; set; } = true;
+    public bool        SkipTeleportIfClose { get; set; } = true;
+    public XivChatType ChatTypeMessage     { get; set; } = XivChatType.Echo;
+    public XivChatType ChatTypeError       { get; set; } = XivChatType.ErrorMessage;
 
     // Weather tab
     public bool ShowWeatherNames { get; set; } = true;
@@ -52,6 +54,9 @@ public partial class Configuration : IPluginConfiguration
     public Dictionary<ColorId, uint> Colors { get; set; }
         = Enum.GetValues<ColorId>().ToDictionary(c => c, c => c.Data().DefaultColor);
 
+    public int SeColorHighlight1 = DefaultSeColorHighlight1;
+    public int SeColorHighlight2 = DefaultSeColorHighlight2;
+    public int SeColorHighlight3 = DefaultSeColorHighlight3;
 
     // Fish Timer
     public bool ShowFishTimer        { get; set; } = true;
@@ -59,6 +64,14 @@ public partial class Configuration : IPluginConfiguration
     public bool HideUncaughtFish     { get; set; } = false;
     public bool HideUnavailableFish  { get; set; } = false;
     public bool ShowFishTimerUptimes { get; set; } = true;
+
+    // Spearfish Helper
+    public bool ShowSpearfishHelper          { get; set; } = true;
+    public bool ShowSpearfishNames           { get; set; } = true;
+    public bool ShowAvailableSpearfish       { get; set; } = true;
+    public bool ShowSpearfishSpeed           { get; set; } = false;
+    public bool ShowSpearfishCenterLine      { get; set; } = true;
+    public bool ShowSpearfishListIconsAsText { get; set; } = false;
 
 
     // Gather Window

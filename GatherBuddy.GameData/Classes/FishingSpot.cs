@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GatherBuddy.Interfaces;
 using GatherBuddy.Utility;
@@ -19,13 +20,15 @@ public class FishingSpot : IComparable<FishingSpot>, ILocation
     public Lumina.Excel.GeneratedSheets.FishingSpot? FishingSpotData
         => _data as Lumina.Excel.GeneratedSheets.FishingSpot;
 
-    public Territory  Territory        { get; init; }
-    public string     Name             { get; init; }
-    public Aetheryte? ClosestAetheryte { get; internal set; }
-    public Fish[]     Items            { get; init; }
+    public Territory Territory { get; init; }
+    public string    Name      { get; init; }
+    public Fish[]    Items     { get; init; }
 
     public GatheringType GatheringType
         => Spearfishing ? GatheringType.Spearfishing : GatheringType.Fisher;
+
+    public IEnumerable<IGatherable> Gatherables
+        => Items;
 
     public uint SheetId
         => _data is SpearfishingNotebook sf
@@ -40,22 +43,19 @@ public class FishingSpot : IComparable<FishingSpot>, ILocation
     public ObjectType Type
         => ObjectType.Fish;
 
-    public int IntegralXCoord { get; internal set; }
-    public int IntegralYCoord { get; internal set; }
+    public Aetheryte? ClosestAetheryte { get; set; }
+    public int        IntegralXCoord   { get; set; }
+    public int        IntegralYCoord   { get; set; }
 
-    public float XCoord
-        => IntegralXCoord is >= 100 and <= 4200 ? IntegralXCoord / 100.0f : 1.0f;
-
-    public float YCoord
-        => IntegralYCoord is >= 100 and <= 4200 ? IntegralYCoord / 100.0f : 1.0f;
+    public Aetheryte? DefaultAetheryte { get; internal set; }
+    public int        DefaultXCoord    { get; internal set; }
+    public int        DefaultYCoord    { get; internal set; }
 
     public bool Spearfishing
         => _data is SpearfishingNotebook;
 
     public int CompareTo(FishingSpot? obj)
         => SheetId.CompareTo(obj?.SheetId ?? 0);
-
-    private DefaultInfo? _defaultInfo;
 
     public FishingSpot(GameData data, Lumina.Excel.GeneratedSheets.FishingSpot spot)
     {
@@ -68,6 +68,10 @@ public class FishingSpot : IComparable<FishingSpot>, ILocation
         ClosestAetheryte = Territory.Aetherytes.Count > 0
             ? Territory.Aetherytes.ArgMin(a => a.WorldDistance(Territory.Id, IntegralXCoord, IntegralYCoord))
             : null;
+
+        DefaultXCoord    = IntegralXCoord;
+        DefaultYCoord    = IntegralYCoord;
+        DefaultAetheryte = ClosestAetheryte;
 
         Items = spot.Item.Where(i => i.Row > 0)
             .Select(i => data.Fishes.TryGetValue(i.Row, out var fish) ? fish : null)
@@ -89,6 +93,10 @@ public class FishingSpot : IComparable<FishingSpot>, ILocation
             ? Territory.Aetherytes.ArgMin(a => a.WorldDistance(Territory.Id, IntegralXCoord, IntegralYCoord))
             : null;
 
+        DefaultXCoord    = IntegralXCoord;
+        DefaultYCoord    = IntegralYCoord;
+        DefaultAetheryte = ClosestAetheryte;
+
         Items = spot.GatheringPointBase.Value?.Item.Where(i => i > 0)
                 .Select(i => data.Fishes.Values.FirstOrDefault(f => f.IsSpearFish && f.FishId == i))
                 .Where(f => f != null).Cast<Fish>()
@@ -96,37 +104,5 @@ public class FishingSpot : IComparable<FishingSpot>, ILocation
          ?? Array.Empty<Fish>();
         foreach (var item in Items)
             item.FishingSpots.Add(this);
-    }
-
-    public bool OverwriteWithCustomInfo(Aetheryte? closestAetheryte, float xCoord, float yCoord)
-    {
-        if (closestAetheryte is { Id: 0 })
-            return false;
-        if (xCoord is < 1f or > 42f)
-            return false;
-        if (yCoord is < 1f or > 42f)
-            return false;
-
-        _defaultInfo ??= new DefaultInfo()
-        {
-            ClosestAetheryte = ClosestAetheryte,
-            IntegralXCoord   = IntegralXCoord,
-            IntegralYCoord   = IntegralYCoord,
-        };
-
-        ClosestAetheryte = closestAetheryte;
-        IntegralXCoord   = (int)(100f * xCoord);
-        IntegralYCoord   = (int)(100f * yCoord);
-        return true;
-    }
-
-    public void OverwriteWithDefault()
-    {
-        if (_defaultInfo == null)
-            return;
-
-        ClosestAetheryte = _defaultInfo.ClosestAetheryte;
-        IntegralXCoord   = _defaultInfo.IntegralXCoord;
-        IntegralYCoord   = _defaultInfo.IntegralYCoord;
     }
 }

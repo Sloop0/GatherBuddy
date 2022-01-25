@@ -216,7 +216,7 @@ public partial class Interface
             var minutes = intuition / RealTime.SecondsPerMinute;
             var seconds = intuition % RealTime.SecondsPerMinute;
             if (seconds == 0)
-                return minutes == 1 ? $"Intuition for {minutes} Minute" : $"Intuition for {minutes} Minutes";
+                return minutes == 1 ? "Intuition for 1 Minute" : $"Intuition for {minutes} Minutes";
 
             return $"Intuition for {minutes}:{seconds:D2} Minutes";
         }

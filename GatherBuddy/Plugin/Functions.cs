@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Runtime.InteropServices;
+using Dalamud.Game.Text;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Logging;
 
 namespace GatherBuddy.Plugin;
@@ -80,4 +83,53 @@ public static class Functions
 
         return memcmp(ptr1, ptr2, length1) == 0;
     }
+
+    public static string CompressedBase64(byte[] data)
+    {
+        using var compressedStream = new MemoryStream();
+        using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
+        {
+            zipStream.Write(data, 0, data.Length);
+        }
+
+        return Convert.ToBase64String(compressedStream.ToArray());
+    }
+
+    public static byte[] DecompressedBase64(string compressedBase64)
+    {
+        var       data             = Convert.FromBase64String(compressedBase64);
+        using var compressedStream = new MemoryStream(data);
+        using var zipStream        = new GZipStream(compressedStream, CompressionMode.Decompress);
+        using var resultStream     = new MemoryStream();
+        zipStream.CopyTo(resultStream);
+        return resultStream.ToArray();
+    }
+
+    public static void Print(SeString message)
+    {
+        var entry = new XivChatEntry()
+        {
+            Message = message,
+            Name    = SeString.Empty,
+            Type    = GatherBuddy.Config.ChatTypeMessage,
+        };
+        Dalamud.Chat.PrintChat(entry);
+    }
+
+    public static void PrintError(SeString message)
+    {
+        var entry = new XivChatEntry()
+        {
+            Message = message,
+            Name    = SeString.Empty,
+            Type    = GatherBuddy.Config.ChatTypeError,
+        };
+        Dalamud.Chat.PrintChat(entry);
+    }
+
+    public static void Print(string message)
+        => Print((SeString)message);
+
+    public static void PrintError(string message)
+        => PrintError((SeString)message);
 }

@@ -2,6 +2,7 @@
 using System.Numerics;
 using GatherBuddy.Alarms;
 using GatherBuddy.Config;
+using GatherBuddy.Plugin;
 using ImGuiNET;
 using ImGuiOtter;
 
@@ -61,7 +62,7 @@ public partial class Interface
             if (Items.Count <= idx || idx < 0)
                 return;
 
-            Dalamud.Chat.Print($"Dropped {data?.ToString() ?? "NULL"} onto {Items[idx].Name} ({idx}).");
+            Functions.Print($"Dropped {data?.ToString() ?? "NULL"} onto {Items[idx].Name} ({idx}).");
         }
 
         protected override bool OnMove(int idx1, int idx2)

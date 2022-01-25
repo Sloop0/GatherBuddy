@@ -8,9 +8,15 @@ public static partial class ImGuiRaii
     public static Font PushFont(ImFontPtr font)
         => new(font);
 
+    public static Font PushFont(ImFontPtr font, bool enable)
+        => enable ? new Font(font) : new Font();
+
     public sealed class Font : IDisposable
     {
         private int _count;
+
+        public Font()
+            => _count = 0;
 
         public Font(ImFontPtr font)
             => Push(font);

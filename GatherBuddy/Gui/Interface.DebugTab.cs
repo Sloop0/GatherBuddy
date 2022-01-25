@@ -56,7 +56,7 @@ public partial class Interface
         ImGuiUtil.DrawTableColumn(n.Level.ToString());
         ImGuiUtil.DrawTableColumn(n.NodeType.ToString());
         ImGuiUtil.DrawTableColumn($"{n.Territory.Name} ({n.Territory.Id})");
-        ImGuiUtil.DrawTableColumn($"{n.XCoord}-{n.YCoord}");
+        ImGuiUtil.DrawTableColumn($"{n.IntegralXCoord}-{n.IntegralYCoord}");
         ImGuiUtil.DrawTableColumn(n.ClosestAetheryte?.Name ?? "Unknown");
         ImGuiUtil.DrawTableColumn(n.Folklore);
         ImGuiUtil.DrawTableColumn(n.Times.PrintHours(true));

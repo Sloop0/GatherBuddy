@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
+using Dalamud.Logging;
 using ImGuiNET;
 
 namespace ImGuiOtter;
@@ -14,8 +15,6 @@ public class ClippedSelectableCombo<T>
 
     private readonly IList<T>        _items;
     private readonly Func<T, string> _itemToName;
-
-    private bool _needsClear;
 
     private          string              _filter = string.Empty;
     private readonly List<(string, int)> _remainingItems;
@@ -69,27 +68,22 @@ public class ClippedSelectableCombo<T>
         ImGui.SetNextItemWidth(_previewSize);
 
         if (!ImGui.BeginCombo(_label, currentName, flags | ImGuiComboFlags.HeightLargest))
-        {
-            if (!_needsClear)
-                return false;
-
-            _needsClear = false;
-            UpdateFilter(string.Empty);
             return false;
-        }
 
         if (ImGui.IsWindowAppearing())
+        {
             ImGui.SetKeyboardFocusHere();
+            UpdateFilter(string.Empty);
+        }
 
         using var end = ImGuiRaii.DeferredEnd(ImGui.EndCombo);
-        _needsClear = true;
 
         ImGui.SetNextItemWidth(-1);
         var tmp   = _filter;
         var enter = ImGui.InputTextWithHint("##filter", "Filter...", ref tmp, 255, ImGuiInputTextFlags.EnterReturnsTrue);
         UpdateFilter(tmp);
 
-        if (enter && _remainingItems.Count != 1)
+        if (enter && _remainingItems.Count == 0)
         {
             ImGui.CloseCurrentPopup();
             return false;
@@ -104,7 +98,7 @@ public class ClippedSelectableCombo<T>
         if (!enter && (isFocused || _remainingItems.Count != 1))
             return false;
 
-        newIdx = _remainingItems[0].Item2;
+        newIdx      = _remainingItems[0].Item2;
         ImGui.CloseCurrentPopup();
         return true;
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using Dalamud.Game.Command;
 using Dalamud.Logging;
 using GatherBuddy.Enums;
+using GatherBuddy.Plugin;
 using GatherBuddy.Time;
 
 namespace GatherBuddy;
@@ -89,7 +90,7 @@ public partial class GatherBuddy
     private void OnGather(string command, string arguments)
     {
         if (arguments.Length == 0)
-            Dalamud.Chat.Print($"Please supply a (partial) item name for {command}.");
+            Functions.PrintError($"Please supply a (partial) item name for {command}.");
         else
             Executor.GatherItemByName(arguments);
     }
@@ -97,7 +98,7 @@ public partial class GatherBuddy
     private void OnGatherBtn(string command, string arguments)
     {
         if (arguments.Length == 0)
-            Dalamud.Chat.Print($"Please supply a (partial) item name for {command}.");
+            Functions.PrintError($"Please supply a (partial) item name for {command}.");
         else
             Executor.GatherItemByName(arguments, GatheringType.Botanist);
     }
@@ -105,7 +106,7 @@ public partial class GatherBuddy
     private void OnGatherMin(string command, string arguments)
     {
         if (arguments.Length == 0)
-            Dalamud.Chat.Print($"Please supply a (partial) item name for {command}.");
+            Functions.PrintError($"Please supply a (partial) item name for {command}.");
         else
             Executor.GatherItemByName(arguments, GatheringType.Miner);
     }
@@ -113,56 +114,33 @@ public partial class GatherBuddy
     private void OnGatherFish(string command, string arguments)
     {
         if (arguments.Length == 0)
-            Dalamud.Chat.Print($"Please supply a (partial) fish name for {command}.");
+            Functions.PrintError($"Please supply a (partial) fish name for {command}.");
         else
             Executor.GatherFishByName(arguments);
     }
 
     private void OnGatherGroup(string command, string arguments)
     {
-        var argumentParts = arguments.Split();
-        switch (argumentParts.Length)
+        if (arguments.Length == 0)
         {
-            case 0:
-                Dalamud.Chat.Print($"Nope");
-                break;
-            case 1:
-            {
-                if (!GatherGroupManager.Groups.TryGetValue(argumentParts[0], out var group))
-                {
-                    Dalamud.Chat.Print($"Nope");
-                }
-                else
-                {
-                    var node = group.CurrentNode((uint)Time.EorzeaMinuteOfDay);
-                    if (node == null)
-                        Dalamud.Chat.Print($"Nope");
-                    else
-                        Executor.GatherItem(node.Item);
-                }
-
-                break;
-            }
-            default:
-            {
-                if (!GatherGroupManager.Groups.TryGetValue(argumentParts[0], out var group))
-                {
-                    Dalamud.Chat.Print($"Nope");
-                }
-                else
-                {
-                    var node = group.CurrentNode(
-                        (uint)(Time.EorzeaMinuteOfDay + (int.TryParse(argumentParts[1], out var offset) ? offset : 0))
-                      % RealTime.MinutesPerDay);
-                    if (node == null)
-                        Dalamud.Chat.Print($"Nope");
-                    else
-                        Executor.GatherItem(node.Item);
-                }
-
-                break;
-            }
+            Functions.Print(GatherGroupManager.CreateHelp()); // TODO Help
+            return;
         }
+
+        var argumentParts = arguments.Split();
+        var minute = Time.EorzeaMinuteOfDay + (argumentParts.Length < 2 ? 0 : int.TryParse(argumentParts[1], out var offset) ? offset : 0);
+        if (!GatherGroupManager.TryGetValue(argumentParts[0], out var group))
+        {
+            Functions.Print($"The group {argumentParts[0]} does not exist.");
+            return;
+        }
+
+        var node = group.CurrentNode((uint)minute);
+        if (node == null)
+            Functions.Print(
+                $"The group {group.Name} has no item corresponding to the eorzea time {minute / RealTime.MinutesPerHour:D2}:{minute % RealTime.MinutesPerHour:D2}.");
+        else
+            Executor.GatherItem(node.Item);
     }
 
     private void OnGatherDebug(string command, string arguments)
@@ -172,11 +150,11 @@ public partial class GatherBuddy
             return;
 
         var sums = Enum.GetValues<SpearfishSpeed>().ToDictionary(s => s, _ => 0);
-        foreach (var fish in GatherBuddy.GameData.Fishes.Values)
+        foreach (var fish in GameData.Fishes.Values)
             sums[fish.Speed]++;
 
-        foreach(var (speed, sum) in sums.Where(s => s.Key != SpearfishSpeed.None && s.Key != SpearfishSpeed.Unknown))
-            PluginLog.Information($"{speed.ToName(),-20} ({(ushort) speed,3}) - {sum,4}");
+        foreach (var (speed, sum) in sums.Where(s => s.Key != SpearfishSpeed.None && s.Key != SpearfishSpeed.Unknown))
+            PluginLog.Information($"{speed.ToName(),-20} ({(ushort)speed,3}) - {sum,4}");
         //if (Util.CompareCi(argumentParts[0], "dump"))
         //    switch (argumentParts[1].ToLowerInvariant())
         //    {
