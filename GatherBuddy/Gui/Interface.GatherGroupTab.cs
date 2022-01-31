@@ -16,66 +16,66 @@ namespace GatherBuddy.Gui;
 
 public partial class Interface
 {
-    private sealed class Selector : ItemSelector<TimedGroup>
-    {
-        private readonly Manager _manager;
-
-        public Selector(Manager manager)
-            : base(manager.Groups.Values, Flags.All & ~Flags.Move)
-            => _manager = manager;
-
-        protected override bool Filtered(int idx)
-            => Filter.Length != 0 && !Items[idx].Name.Contains(Filter, StringComparison.InvariantCultureIgnoreCase);
-
-        protected override bool OnDraw(int idx)
-        {
-            using var id = ImGuiRaii.PushId(idx);
-            return ImGui.Selectable(Items[idx].Name, idx == CurrentIdx);
-        }
-
-        protected override bool OnDelete(int idx)
-        {
-            if (Items.Count <= idx || idx < 0)
-                return false;
-
-            _manager.Groups.RemoveAt(idx);
-            _manager.Save();
-            return true;
-        }
-
-        protected override bool OnAdd(string name)
-            => _manager.AddGroup(name, new TimedGroup(name));
-
-        protected override bool OnClipboardImport(string name, string data)
-        {
-            if (!TimedGroup.Config.FromBase64(data, out var cfgGroup))
-                return false;
-
-            TimedGroup.FromConfig(cfgGroup, out var group);
-            group.Name = name;
-            return _manager.AddGroup(name, group);
-        }
-
-        protected override bool OnDuplicate(string name, int idx)
-        {
-            if (Items.Count <= idx || idx < 0)
-                return false;
-
-            var group = _manager.Groups.Values[idx].Clone(name);
-            return _manager.AddGroup(name, group);
-        }
-
-        protected override void OnDrop(object? data, int idx)
-        {
-            if (Items.Count <= idx || idx < 0)
-                return;
-
-            Functions.Print($"Dropped {data?.ToString() ?? "NULL"} onto {Items[idx].Name} ({idx}).");
-        }
-    }
-
     private class GatherGroupCache
     {
+        public sealed class GatherGroupSelector : ItemSelector<TimedGroup>
+        {
+            private readonly GatherGroupManager _manager;
+
+            public GatherGroupSelector(GatherGroupManager manager)
+                : base(manager.Groups.Values, Flags.All & ~Flags.Move)
+                => _manager = manager;
+
+            protected override bool Filtered(int idx)
+                => Filter.Length != 0 && !Items[idx].Name.Contains(Filter, StringComparison.InvariantCultureIgnoreCase);
+
+            protected override bool OnDraw(int idx)
+            {
+                using var id = ImGuiRaii.PushId(idx);
+                return ImGui.Selectable(Items[idx].Name, idx == CurrentIdx);
+            }
+
+            protected override bool OnDelete(int idx)
+            {
+                if (Items.Count <= idx || idx < 0)
+                    return false;
+
+                _manager.Groups.RemoveAt(idx);
+                _manager.Save();
+                return true;
+            }
+
+            protected override bool OnAdd(string name)
+                => _manager.AddGroup(name, new TimedGroup(name));
+
+            protected override bool OnClipboardImport(string name, string data)
+            {
+                if (!TimedGroup.Config.FromBase64(data, out var cfgGroup))
+                    return false;
+
+                TimedGroup.FromConfig(cfgGroup, out var group);
+                group.Name = name;
+                return _manager.AddGroup(name, group);
+            }
+
+            protected override bool OnDuplicate(string name, int idx)
+            {
+                if (Items.Count <= idx || idx < 0)
+                    return false;
+
+                var group = _manager.Groups.Values[idx].Clone(name);
+                return _manager.AddGroup(name, group);
+            }
+
+            protected override void OnDrop(object? data, int idx)
+            {
+                if (Items.Count <= idx || idx < 0)
+                    return;
+
+                Functions.Print($"Dropped {data?.ToString() ?? "NULL"} onto {Items[idx].Name} ({idx}).");
+            }
+        }
+
         public static readonly IGatherable[] AllGatherables = GatherBuddy
             .GameData
             .Gatherables.Values
@@ -87,7 +87,7 @@ public partial class Interface
         public readonly ClippedSelectableCombo<IGatherable> GatherableSelector =
             new("AllGatherables", string.Empty, 250, AllGatherables, g => g.Name[GatherBuddy.Language]);
 
-        public readonly Selector Selector;
+        public readonly GatherGroupSelector Selector;
 
         public bool NameEdit          = false;
         public bool DescriptionEdit   = false;
@@ -116,9 +116,9 @@ public partial class Interface
             return times;
         }
 
-        public GatherGroupCache(Manager gatherGroupManager)
+        public GatherGroupCache(GatherGroupManager gatherGroupManager)
         {
-            Selector = new Selector(gatherGroupManager);
+            Selector = new GatherGroupSelector(gatherGroupManager);
             DefaultGroupTooltip =
                 "Restore the gather groups provided by default if they have been deleted or changed in any way.\n"
               + "Hold Control to apply. Default Groups are:\n\t- "
@@ -349,7 +349,7 @@ public partial class Interface
         DrawGatherGroupNodeTable(group);
     }
 
-    private void DrawHeaderLine()
+    private void DrawGatherGroupHeaderLine()
     {
         if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Copy.ToIconString(), IconButtonSize, "Copy current Gather Group to clipboard.",
                 _gatherGroupCache.Selector.Current == null, true))
@@ -389,16 +389,22 @@ public partial class Interface
 
     private void DrawGatherGroupTab()
     {
-        using var id = ImGuiRaii.PushId("Groups");
-        if (!ImGui.BeginTabItem("Groups"))
+        using var id  = ImGuiRaii.PushId("Groups");
+        var       tab = ImGui.BeginTabItem("Groups");
+
+        ImGuiUtil.HoverTooltip(
+            "Do you really need to catch a Dirty Herry from 8PM to 10PM but gather mythril ore otherwise?\n"
+          + "Set up your own gather groups! You can even share them with others!");
+
+        if (!tab)
             return;
 
         using var end = ImGuiRaii.DeferredEnd(ImGui.EndTabItem);
 
-        _gatherGroupCache.Selector.Draw(SelectorWidth * ImGuiHelpers.GlobalScale);
+        _gatherGroupCache.Selector.Draw(SelectorWidth);
         ImGui.SameLine();
 
-        ItemDetailsWindow.Draw("Group Details", DrawHeaderLine, () =>
+        ItemDetailsWindow.Draw("Group Details", DrawGatherGroupHeaderLine, () =>
         {
             if (_gatherGroupCache.Selector.Current != null)
                 DrawGatherGroup(_gatherGroupCache.Selector.Current);

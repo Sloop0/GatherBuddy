@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Logging;
@@ -132,4 +133,17 @@ public static class Functions
 
     public static void PrintError(string message)
         => PrintError((SeString)message);
+
+    public static bool BoundByDuty()
+        => Dalamud.Conditions[ConditionFlag.BoundByDuty]
+         || Dalamud.Conditions[ConditionFlag.WatchingCutscene]
+         || Dalamud.Conditions[ConditionFlag.BoundByDuty56]
+         || Dalamud.Conditions[ConditionFlag.BoundByDuty95]
+         || Dalamud.Conditions[ConditionFlag.BoundToDuty97]
+         || Dalamud.Conditions[ConditionFlag.WatchingCutscene78]
+         || Dalamud.Conditions[ConditionFlag.InDeepDungeon];
+
+    public static bool BetweenAreas()
+        => Dalamud.Conditions[ConditionFlag.BetweenAreas]
+         || Dalamud.Conditions[ConditionFlag.BetweenAreas51];
 }

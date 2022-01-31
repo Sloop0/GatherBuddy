@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GatherBuddy.Time;
 
 namespace GatherBuddy.Alarms;
 
@@ -18,28 +19,29 @@ public partial class AlarmManager
         {
             group.Enabled = true;
             foreach (var alarm in group.Alarms.Where(a => a.Enabled))
-                ActiveAlarms.Add(alarm, false);
+            {
+                ActiveAlarms.Add(alarm, TimeStamp.Epoch);
+                SetDirty();
+            }
         }
 
         Save();
     }
 
     public void AddGroup(string name)
-    {
-        var newGroup = new AlarmGroup()
+        => AddGroup(new AlarmGroup()
         {
             Name        = name,
             Description = string.Empty,
             Enabled     = false,
             Alarms      = new List<Alarm>(),
-        };
-        Alarms.Add(newGroup);
-        Save();
-    }
+        });
 
     public void AddGroup(AlarmGroup group)
     {
         Alarms.Add(group);
+        if (group.Enabled && group.Alarms.Any(a => a.Enabled))
+            SetActiveAlarms();
         Save();
     }
 

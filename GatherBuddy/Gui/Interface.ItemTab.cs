@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using Dalamud.Game.Gui.PartyFinder.Types;
 using Dalamud.Interface;
 using GatherBuddy.Config;
 using GatherBuddy.Enums;
 using GatherBuddy.Interfaces;
-using GatherBuddy.Plugin;
-using GatherBuddy.Time;
 using ImGuiNET;
 using ImGuiOtter;
 using ImGuiOtter.Table;

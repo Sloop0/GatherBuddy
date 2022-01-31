@@ -24,7 +24,7 @@ public unsafe class MacroManager : IDisposable
 
     public MacroManager()
     {
-        Macro = (RaptureMacroModule.Macro*)(Marshal.AllocHGlobal(sizeof(RaptureMacroModule.Macro) + 8) + 8);
+        Macro = (RaptureMacroModule.Macro*)Marshal.AllocHGlobal(sizeof(RaptureMacroModule.Macro));
         PrepareMacro(Macro);
         PrepareDefault();
     }
@@ -134,5 +134,5 @@ public unsafe class MacroManager : IDisposable
     }
 
     public void Execute()
-        => Module->ExecuteMacro((RaptureMacroModule.Macro*)((byte*)Macro - 8));
+        => Module->ExecuteMacro((RaptureMacroModule.Macro*)(byte*)Macro);
 }

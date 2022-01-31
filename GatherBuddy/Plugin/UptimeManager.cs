@@ -18,6 +18,7 @@ namespace GatherBuddy.Plugin;
 public class UptimeManager : IDisposable
 {
     // We only cache the best uptime regarding current server time and corresponding location per item.
+    public readonly  IGatherable[]                                 TimedGatherables;
     private readonly (ILocation Location, TimeInterval Interval)[] _bestUptime;
     private readonly (ILocation Location, uint Reset)[]            _bestLocation;
     private          uint                                          _lastReset = 1;
@@ -31,6 +32,13 @@ public class UptimeManager : IDisposable
 
     public UptimeManager(GameData gameData)
     {
+        // Set an array of available timed gatherables.
+        TimedGatherables = new IGatherable[gameData.TimedGatherables];
+        foreach(var gatherable in gameData.Gatherables.Values.Where(g => g.InternalLocationId > 0))
+            TimedGatherables[gatherable.InternalLocationId - 1] = gatherable;
+        foreach (var gatherable in gameData.Fishes.Values.Where(g => g.InternalLocationId > 0))
+            TimedGatherables[gatherable.InternalLocationId - 1] = gatherable;
+
         // Ensures that any valid interval is better than this for the first update by setting them to Never.
         // +1 due to 0 being unused.
         _bestUptime = new (ILocation, TimeInterval)[gameData.TimedGatherables + 1];

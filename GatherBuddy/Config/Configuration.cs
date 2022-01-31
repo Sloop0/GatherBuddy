@@ -33,22 +33,24 @@ public partial class Configuration : IPluginConfiguration
 
 
     // General Config
-    public bool        OpenOnStart         { get; set; } = false;
-    public bool        UseGearChange       { get; set; } = true;
-    public bool        UseTeleport         { get; set; } = true;
-    public bool        UseCoordinates      { get; set; } = true;
-    public bool        WriteCoordinates    { get; set; } = true;
-    public bool        PrintUptime         { get; set; } = true;
-    public bool        PrintSpearfishInfo  { get; set; } = true;
-    public bool        SkipTeleportIfClose { get; set; } = true;
-    public XivChatType ChatTypeMessage     { get; set; } = XivChatType.Echo;
-    public XivChatType ChatTypeError       { get; set; } = XivChatType.ErrorMessage;
+    public bool        OpenOnStart           { get; set; } = false;
+    public bool        UseGearChange         { get; set; } = true;
+    public bool        UseTeleport           { get; set; } = true;
+    public bool        UseCoordinates        { get; set; } = true;
+    public bool        WriteCoordinates      { get; set; } = true;
+    public bool        PrintUptime           { get; set; } = true;
+    public bool        PrintSpearfishInfo    { get; set; } = true;
+    public bool        SkipTeleportIfClose   { get; set; } = true;
+    public XivChatType ChatTypeMessage       { get; set; } = XivChatType.Echo;
+    public XivChatType ChatTypeError         { get; set; } = XivChatType.ErrorMessage;
+    public bool        AddIngameContextMenus { get; set; } = true;
 
     // Weather tab
     public bool ShowWeatherNames { get; set; } = true;
 
     // Alarms
     public bool AlarmsEnabled { get; set; } = false;
+    public bool AlarmsInDuty  { get; set; } = true;
 
     // Colors
     public Dictionary<ColorId, uint> Colors { get; set; }
@@ -75,9 +77,13 @@ public partial class Configuration : IPluginConfiguration
 
 
     // Gather Window
-    public bool ShowGatherWindow       { get; set; } = true;
-    public bool ShowGatherWindowTimers { get; set; } = true;
-    public bool ShowGatherWindowAlarms { get; set; } = true;
+    public bool ShowGatherWindow                { get; set; } = true;
+    public bool ShowGatherWindowTimers          { get; set; } = true;
+    public bool ShowGatherWindowAlarms          { get; set; } = true;
+    public bool SortGatherWindowByUptime        { get; set; } = false;
+    public bool HideGatherWindowInDuty          { get; set; } = true;
+    public bool OnlyShowGatherWindowHoldingCtrl { get; set; } = false;
+    public bool LockGatherWindow                { get; set; } = false;
 
     public void Save()
         => Dalamud.PluginInterface.SavePluginConfig(this);

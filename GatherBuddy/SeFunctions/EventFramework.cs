@@ -16,6 +16,13 @@ public enum FishingState : byte
     Waiting2   = 9,
 }
 
+internal enum TugType : byte
+{
+    Weak      = 36,
+    Strong    = 37,
+    Ferocious = 38,
+}
+
 public sealed class EventFramework : SeAddressBase
 {
     private const int FishingManagerOffset = 0x70;
@@ -23,6 +30,7 @@ public sealed class EventFramework : SeAddressBase
 
     internal readonly IntPtr _fishingManager;
     internal readonly IntPtr _fishingState;
+    private readonly  IntPtr _tugType = IntPtr.Zero;
 
     public unsafe FishingState FishingState
         => _fishingState != IntPtr.Zero ? *(FishingState*)_fishingState : FishingState.None;

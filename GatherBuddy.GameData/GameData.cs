@@ -139,7 +139,7 @@ public class GameData
             foreach (var fish in Fishes.Values)
             {
                 if (fish.FishingSpots.Count > 0 && fish.FishRestrictions != FishRestrictions.None && !fish.OceanFish)
-                    fish.InternalLocationId = TimedGatherables++;
+                    fish.InternalLocationId = ++TimedGatherables;
                 else if (fish.FishingSpots.Count > 0)
                     fish.InternalLocationId = -++MultiNodeGatherables;
                 FishTrie.Add(fish.Name[gameData.Language].ToLowerInvariant(), fish);

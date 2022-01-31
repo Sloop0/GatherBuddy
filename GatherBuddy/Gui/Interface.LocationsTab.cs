@@ -145,12 +145,12 @@ public partial class Interface
                 using var color       = ImGuiRaii.PushColor(ImGuiCol.FrameBg, ColorId.ChangedLocationBg.Value(), overwritten);
                 var       currentName = location.ClosestAetheryte?.Name ?? "None";
                 if (_aetheryteCombo.Draw(currentName, out var newIdx))
-                    location.SetAetheryte(_aetherytes[newIdx]);
+                    _plugin.LocationManager.SetAetheryte(location, _aetherytes[newIdx]);
                 if (overwritten)
                 {
                     ImGuiUtil.HoverTooltip($"Right-click to restore default. ({location.DefaultAetheryte?.Name ?? "None"})");
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                        location.SetAetheryte(location.DefaultAetheryte);
+                        _plugin.LocationManager.SetAetheryte(location, location.DefaultAetheryte);
                 }
             }
         }
@@ -170,12 +170,12 @@ public partial class Interface
                 var       x           = location.IntegralXCoord / 100f;
                 ImGui.SetNextItemWidth(-1);
                 if (ImGui.DragFloat("##x", ref x, 0.05f, 1f, 42f, "%.2f", ImGuiSliderFlags.AlwaysClamp))
-                    location.SetXCoord((int)(x * 100f + 0.5f));
+                    _plugin.LocationManager.SetXCoord(location, (int)(x * 100f + 0.5f));
                 if (overwritten)
                 {
                     ImGuiUtil.HoverTooltip($"Right-click to restore default. ({location.DefaultXCoord / 100f:0.00})");
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                        location.SetXCoord(location.DefaultXCoord);
+                        _plugin.LocationManager.SetXCoord(location, location.DefaultXCoord);
                 }
             }
 
@@ -198,12 +198,12 @@ public partial class Interface
                 var       y           = location.IntegralYCoord / 100f;
                 ImGui.SetNextItemWidth(-1);
                 if (ImGui.DragFloat("##y", ref y, 0.05f, 1f, 42f, "%.2f", ImGuiSliderFlags.AlwaysClamp))
-                    location.SetYCoord((int)(y * 100f + 0.5f));
+                    _plugin.LocationManager.SetYCoord(location, (int)(y * 100f + 0.5f));
                 if (overwritten)
                 {
                     ImGuiUtil.HoverTooltip($"Right-click to restore default. ({location.DefaultYCoord / 100f:0.00})");
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                        location.SetYCoord(location.DefaultYCoord);
+                        _plugin.LocationManager.SetYCoord(location, location.DefaultYCoord);
                 }
             }
 
@@ -221,8 +221,12 @@ public partial class Interface
 
     private void DrawLocationsTab()
     {
-        using var id = ImGuiRaii.PushId("Locations");
-        if (!ImGui.BeginTabItem("Locations"))
+        using var id  = ImGuiRaii.PushId("Locations");
+        var       tab = ImGui.BeginTabItem("Locations");
+        ImGuiUtil.HoverTooltip("Default locations getting you down?\n"
+          + "Set up custom aetherytes or map marker locations for specific nodes.");
+
+        if (!tab)
             return;
 
         using var end = ImGuiRaii.DeferredEnd(ImGui.EndTabItem);

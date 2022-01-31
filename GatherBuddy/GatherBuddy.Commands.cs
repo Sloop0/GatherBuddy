@@ -128,7 +128,7 @@ public partial class GatherBuddy
         }
 
         var argumentParts = arguments.Split();
-        var minute = Time.EorzeaMinuteOfDay + (argumentParts.Length < 2 ? 0 : int.TryParse(argumentParts[1], out var offset) ? offset : 0);
+        var minute = (Time.EorzeaMinuteOfDay + (argumentParts.Length < 2 ? 0 : int.TryParse(argumentParts[1], out var offset) ? offset : 0)) % RealTime.MinutesPerDay;
         if (!GatherGroupManager.TryGetValue(argumentParts[0], out var group))
         {
             Functions.Print($"The group {argumentParts[0]} does not exist.");

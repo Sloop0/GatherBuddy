@@ -4,7 +4,7 @@ using Lumina.Excel.GeneratedSheets;
 
 namespace GatherBuddy.Structs;
 
-public readonly struct Bait : IComparable<Bait>
+public class Bait : IComparable<Bait>
 {
     public const uint FishingTackleRow = 30;
 
@@ -23,6 +23,6 @@ public readonly struct Bait : IComparable<Bait>
             Name = MultiString.ParseSeStringLumina(data.Name);
     }
 
-    public int CompareTo(Bait other)
-        => Id.CompareTo(other.Id);
+    public int CompareTo(Bait? other)
+        => Id.CompareTo(other?.Id ?? 0);
 }

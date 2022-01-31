@@ -6,7 +6,9 @@ using Dalamud.Plugin;
 using GatherBuddy.Alarms;
 using GatherBuddy.Config;
 using GatherBuddy.CustomInfo;
+using GatherBuddy.FishTimer;
 using GatherBuddy.FishTimer.Parser;
+using GatherBuddy.GatherHelper;
 using GatherBuddy.Gui;
 using GatherBuddy.Plugin;
 using GatherBuddy.SeFunctions;
@@ -34,15 +36,19 @@ public partial class GatherBuddy : IDalamudPlugin
     public static UptimeManager  UptimeManager  { get; private set; } = null!;
     public static FishLog        FishLog        { get; private set; } = null!;
     public static EventFramework EventFramework { get; private set; } = null!;
+    public static SeTugType      TugType        { get; private set; } = null!;
     public static FishingParser  FishingParser  { get; private set; } = null!;
 
-    internal readonly GatherGroup.Manager GatherGroupManager;
-    internal readonly LocationManager     LocationManager;
-    internal readonly AlarmManager        AlarmManager;
-    internal readonly WindowSystem        WindowSystem;
-    internal readonly Interface           Interface;
-    internal readonly Executor            Executor;
-    internal readonly SpearfishingHelper  SpearfishingHelper;
+    internal readonly GatherGroup.GatherGroupManager GatherGroupManager;
+    internal readonly LocationManager                LocationManager;
+    internal readonly AlarmManager                   AlarmManager;
+    internal readonly GatherWindowManager            GatherWindowManager;
+    internal readonly WindowSystem                   WindowSystem;
+    internal readonly Interface                      Interface;
+    internal readonly GatherWindow                   GatherWindow;
+    internal readonly Executor                       Executor;
+    internal readonly ContextMenu                        ContextMenu;
+    internal readonly SpearfishingHelper             SpearfishingHelper;
 
     internal readonly GatherBuddyIpc Ipc;
     //    internal readonly WotsitIpc Wotsit;
@@ -56,38 +62,44 @@ public partial class GatherBuddy : IDalamudPlugin
         GameData = new GameData(Dalamud.GameData);
         Time     = new SeTime();
 
-        WeatherManager     = new WeatherManager(GameData);
-        UptimeManager      = new UptimeManager(GameData);
-        FishLog            = new FishLog();
-        EventFramework     = new EventFramework(Dalamud.SigScanner);
-        FishingParser      = new FishingParser();
-        Executor           = new Executor();
-        GatherGroupManager = GatherGroup.Manager.Load();
-        LocationManager    = LocationManager.Load();
-        AlarmManager       = new AlarmManager();
+        WeatherManager      = new WeatherManager(GameData);
+        UptimeManager       = new UptimeManager(GameData);
+        FishLog             = new FishLog();
+        EventFramework      = new EventFramework(Dalamud.SigScanner);
+        TugType             = new SeTugType(Dalamud.SigScanner);
+        FishingParser       = new FishingParser();
+        Executor            = new Executor();
+        ContextMenu         = new ContextMenu(Executor);
+        GatherGroupManager  = GatherGroup.GatherGroupManager.Load();
+        LocationManager     = LocationManager.Load();
+        AlarmManager        = AlarmManager.Load();
+        GatherWindowManager = GatherWindowManager.Load();
+        AlarmManager.ForceEnable();
 
         SpearfishingHelper = new SpearfishingHelper(GameData);
-
         InitializeCommands();
 
         WindowSystem = new WindowSystem(Name);
         Interface    = new Interface(this);
+        GatherWindow = new GatherWindow(this);
         WindowSystem.AddWindow(Interface);
         Dalamud.PluginInterface.UiBuilder.Draw         += WindowSystem.Draw;
         Dalamud.PluginInterface.UiBuilder.Draw         += SpearfishingHelper.Draw;
+        Dalamud.PluginInterface.UiBuilder.Draw         += GatherWindow.Draw;
         Dalamud.PluginInterface.UiBuilder.OpenConfigUi += Interface.Toggle;
 
         Ipc = new GatherBuddyIpc(this);
         //Wotsit = new WotsitIpc();
-        new FishingRecords();
     }
 
     void IDisposable.Dispose()
     {
+        ContextMenu.Dispose();
         UptimeManager.Dispose();
         Ipc.Dispose();
         //Wotsit.Dispose();
         Dalamud.PluginInterface.UiBuilder.OpenConfigUi -= Interface.Toggle;
+        Dalamud.PluginInterface.UiBuilder.Draw         -= GatherWindow.Draw;
         Dalamud.PluginInterface.UiBuilder.Draw         -= SpearfishingHelper.Draw;
         Dalamud.PluginInterface.UiBuilder.Draw         -= WindowSystem.Draw;
         Interface.Dispose();

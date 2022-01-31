@@ -4,7 +4,6 @@ using Dalamud;
 using Dalamud.Game.Text.SeStringHandling;
 using Lumina.Excel.GeneratedSheets;
 using FishingSpot = GatherBuddy.Classes.FishingSpot;
-using GatherBuddy.Plugin;
 
 namespace GatherBuddy.FishTimer.Parser;
 

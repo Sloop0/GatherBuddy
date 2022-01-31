@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Dalamud;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Logging;
 using GatherBuddy.Classes;
@@ -165,7 +166,8 @@ public class Executor
             return;
 
         var link = Communicator
-            .AddFullMapLink(new SeStringBuilder(), _location.Name, _location.Territory, _location.IntegralXCoord / 100f, _location.IntegralYCoord / 100f, true).BuiltString;
+            .AddFullMapLink(new SeStringBuilder(), _location.Name, _location.Territory, _location.IntegralXCoord / 100f,
+                _location.IntegralYCoord / 100f,   true).BuiltString;
         if (GatherBuddy.Config.WriteCoordinates)
             Functions.Print(link);
     }

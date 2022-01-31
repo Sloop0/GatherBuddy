@@ -23,7 +23,7 @@ internal static class SeStringBuilderExtension
     }
 }
 
-public class Manager
+public class GatherGroupManager
 {
     public const string FileName = "gather_groups.json";
 
@@ -201,9 +201,9 @@ public class Manager
     }
 
 
-    public static Manager Load()
+    public static GatherGroupManager Load()
     {
-        var manager = new Manager();
+        var manager = new GatherGroupManager();
         var file    = Functions.ObtainSaveFile(FileName);
         if (file is not { Exists: true })
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
 using GatherBuddy.Config;
@@ -74,19 +75,31 @@ public partial class Interface
 
     private HeaderCache _headerCache = new();
 
-    private void DrawLastItemAlarm()
+    private void DrawLastAlarm(bool which, string failureText)
     {
-        // TODO when alarms exist
-        if (ImGuiUtil.DrawDisabledButton("No Item Alarm Triggered", _headerCache.AlarmButtonSize, "Click to /gather this alarm.", true))
-        { }
+        var alarmData = which ? _plugin.AlarmManager.LastItemAlarm : _plugin.AlarmManager.LastFishAlarm;
+        if (alarmData == null)
+        {
+            ImGuiUtil.DrawDisabledButton(failureText, _headerCache.AlarmButtonSize, "Click to /gather this alarm.", true);
+            return;
+        }
+
+        var (alarm, loc, time) = alarmData.Value;
+
+        var text = $"{(alarm.Name.Any() ? alarm.Name : alarm.Item.Name[GatherBuddy.Language])}###{(which ? "itemAlarm" : "fishAlarm")}";
+        var desc =
+            $"Click to /gather this alarm.\n{loc.Name} - {loc.ClosestAetheryte?.Name ?? "None"}\n{time.Start.LocalTime}\n{time.End.LocalTime}";
+
+        if (ImGuiUtil.DrawDisabledButton(text, _headerCache.AlarmButtonSize, desc, false))
+            _plugin.Executor.GatherLocation(loc);
     }
 
+    private void DrawLastItemAlarm()
+        => DrawLastAlarm(false, "No Item Alarm Triggered");
+
     private void DrawLastFishAlarm()
-    {
-        // TODO when alarms exist
-        if (ImGuiUtil.DrawDisabledButton("No Fish Alarm Triggered", _headerCache.AlarmButtonSize, "Click to /gather this alarm.", true))
-        { }
-    }
+        => DrawLastAlarm(true, "No Fish Alarm Triggered");
+
 
     private void DrawAlarmRow()
     {

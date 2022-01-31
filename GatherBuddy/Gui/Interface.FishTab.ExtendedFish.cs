@@ -80,8 +80,6 @@ public partial class Interface
             if (!fish.Interval.AlwaysUp())
                 uptime = (uptime * fish.Interval.OnTime) / EorzeaTimeStampExtensions.MillisecondsPerEorzeaHour / RealTime.HoursPerDay;
             ushort bestUptime = 0;
-            if (fish.ItemId == 8772)
-                bestUptime = bestUptime;
             foreach (var spot in fish.FishingSpots)
             {
                 var tmp = uptime

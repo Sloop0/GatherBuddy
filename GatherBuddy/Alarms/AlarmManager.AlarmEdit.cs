@@ -1,4 +1,5 @@
 ﻿using GatherBuddy.Interfaces;
+using GatherBuddy.Time;
 
 namespace GatherBuddy.Alarms;
 
@@ -16,7 +17,10 @@ public partial class AlarmManager
         {
             alarm.Enabled = true;
             if (group.Enabled)
-                ActiveAlarms.TryAdd(alarm, false);
+            {
+                ActiveAlarms.TryAdd(alarm, TimeStamp.Epoch);
+                SetDirty();
+            }
         }
 
         Save();
@@ -46,12 +50,15 @@ public partial class AlarmManager
     {
         group.Alarms.Add(value);
         if (group.Enabled && value.Enabled)
-            ActiveAlarms.Add(value, false);
+        {
+            ActiveAlarms.Add(value, TimeStamp.Epoch);
+            SetDirty();
+        }
+
         Save();
     }
 
-    public void ChangeAlarmName(AlarmGroup group, int idx, string name, IGatherable? item, bool? printMessage, Sounds? soundId,
-        int? secondOffset)
+    public void ChangeAlarmName(AlarmGroup group, int idx, string name)
     {
         var alarm = group.Alarms[idx];
         if (alarm.Name == name)
@@ -69,7 +76,14 @@ public partial class AlarmManager
 
         alarm.Item = item;
         if (ActiveAlarms.ContainsKey(alarm))
-            ActiveAlarms[alarm] = false;
+        {
+            ActiveAlarms[alarm] = TimeStamp.Epoch;
+            SetDirty();
+            if (ReferenceEquals(alarm, LastFishAlarm?.Item1))
+                LastFishAlarm = null;
+            if (ReferenceEquals(alarm, LastItemAlarm?.Item1))
+                LastItemAlarm = null;
+        }
 
         Save();
     }
@@ -102,7 +116,11 @@ public partial class AlarmManager
 
         alarm.SecondOffset = secondOffset;
         if (ActiveAlarms.ContainsKey(alarm))
-            ActiveAlarms[alarm] = false;
+        {
+            ActiveAlarms[alarm] = TimeStamp.Epoch;
+            SetDirty();
+        }
+
         Save();
     }
 }

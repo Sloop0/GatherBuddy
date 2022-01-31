@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Dalamud.Game;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Logging;
-using GatherBuddy.GatherGroup;
 using GatherBuddy.Interfaces;
 using GatherBuddy.Plugin;
 using GatherBuddy.SeFunctions;
@@ -18,36 +20,108 @@ public partial class AlarmManager : IDisposable
     private readonly PlaySound _sounds;
 
     public   List<AlarmGroup>                  Alarms        { get; init; } = new();
-    internal Dictionary<Alarm, bool>           ActiveAlarms  { get; init; } = new();
+    internal Dictionary<Alarm, TimeStamp>      ActiveAlarms  { get; init; } = new();
     public   (Alarm, ILocation, TimeInterval)? LastItemAlarm { get; private set; }
     public   (Alarm, ILocation, TimeInterval)? LastFishAlarm { get; private set; }
 
-    private AlarmGroup? _alarmGroup = null;
-    public  AlarmGroup  DefaultGroup
-        => _alarmGroup ??= AddDefaultAlarms();
+    public TimeStamp NextChange = TimeStamp.Epoch;
 
     public AlarmManager()
         => _sounds = new PlaySound(Dalamud.SigScanner);
 
-    public void Dispose()
-    { }
-
-    public void OnUpdate()
+    public void Enable()
     {
-        // Skip if the player isn't loaded in a territory.
-        if (Dalamud.ClientState.TerritoryType == 0 || Dalamud.ClientState.LocalPlayer == null)
+        if (GatherBuddy.Config.AlarmsEnabled)
             return;
 
+        GatherBuddy.Config.AlarmsEnabled = true;
+        GatherBuddy.Config.Save();
+
+        Dalamud.Framework.Update  += OnUpdate;
+        Dalamud.ClientState.Login += OnLogin;
+        SetActiveAlarms();
+    }
+
+    internal void ForceEnable()
+    {
+        if (GatherBuddy.Config.AlarmsEnabled)
+        {
+            Dalamud.ClientState.Login -= OnLogin;
+            Dalamud.Framework.Update  += OnUpdate;
+            SetActiveAlarms();
+        }
+    }
+
+    public void Disable()
+    {
+        if (!GatherBuddy.Config.AlarmsEnabled)
+            return;
+
+        GatherBuddy.Config.AlarmsEnabled = false;
+        GatherBuddy.Config.Save();
+        Dalamud.Framework.Update -= OnUpdate;
+        SetActiveAlarms();
+        LastItemAlarm = null;
+        LastFishAlarm = null;
+    }
+
+    public void SetDirty()
+        => NextChange = TimeStamp.Epoch;
+
+    public void Dispose()
+        => Disable();
+
+    private void SetActiveAlarms()
+    {
+        ActiveAlarms.Clear();
+        if (!GatherBuddy.Config.AlarmsEnabled)
+            return;
+
+        foreach (var alarm in Alarms.Where(g => g.Enabled)
+                     .SelectMany(g => g.Alarms)
+                     .Where(a => a.Enabled))
+            ActiveAlarms.TryAdd(alarm, TimeStamp.Epoch);
+        SetDirty();
+    }
+
+    private void OnLogin(object? _, EventArgs _2)
+        => SetDirty();
+    
+    private static bool AlarmActive(Alarm a, TimeInterval i)
+        => GatherBuddy.Time.ServerTime >= i.Start.AddSeconds(-a.SecondOffset) && GatherBuddy.Time.ServerTime < i.End;
+
+    public void OnUpdate(Framework _)
+    {
+        var st = GatherBuddy.Time.ServerTime;
+        if (st < NextChange)
+            return;
+
+        if (Functions.BetweenAreas())
+            return;
+
+        if (!GatherBuddy.Config.AlarmsInDuty && Functions.BoundByDuty())
+            return;
+
+        var nextChange = st.AddDays(365);
         foreach (var (alarm, status) in ActiveAlarms)
         {
-            var time = GatherBuddy.Time.ServerTime.AddSeconds(alarm.SecondOffset);
             var (location, uptime) = GatherBuddy.UptimeManager.BestLocation(alarm.Item);
-            if (uptime.End > time)
-                ActiveAlarms[alarm] = false;
-            if (uptime.End > time || status)
+
+            var shiftedStart = uptime.Start.AddSeconds(-alarm.SecondOffset);
+
+            if (shiftedStart > st && uptime.Start < nextChange)
+                nextChange = shiftedStart;
+
+            if (uptime.End < nextChange)
+                nextChange = uptime.End;
+
+            if (uptime.Start == status)
                 continue;
 
-            ActiveAlarms[alarm] = true;
+            ActiveAlarms[alarm] = uptime.Start;
+            if (shiftedStart > st)
+                continue;
+
             if (alarm.Item.Type == ObjectType.Fish)
                 LastFishAlarm = (alarm, location, uptime);
             else if (alarm.Item.Type == ObjectType.Gatherable)
@@ -58,13 +132,21 @@ public partial class AlarmManager : IDisposable
 
             alarm.SendMessage(location, uptime);
         }
+
+        if (LastFishAlarm != null && !AlarmActive(LastFishAlarm.Value.Item1, LastFishAlarm.Value.Item3))
+            LastFishAlarm = null;
+
+        if (LastItemAlarm != null && !AlarmActive(LastItemAlarm.Value.Item1, LastItemAlarm.Value.Item3))
+            LastItemAlarm = null;
+
+        NextChange = nextChange;
     }
 
-    private AlarmGroup AddDefaultAlarms()
+    private bool AddDefaultAlarms()
     {
         var def = Alarms.FirstOrDefault(a => a.Name == "Default");
         if (def != null)
-            return def;
+            return false;
 
         def = new AlarmGroup()
         {
@@ -72,7 +154,7 @@ public partial class AlarmManager : IDisposable
             Description = "Default alarm group, all new alarms from the item windows are added here first.",
         };
         Alarms.Insert(0, def);
-        return def;
+        return true;
     }
 
     public void Save()
@@ -80,70 +162,68 @@ public partial class AlarmManager : IDisposable
         var file = Functions.ObtainSaveFile(FileName);
         if (file == null)
             return;
-    
+
         try
         {
-            //var text = JsonConvert.SerializeObject(Alarms.Select(a => ), Formatting.Indented);
-            //File.WriteAllText(file.FullName, text);
+            var text = JsonConvert.SerializeObject(Alarms.Select(a => new AlarmGroup.Config(a)), Formatting.Indented);
+            File.WriteAllText(file.FullName, text);
         }
         catch (Exception e)
         {
             PluginLog.Error($"Could not write gather groups to file {file.FullName}:\n{e}");
         }
     }
-    //public static AlarmManager Load()
-    //{
-    //    var manager = new AlarmManager();
-    //    var file    = Utility.Functions.ObtainSaveFile(FileName);
-    //    if (file is not { Exists: true })
-    //    {
-    //        manager.Save();
-    //        return manager;
-    //    }
-    //
-    //    try
-    //    {
-    //        var text    = File.ReadAllText(file.FullName);
-    //        var data    = JsonConvert.DeserializeObject<List<TimedGroup.Config>>(text);
-    //        var changes = false;
-    //        foreach (var config in data)
-    //        {
-    //            if (!TimedGroup.FromConfig(config, out var group))
-    //            {
-    //                PluginLog.Error($"Invalid items in gather group {group.Name} skipped.");
-    //                changes = true;
-    //            }
-    //
-    //            var searchName = group.Name.ToLowerInvariant().Trim();
-    //            if (searchName.Length == 0)
-    //            {
-    //                changes = true;
-    //                PluginLog.Error("Gather group without name found, skipping.");
-    //                continue;
-    //            }
-    //
-    //            if (manager.Groups.ContainsKey(searchName))
-    //            {
-    //                changes = true;
-    //                PluginLog.Error($"Multiple gather groups with the same name {searchName} found, skipping later ones.");
-    //                continue;
-    //            }
-    //
-    //            manager.Groups.Add(searchName, group);
-    //        }
-    //
-    //        changes |= manager.SetDefaults();
-    //        if (changes)
-    //            manager.Save();
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        PluginLog.Error($"Error loading gather groups:\n{e}");
-    //        manager.Groups.Clear();
-    //        manager.SetDefaults();
-    //        manager.Save();
-    //    }
-    //
-    //    return manager;
-    //}
+
+    public static AlarmManager Load()
+    {
+        var manager = new AlarmManager();
+        var file    = Functions.ObtainSaveFile(FileName);
+        if (file is not { Exists: true })
+        {
+            manager.AddDefaultAlarms();
+            manager.Save();
+            return manager;
+        }
+
+        try
+        {
+            var text    = File.ReadAllText(file.FullName);
+            var data    = JsonConvert.DeserializeObject<AlarmGroup.Config[]>(text);
+            var changes = false;
+            foreach (var alarmGroup in data)
+            {
+                var group = new AlarmGroup()
+                {
+                    Name        = alarmGroup.Name,
+                    Description = alarmGroup.Description,
+                    Enabled     = alarmGroup.Enabled,
+                };
+                foreach (var item in alarmGroup.Alarms)
+                {
+                    if (!Alarm.FromConfig(item, out var alarm))
+                    {
+                        PluginLog.Error($"Could not add alarm to {@group.Name}.");
+                        changes = true;
+                        continue;
+                    }
+
+                    group.Alarms.Add(alarm!);
+                }
+
+                manager.Alarms.Add(group);
+            }
+
+            changes |= manager.AddDefaultAlarms();
+            if (changes)
+                manager.Save();
+        }
+        catch (Exception e)
+        {
+            PluginLog.Error($"Error loading gather groups:\n{e}");
+            manager.AddDefaultAlarms();
+            manager.Save();
+        }
+
+        return manager;
+    }
 }

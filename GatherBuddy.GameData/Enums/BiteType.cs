@@ -2,9 +2,9 @@
 
 public enum BiteType : byte
 {
-    Unknown,
-    Weak,
-    Strong,
-    Legendary,
-    None = 255,
+    Unknown   = 0,
+    Weak      = 36,
+    Strong    = 37,
+    Legendary = 38,
+    None      = 255,
 }

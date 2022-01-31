@@ -98,6 +98,18 @@ public partial class Interface
               + ChatInformationString,
                 GatherBuddy.Config.ChatTypeError, t => GatherBuddy.Config.ChatTypeError = t);
 
+        public static void DrawContextMenuBox()
+            => DrawCheckbox("Add Ingame Context Menus",
+                "Add a 'Gather' entry to ingame right-click context menus for gatherable items.",
+                GatherBuddy.Config.AddIngameContextMenus, b =>
+                {
+                    GatherBuddy.Config.AddIngameContextMenus = b;
+                    if (b)
+                        _plugin.ContextMenu.Enable();
+                    else
+                        _plugin.ContextMenu.Disable();
+                });
+
         // Weather Tab
         public static void DrawWeatherTabNamesBox()
             => DrawCheckbox("Show Names in Weather Tab",
@@ -107,7 +119,17 @@ public partial class Interface
         // Alarms
         public static void DrawAlarmToggle()
             => DrawCheckbox("Enable Alarms", "Toggle all alarms on or off.", GatherBuddy.Config.AlarmsEnabled,
-                b => { GatherBuddy.Config.AlarmsEnabled = b; }); // TODO when alarms exist
+                b =>
+                {
+                    if (b)
+                        _plugin.AlarmManager.Enable();
+                    else
+                        _plugin.AlarmManager.Disable();
+                });
+
+        public static void DrawAlarmsInDutyToggle()
+            => DrawCheckbox("Enable Alarms in Duty", "Set whether alarms should trigger while you are bound by a duty.",
+                GatherBuddy.Config.AlarmsInDuty,     b => GatherBuddy.Config.AlarmsInDuty = b);
 
         // Fish Timer
         public static void DrawFishTimerBox()
@@ -182,6 +204,26 @@ public partial class Interface
                 "Show the last triggered alarms in your gather window if they exist.",
                 GatherBuddy.Config.ShowGatherWindowAlarms, b => GatherBuddy.Config.ShowGatherWindowAlarms = b);
 
+        public static void DrawSortGatherWindowBox()
+            => DrawCheckbox("Sort Gather Window by Uptime",
+                "Sort the items selected for the gather window by their uptimes.",
+                GatherBuddy.Config.SortGatherWindowByUptime, b => GatherBuddy.Config.SortGatherWindowByUptime = b);
+
+        public static void DrawHideGatherWindowInDutyBox()
+            => DrawCheckbox("Hide Gather Window in Duty",
+                "Hide the gather window when bound by any duty.",
+                GatherBuddy.Config.HideGatherWindowInDuty, b => GatherBuddy.Config.HideGatherWindowInDuty = b);
+
+        public static void DrawGatherWindowHoldCtrlBox()
+            => DrawCheckbox("Only Show Gather Window if Holding Control",
+                "Only show the gather window if you are holding your control key.",
+                GatherBuddy.Config.OnlyShowGatherWindowHoldingCtrl, b => GatherBuddy.Config.OnlyShowGatherWindowHoldingCtrl = b);
+
+        public static void DrawGatherWindowLockBox()
+            => DrawCheckbox("Lock Gather Window Position",
+                "Prevent moving the gather window by dragging it around.",
+                GatherBuddy.Config.LockGatherWindow, b => GatherBuddy.Config.LockGatherWindow = b);
+
         public static void DrawAetherytePreference()
         {
             var tmp     = GatherBuddy.Config.AetherytePreference == AetherytePreference.Cost;
@@ -217,55 +259,87 @@ public partial class Interface
 
         if (ImGui.CollapsingHeader("General"))
         {
-            ConfigFunctions.DrawGearChangeBox();
-            ConfigFunctions.DrawTeleportBox();
-            ConfigFunctions.DrawMapMarkerOpenBox();
-            ConfigFunctions.DrawAetherytePreference();
-            ConfigFunctions.DrawSkipTeleportBox();
-            ConfigFunctions.DrawAlarmToggle();
-            ConfigFunctions.DrawPrintTypeSelector();
-            ConfigFunctions.DrawErrorTypeSelector();
-            ImGui.NewLine();
-        }
+            if (ImGui.TreeNodeEx("Gather Command"))
+            {
+                ConfigFunctions.DrawGearChangeBox();
+                ConfigFunctions.DrawTeleportBox();
+                ConfigFunctions.DrawMapMarkerOpenBox();
+                ConfigFunctions.DrawAetherytePreference();
+                ConfigFunctions.DrawSkipTeleportBox();
+                ConfigFunctions.DrawContextMenuBox();
+                ImGui.TreePop();
+            }
 
-        if (ImGui.CollapsingHeader("Set Names"))
-        {
-            ConfigFunctions.DrawSetInput("Miner",    GatherBuddy.Config.MinerSetName,    s => GatherBuddy.Config.MinerSetName    = s);
-            ConfigFunctions.DrawSetInput("Botanist", GatherBuddy.Config.BotanistSetName, s => GatherBuddy.Config.BotanistSetName = s);
-            ConfigFunctions.DrawSetInput("Fisher",   GatherBuddy.Config.FisherSetName,   s => GatherBuddy.Config.FisherSetName   = s);
+            if (ImGui.TreeNodeEx("Set Names"))
+            {
+                ConfigFunctions.DrawSetInput("Miner",    GatherBuddy.Config.MinerSetName,    s => GatherBuddy.Config.MinerSetName    = s);
+                ConfigFunctions.DrawSetInput("Botanist", GatherBuddy.Config.BotanistSetName, s => GatherBuddy.Config.BotanistSetName = s);
+                ConfigFunctions.DrawSetInput("Fisher",   GatherBuddy.Config.FisherSetName,   s => GatherBuddy.Config.FisherSetName   = s);
+                ImGui.TreePop();
+            }
+
+            if (ImGui.TreeNodeEx("Alarms"))
+            {
+                ConfigFunctions.DrawAlarmToggle();
+                ConfigFunctions.DrawAlarmsInDutyToggle();
+                ImGui.TreePop();
+            }
+
+            if (ImGui.TreeNodeEx("Messages"))
+            {
+                ConfigFunctions.DrawPrintTypeSelector();
+                ConfigFunctions.DrawErrorTypeSelector();
+                ConfigFunctions.DrawMapMarkerPrintBox();
+                ConfigFunctions.DrawPrintUptimesBox();
+                ConfigFunctions.DrawPrintSpearfishBox();
+                ImGui.TreePop();
+            }
+
             ImGui.NewLine();
         }
 
         if (ImGui.CollapsingHeader("Interface"))
         {
-            ConfigFunctions.DrawOpenOnStartBox();
-            ConfigFunctions.DrawWeatherTabNamesBox();
+            if (ImGui.TreeNodeEx("Config Window"))
+            {
+                ConfigFunctions.DrawOpenOnStartBox();
+                ConfigFunctions.DrawWeatherTabNamesBox();
+                ImGui.TreePop();
+            }
 
-            ConfigFunctions.DrawFishTimerBox();
-            ConfigFunctions.DrawFishTimerEditBox();
-            ConfigFunctions.DrawFishTimerHideBox();
-            ConfigFunctions.DrawFishTimerHideBox2();
-            ConfigFunctions.DrawFishTimerUptimesBox();
+            if (ImGui.TreeNodeEx("Fish Timer"))
+            {
+                ConfigFunctions.DrawFishTimerBox();
+                ConfigFunctions.DrawFishTimerEditBox();
+                ConfigFunctions.DrawFishTimerHideBox();
+                ConfigFunctions.DrawFishTimerHideBox2();
+                ConfigFunctions.DrawFishTimerUptimesBox();
+                ImGui.TreePop();
+            }
 
-            ConfigFunctions.DrawShowGatherWindowBox();
-            ConfigFunctions.DrawGatherWindowTimersBox();
-            ConfigFunctions.DrawGatherWindowAlarmsBox();
+            if (ImGui.TreeNodeEx("Gather Window"))
+            {
+                ConfigFunctions.DrawShowGatherWindowBox();
+                ConfigFunctions.DrawGatherWindowTimersBox();
+                ConfigFunctions.DrawGatherWindowAlarmsBox();
+                ConfigFunctions.DrawSortGatherWindowBox();
+                ConfigFunctions.DrawHideGatherWindowInDutyBox();
+                ConfigFunctions.DrawGatherWindowHoldCtrlBox();
+                ConfigFunctions.DrawGatherWindowLockBox();
+                ImGui.TreePop();
+            }
 
-            ConfigFunctions.DrawSpearfishHelperBox();
-            ConfigFunctions.DrawSpearfishNamesBox();
-            ConfigFunctions.DrawSpearfishSpeedBox();
-            ConfigFunctions.DrawAvailableSpearfishBox();
-            ConfigFunctions.DrawSpearfishIconsAsTextBox();
-            ConfigFunctions.DrawSpearfishCenterLineBox();
+            if (ImGui.TreeNodeEx("Spearfishing Helper"))
+            {
+                ConfigFunctions.DrawSpearfishHelperBox();
+                ConfigFunctions.DrawSpearfishNamesBox();
+                ConfigFunctions.DrawSpearfishSpeedBox();
+                ConfigFunctions.DrawAvailableSpearfishBox();
+                ConfigFunctions.DrawSpearfishIconsAsTextBox();
+                ConfigFunctions.DrawSpearfishCenterLineBox();
+                ImGui.TreePop();
+            }
 
-            ImGui.NewLine();
-        }
-
-        if (ImGui.CollapsingHeader("Messages"))
-        {
-            ConfigFunctions.DrawMapMarkerPrintBox();
-            ConfigFunctions.DrawPrintUptimesBox();
-            ConfigFunctions.DrawPrintSpearfishBox();
             ImGui.NewLine();
         }
 

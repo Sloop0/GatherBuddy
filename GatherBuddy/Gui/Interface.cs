@@ -18,9 +18,11 @@ public partial class Interface : Window, IDisposable
     public Interface(GatherBuddy plugin)
         : base(GatherBuddy.Version.Length > 0 ? $"{PluginName} v{GatherBuddy.Version}###GatherBuddyMain" : PluginName)
     {
-        _plugin           = plugin;
-        _gatherGroupCache = new GatherGroupCache(_plugin.GatherGroupManager);
-        _locationTable    = new LocationTable();
+        _plugin            = plugin;
+        _gatherGroupCache  = new GatherGroupCache(_plugin.GatherGroupManager);
+        _gatherWindowCache = new GatherWindowCache();
+        _locationTable     = new LocationTable();
+        _alarmCache        = new AlarmCache(_plugin.AlarmManager);
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(MinSize,     17 * ImGui.GetTextLineHeightWithSpacing() / ImGuiHelpers.GlobalScale),
@@ -63,6 +65,7 @@ public partial class Interface : Window, IDisposable
         tabs.Item3();
         DrawAlarmTab();
         DrawGatherGroupTab();
+        DrawGatherWindowTab();
         DrawConfigTab();
         DrawLocationsTab();
         DrawDebugTab();

@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Dalamud.Logging;
 using GatherBuddy.Interfaces;
 using GatherBuddy.Time;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GatherBuddy.Alarms;
 
@@ -36,6 +34,7 @@ public class Alarm
 
         switch (Item.Type)
         {
+            // TODO
             //case ObjectType.Invalid:
             //    PluginLog.Error($"Invalid item for Alarm {Name}.");
             //    break;
@@ -57,34 +56,47 @@ public class Alarm
 
     internal struct Config
     {
-        public uint       Id;
+        public uint Id;
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public ObjectType Type;
-        public int        SecondOffset;
-        public Sounds     SoundId;
-        public bool       Enabled;
-        public bool       PrintMessage;
+
+        public int    SecondOffset;
+        public Sounds SoundId;
+        public bool   Enabled;
+        public bool   PrintMessage;
+
+        public Config(Alarm a)
+        {
+            Id           = a.Item.ItemId;
+            Type         = a.Item.Type;
+            SecondOffset = a.SecondOffset;
+            SoundId      = a.SoundId;
+            Enabled      = a.Enabled;
+            PrintMessage = a.PrintMessage;
+        }
     }
 
     internal static bool FromConfig(Config config, out Alarm? alarm)
     {
         alarm = null;
-        return false;
-    }
-}
-
-public class AlarmGroup
-{
-    public string      Name        { get; set; } = string.Empty;
-    public string      Description { get; set; } = string.Empty;
-    public List<Alarm> Alarms      { get; set; } = new();
-    public bool        Enabled     { get; set; } = false;
-
-    public AlarmGroup Clone()
-        => new()
+        IGatherable? item = config.Type switch
         {
-            Name        = Name,
-            Description = Description,
-            Alarms      = Alarms.Select(a => a.Clone()).ToList(),
-            Enabled     = false,
+            ObjectType.Gatherable => GatherBuddy.GameData.Gatherables.TryGetValue(config.Id, out var i) ? i : null,
+            ObjectType.Fish       => GatherBuddy.GameData.Fishes.TryGetValue(config.Id, out var i) ? i : null,
+            _                     => null,
         };
+        if (item is not { InternalLocationId: > 0 })
+            return false;
+
+        alarm = new Alarm(item)
+        {
+            Enabled      = config.Enabled,
+            PrintMessage = config.PrintMessage,
+            SecondOffset = config.SecondOffset,
+            SoundId      = config.SoundId,
+        };
+
+        return true;
+    }
 }

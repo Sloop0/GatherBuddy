@@ -8,6 +8,7 @@ using GatherBuddy.Classes;
 using GatherBuddy.Levenshtein;
 using GatherBuddy.Plugin;
 using GatherBuddy.Structs;
+using GatherBuddy.Time;
 using ImGuiNET;
 using ImGuiOtter;
 
@@ -133,6 +134,8 @@ public partial class Interface
         ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework._fishingState.ToString("X"));
         ImGuiUtil.DrawTableColumn("Fishing State");
         ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework.FishingState.ToString());
+        ImGuiUtil.DrawTableColumn("Bite Type");
+        ImGuiUtil.DrawTableColumn(GatherBuddy.TugType.Bite.ToString());
     }
 
     private void DrawUptimeManagerTable()
@@ -172,6 +175,31 @@ public partial class Interface
         }
     }
 
+    private void DrawAlarmDebug()
+    {
+        if (!ImGui.CollapsingHeader("Alarms##AlarmDebug"))
+            return;
+        if(!ImGui.BeginTable("##Alarms", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit))
+            return;
+        using var end = ImGuiRaii.DeferredEnd(ImGui.EndTable);
+
+        ImGuiUtil.DrawTableColumn("Enabled");
+        ImGuiUtil.DrawTableColumn(GatherBuddy.Config.AlarmsEnabled.ToString());
+        ImGuiUtil.DrawTableColumn("Next Change (Absolute)");
+        ImGuiUtil.DrawTableColumn(_plugin.AlarmManager.NextChange.LocalTime.ToString(CultureInfo.InvariantCulture));
+        ImGuiUtil.DrawTableColumn("Next Change (Relative)");
+        ImGuiUtil.DrawTableColumn(TimeInterval.DurationString(_plugin.AlarmManager.NextChange, GatherBuddy.Time.ServerTime, false));
+        ImGuiUtil.DrawTableColumn("#Alarm Groups");
+        ImGuiUtil.DrawTableColumn(_plugin.AlarmManager.Alarms.Count.ToString());
+        ImGuiUtil.DrawTableColumn("#Enabled Alarms");
+        ImGuiUtil.DrawTableColumn(_plugin.AlarmManager.ActiveAlarms.Count.ToString());
+        foreach (var (alarm, state) in _plugin.AlarmManager.ActiveAlarms)
+        {
+            ImGuiUtil.DrawTableColumn(alarm.Name);
+            ImGuiUtil.DrawTableColumn(state.ToString());
+        }
+    }
+
     private string _identifyTest       = string.Empty;
     private uint   _lastItemIdentified = 0;
 
@@ -188,6 +216,7 @@ public partial class Interface
 
         DrawDebugButtons();
         DrawDebugEventFramework();
+        DrawAlarmDebug();
         ImGuiTable.DrawTabbedTable($"Aetherytes ({GatherBuddy.GameData.Aetherytes.Count})", GatherBuddy.GameData.Aetherytes.Values,
             DrawDebugAetheryte, flags, "Id", "Name", "Territory", "Coords", "Aetherstream");
         ImGuiTable.DrawTabbedTable($"Territories ({GatherBuddy.GameData.WeatherTerritories.Length})", GatherBuddy.GameData.WeatherTerritories,
@@ -226,10 +255,8 @@ public partial class Interface
             ImGui.Text(GatherBuddyIpc.VersionName);
             ImGui.Text(GatherBuddyIpc.IdentifyName);
             if (_plugin.Ipc._identifyProvider != null && ImGui.InputTextWithHint("##IPCIdentifyTest", "Identify...", ref _identifyTest, 64))
-            {
                 _lastItemIdentified = Dalamud.PluginInterface.GetIpcSubscriber<string, uint>(GatherBuddyIpc.IdentifyName)
                     .InvokeFunc(_identifyTest);
-            }
             group1.Pop();
             ImGui.SameLine();
             using var group2 = ImGuiRaii.NewGroup();

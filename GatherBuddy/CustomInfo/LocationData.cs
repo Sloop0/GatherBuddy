@@ -1,20 +1,27 @@
 ﻿using GatherBuddy.Classes;
 using GatherBuddy.Interfaces;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GatherBuddy.CustomInfo;
 
-public class LocationData
+public struct LocationData
 {
-    public ILocation  Location;
-    public Aetheryte? Aetheryte;
-    public int      XCoord;
-    public int      YCoord;
+    public uint Id;
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public ObjectType Type;
+
+    public int AetheryteId;
+    public int XCoord;
+    public int YCoord;
 
     public LocationData(ILocation loc)
     {
-        Location  = loc;
-        Aetheryte = loc.ClosestAetheryte;
-        XCoord    = loc.IntegralXCoord;
-        YCoord    = loc.IntegralYCoord;
+        Id          = loc.Id;
+        Type        = loc.Type;
+        AetheryteId = loc.ClosestAetheryte == null ? -1 : (int)loc.ClosestAetheryte.Id;
+        XCoord      = loc.IntegralXCoord;
+        YCoord      = loc.IntegralYCoord;
     }
 }
