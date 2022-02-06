@@ -19,7 +19,6 @@ public partial class Interface
     {
         private static float _nameColumnWidth      = 0;
         private static float _territoryColumnWidth = 0;
-        private static float _itemColumnWidth      = 0;
         private static float _aetheryteColumnWidth = 0;
         private static float _coordColumnWidth     = 0;
         private static float _typeColumnWidth      = 0;
@@ -28,11 +27,9 @@ public partial class Interface
         {
             if (_nameColumnWidth != 0)
                 return;
-
+            
             _nameColumnWidth      = _plugin.LocationManager.AllLocations.Max(l => TextWidth(l.Name)) / ImGuiHelpers.GlobalScale;
             _territoryColumnWidth = _plugin.LocationManager.AllLocations.Max(l => TextWidth(l.Territory.Name)) / ImGuiHelpers.GlobalScale;
-            _itemColumnWidth = _plugin.LocationManager.AllLocations.Max(l => l.Gatherables.Max(i => TextWidth(i.Name[GatherBuddy.Language])))
-              / ImGuiHelpers.GlobalScale;
             _aetheryteColumnWidth = GatherBuddy.GameData.Aetherytes.Values.Max(a => TextWidth(a.Name)) / ImGuiHelpers.GlobalScale;
             _coordColumnWidth     = TextWidth("X-Coord") / ImGuiHelpers.GlobalScale + Table.ArrowWidth;
             _typeColumnWidth      = Enum.GetValues<GatheringType>().Max(t => TextWidth(t.ToString())) / ImGuiHelpers.GlobalScale;
@@ -56,6 +53,12 @@ public partial class Interface
 
             public override float Width
                 => _nameColumnWidth * ImGuiHelpers.GlobalScale;
+
+            public override void DrawColumn(ILocation item, int _)
+            {
+                ImGui.AlignTextToFramePadding();
+                base.DrawColumn(item, _);
+            }
         }
 
         private sealed class TypeColumn : HeaderConfigFlags<JobFlags, ILocation>
@@ -80,8 +83,11 @@ public partial class Interface
                 }
             }
 
-            public override void DrawColumn(ILocation location)
-                => ImGui.Text(location.GatheringType.ToString());
+            public override void DrawColumn(ILocation location, int _)
+            {
+                ImGui.AlignTextToFramePadding();
+                ImGui.Text(location.GatheringType.ToString());
+            }
 
             public override int Compare(ILocation a, ILocation b)
                 => a.GatheringType.CompareTo(b.GatheringType);
@@ -111,6 +117,12 @@ public partial class Interface
 
             public override float Width
                 => _territoryColumnWidth * ImGuiHelpers.GlobalScale;
+
+            public override void DrawColumn(ILocation item, int _)
+            {
+                ImGui.AlignTextToFramePadding();
+                base.DrawColumn(item, _);
+            }
         }
 
         private sealed class ItemColumn : HeaderConfigString<ILocation>
@@ -119,7 +131,13 @@ public partial class Interface
                 => string.Join(", ", location.Gatherables.Select(g => g.Name[GatherBuddy.Language]));
 
             public override float Width
-                => _itemColumnWidth * ImGuiHelpers.GlobalScale;
+                => 0;
+
+            public override void DrawColumn(ILocation item, int _)
+            {
+                ImGui.AlignTextToFramePadding();
+                base.DrawColumn(item, _);
+            }
         }
 
         private sealed class AetheryteColumn : HeaderConfigString<ILocation>
@@ -139,7 +157,7 @@ public partial class Interface
             public override float Width
                 => _aetheryteColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ILocation location)
+            public override void DrawColumn(ILocation location, int _)
             {
                 var       overwritten = location.DefaultAetheryte != location.ClosestAetheryte;
                 using var color       = ImGuiRaii.PushColor(ImGuiCol.FrameBg, ColorId.ChangedLocationBg.Value(), overwritten);
@@ -163,7 +181,7 @@ public partial class Interface
             public override float Width
                 => _coordColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ILocation location)
+            public override void DrawColumn(ILocation location, int _)
             {
                 var       overwritten = location.DefaultXCoord != location.IntegralXCoord;
                 using var color       = ImGuiRaii.PushColor(ImGuiCol.FrameBg, ColorId.ChangedLocationBg.Value(), overwritten);
@@ -191,7 +209,7 @@ public partial class Interface
             public override float Width
                 => _coordColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ILocation location)
+            public override void DrawColumn(ILocation location, int _)
             {
                 var       overwritten = location.DefaultYCoord != location.IntegralYCoord;
                 using var color       = ImGuiRaii.PushColor(ImGuiCol.FrameBg, ColorId.ChangedLocationBg.Value(), overwritten);
@@ -212,12 +230,12 @@ public partial class Interface
         }
 
         public LocationTable()
-            : base("##LocationTable", _plugin.LocationManager.AllLocations, ImGui.GetTextLineHeight(), _nameColumn,
+            : base("##LocationTable", _plugin.LocationManager.AllLocations, ImGui.GetFrameHeight(), _nameColumn,
                 _typeColumn, _aetheryteColumn, _xCoordColumn, _yCoordColumn, _territoryColumn, _itemColumn)
         { }
     }
 
-    private LocationTable _locationTable;
+    private readonly LocationTable _locationTable;
 
     private void DrawLocationsTab()
     {

@@ -45,7 +45,7 @@ public class ClippedSelectableCombo<T>
         using var end    = ImGuiRaii.DeferredEnd(ImGui.EndChild);
         var       tmpIdx = selectedIdx;
 
-        void DrawItemInternal((string, int) p)
+        void DrawItemInternal((string, int) p, int _)
         {
             var name = _itemToName(_items[p.Item2]);
             if (ImGui.Selectable(name, currentName == name))

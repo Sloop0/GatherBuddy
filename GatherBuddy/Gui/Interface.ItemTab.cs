@@ -118,7 +118,7 @@ public partial class Interface
             public override float Width
                 => _nameColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedGatherable item)
+            public override void DrawColumn(ExtendedGatherable item, int _)
             {
                 using var style = ImGuiRaii.PushStyle(ImGuiStyleVar.ItemSpacing, ItemSpacing / 2);
                 ImGuiUtil.HoverIcon(item.Icon, LineIconSize);
@@ -140,7 +140,7 @@ public partial class Interface
                 SetNames("Currently Available", "Currently Unavailable");
             }
 
-            public override void DrawColumn(ExtendedGatherable item)
+            public override void DrawColumn(ExtendedGatherable item, int _)
                 => DrawTimeInterval(item.Uptime.Item2);
 
             public override int Compare(ExtendedGatherable lhs, ExtendedGatherable rhs)
@@ -163,7 +163,7 @@ public partial class Interface
             public override float Width
                 => _closestAetheryteColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedGatherable item)
+            public override void DrawColumn(ExtendedGatherable item, int _)
             {
                 var aetheryte = item.Uptime.Item1.ClosestAetheryte;
                 if (aetheryte == null)
@@ -213,7 +213,7 @@ public partial class Interface
             public JobColumn()
                 => SetFlagsAndNames(ItemFilter.Mining, ItemFilter.Quarrying, ItemFilter.Logging, ItemFilter.Harvesting);
 
-            public override void DrawColumn(ExtendedGatherable item)
+            public override void DrawColumn(ExtendedGatherable item, int _)
                 => ImGui.Text(item.Data.GatheringType.ToString());
 
             public override int Compare(ExtendedGatherable lhs, ExtendedGatherable rhs)
@@ -243,7 +243,7 @@ public partial class Interface
             public TypeColumn()
                 => SetFlagsAndNames(ItemFilter.Regular, ItemFilter.Unspoiled, ItemFilter.Ephemeral, ItemFilter.Legendary);
 
-            public override void DrawColumn(ExtendedGatherable item)
+            public override void DrawColumn(ExtendedGatherable item, int _)
                 => ImGui.Text(item.Data.NodeType.ToString());
 
             public override int Compare(ExtendedGatherable lhs, ExtendedGatherable rhs)
@@ -274,7 +274,7 @@ public partial class Interface
                 SetNames("A Realm Reborn", "Heavensward", "Stormblood", "Shadowbringers", "Endwalker");
             }
 
-            public override void DrawColumn(ExtendedGatherable item)
+            public override void DrawColumn(ExtendedGatherable item, int _)
                 => ImGui.Text(item.Expansion);
 
             public override int Compare(ExtendedGatherable lhs, ExtendedGatherable rhs)
@@ -320,7 +320,7 @@ public partial class Interface
             public override float Width
                 => _bestNodeColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedGatherable item)
+            public override void DrawColumn(ExtendedGatherable item, int _)
             {
                 if (ImGui.Selectable(ToName(item)))
                     _plugin.Executor.GatherLocation(item.Uptime.Item1);
@@ -345,7 +345,7 @@ public partial class Interface
             public override float Width
                 => _bestZoneColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedGatherable item)
+            public override void DrawColumn(ExtendedGatherable item, int _)
             {
                 if (ImGui.Selectable(ToName(item)))
                     Executor.TeleportToTerritory(item.Uptime.Item1.Territory);
@@ -370,7 +370,7 @@ public partial class Interface
             public override int Compare(ExtendedGatherable lhs, ExtendedGatherable rhs)
                 => lhs.Data.ItemId.CompareTo(rhs.Data.ItemId);
 
-            public override void DrawColumn(ExtendedGatherable item)
+            public override void DrawColumn(ExtendedGatherable item, int _)
                 => ImGuiUtil.RightAlign($"{item.Data.ItemId}");
         }
 
@@ -382,7 +382,7 @@ public partial class Interface
             public override int Compare(ExtendedGatherable lhs, ExtendedGatherable rhs)
                 => lhs.Data.GatheringId.CompareTo(rhs.Data.GatheringId);
 
-            public override void DrawColumn(ExtendedGatherable item)
+            public override void DrawColumn(ExtendedGatherable item, int _)
                 => ImGuiUtil.RightAlign($"{item.Data.GatheringId}");
         }
 

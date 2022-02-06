@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Dalamud;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using GatherBuddy.Classes;
 using GatherBuddy.Levenshtein;
 using GatherBuddy.Plugin;
@@ -11,7 +12,7 @@ using GatherBuddy.Structs;
 using GatherBuddy.Time;
 using ImGuiNET;
 using ImGuiOtter;
-
+using static GatherBuddy.FishTimer.FishRecord;
 
 namespace GatherBuddy.Gui;
 
@@ -117,25 +118,94 @@ public partial class Interface
         }
     }
 
-    private void DrawDebugEventFramework()
+    private unsafe void DrawDebugFishingState()
     {
-        if (!ImGui.CollapsingHeader("EventFramework"))
+        if (!ImGui.CollapsingHeader("Fishing State"))
             return;
 
         if (!ImGui.BeginTable("##Framework", 2))
             return;
 
-        using var end = ImGuiRaii.DeferredEnd(ImGui.EndTable);
+        using var end     = ImGuiRaii.DeferredEnd(ImGui.EndTable);
+        ImGuiUtil.DrawTableColumn("UiState Address");
+        ImGuiUtil.DrawTableColumn($"{(IntPtr)FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance():X}");
         ImGuiUtil.DrawTableColumn("Event Framework Address");
         ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework.Address.ToString("X"));
         ImGuiUtil.DrawTableColumn("Fishing Manager Address");
-        ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework._fishingManager.ToString("X"));
+        ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework.FishingManager.ToString("X"));
         ImGuiUtil.DrawTableColumn("Fishing State Address");
-        ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework._fishingState.ToString("X"));
+        ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework.FishingStatePtr.ToString("X"));
         ImGuiUtil.DrawTableColumn("Fishing State");
         ImGuiUtil.DrawTableColumn(GatherBuddy.EventFramework.FishingState.ToString());
+        ImGuiUtil.DrawTableColumn("Bite Type Address");
+        ImGuiUtil.DrawTableColumn(GatherBuddy.TugType.Address.ToString("X"));
         ImGuiUtil.DrawTableColumn("Bite Type");
         ImGuiUtil.DrawTableColumn(GatherBuddy.TugType.Bite.ToString());
+        
+        var record = _plugin.FishRecorder.Record;
+        ImGuiUtil.DrawTableColumn("Last Fishing State");
+        ImGuiUtil.DrawTableColumn(_plugin.FishRecorder.LastState.ToString());
+        ImGuiUtil.DrawTableColumn("Current Step");
+        ImGuiUtil.DrawTableColumn(_plugin.FishRecorder.Step.ToString());
+        ImGuiUtil.DrawTableColumn("ContentIdHash");
+        ImGuiUtil.DrawTableColumn(record.ContentIdHash.ToString());
+        ImGuiUtil.DrawTableColumn("Gathering");
+        ImGuiUtil.DrawTableColumn(record.Gathering.ToString());
+        ImGuiUtil.DrawTableColumn("Perception");
+        ImGuiUtil.DrawTableColumn(record.Perception.ToString());
+        ImGuiUtil.DrawTableColumn("Start Time");
+        ImGuiUtil.DrawTableColumn((record.TimeStamp / 1000).ToString());
+        ImGuiUtil.DrawTableColumn("Current Spot");
+        ImGuiUtil.DrawTableColumn($"{record.FishingSpot?.Name ?? "Unknown"} ({record.FishingSpot?.Id ?? 0})");
+        ImGuiUtil.DrawTableColumn("Current Bait");
+        ImGuiUtil.DrawTableColumn($"{record.Bait.Name} ({record.Bait.Id})");
+        ImGuiUtil.DrawTableColumn("Duration");
+        ImGuiUtil.DrawTableColumn(_plugin.FishRecorder.Timer.ElapsedMilliseconds.ToString());
+        ImGuiUtil.DrawTableColumn("BiteType");
+        ImGuiUtil.DrawTableColumn(record.Tug.ToString());
+        ImGuiUtil.DrawTableColumn("HookSet");
+        ImGuiUtil.DrawTableColumn(record.Hook.ToString());
+        ImGuiUtil.DrawTableColumn("Last Catch");
+        ImGuiUtil.DrawTableColumn($"{_plugin.FishRecorder.LastCatch?.Name[ClientLanguage.English] ?? "None"} ({_plugin.FishRecorder.LastCatch?.ItemId ?? 0} - {_plugin.FishRecorder.LastCatch?.FishId ?? 0})");
+        ImGuiUtil.DrawTableColumn("Current Catch");
+        ImGuiUtil.DrawTableColumn($"{record.Catch?.Name[ClientLanguage.English] ?? "None"} ({record.Catch?.ItemId ?? 0} - {record.Catch?.FishId ?? 0}) - of size {record.Size / 10f} times {record.Amount}");
+        foreach (var flag in Enum.GetValues<Effects>())
+        {
+            ImGuiUtil.DrawTableColumn(flag.ToString());
+            ImGuiUtil.DrawTableColumn(record.Flags.HasFlag(flag).ToString());
+        }
+    }
+
+    private unsafe void DrawDebugFishingTimes()
+    {
+        if (!ImGui.CollapsingHeader("Fishing Times"))
+            return;
+
+        if (!ImGui.BeginTable("##Fishing Times", 6))
+            return;
+
+        using var end = ImGuiRaii.DeferredEnd(ImGui.EndTable);
+        foreach (var (fishId, data) in _plugin.FishRecorder.Times)
+        {
+            ImGuiUtil.DrawTableColumn(GatherBuddy.GameData.Fishes[fishId].Name[ClientLanguage.English]);
+            ImGuiUtil.DrawTableColumn("Overall");
+            ImGuiUtil.DrawTableColumn(data.All.Min.ToString());
+            ImGuiUtil.DrawTableColumn(data.All.Max.ToString());
+            ImGuiUtil.DrawTableColumn(data.All.MinChum.ToString());
+            ImGuiUtil.DrawTableColumn(data.All.MaxChum.ToString());
+            foreach (var (baitId, times) in data.Data)
+            {
+                var bait = GatherBuddy.GameData.Bait.TryGetValue(baitId, out var b)
+                    ? b
+                    : new Bait(GatherBuddy.GameData.Fishes[fishId].ItemData);
+                ImGui.TableNextColumn();
+                ImGuiUtil.DrawTableColumn(bait.Name);
+                ImGuiUtil.DrawTableColumn(times.Min.ToString());
+                ImGuiUtil.DrawTableColumn(times.Max.ToString());
+                ImGuiUtil.DrawTableColumn(times.MinChum.ToString());
+                ImGuiUtil.DrawTableColumn(times.MaxChum.ToString());
+            }
+        }
     }
 
     private void DrawUptimeManagerTable()
@@ -215,7 +285,8 @@ public partial class Interface
         const ImGuiTableFlags flags = ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit;
 
         DrawDebugButtons();
-        DrawDebugEventFramework();
+        DrawDebugFishingState();
+        DrawDebugFishingTimes();
         DrawAlarmDebug();
         ImGuiTable.DrawTabbedTable($"Aetherytes ({GatherBuddy.GameData.Aetherytes.Count})", GatherBuddy.GameData.Aetherytes.Values,
             DrawDebugAetheryte, flags, "Id", "Name", "Territory", "Coords", "Aetherstream");

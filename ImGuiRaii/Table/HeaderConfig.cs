@@ -25,7 +25,7 @@ public class HeaderConfig<TItem>
     public virtual int Compare(TItem lhs, TItem rhs)
         => 0;
 
-    public virtual void DrawColumn(TItem item)
+    public virtual void DrawColumn(TItem item, int idx)
     { }
 
     public int CompareInv(TItem lhs, TItem rhs)

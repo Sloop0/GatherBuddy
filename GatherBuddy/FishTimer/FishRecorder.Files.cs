@@ -5,15 +5,16 @@ using System.IO;
 using System.Linq;
 using Dalamud.Logging;
 using GatherBuddy.Plugin;
+using Newtonsoft.Json;
 
 namespace GatherBuddy.FishTimer;
 
 public partial class FishRecorder
 {
-    public const string        FishRecordFileFormat = "fish_records_{0:D4}.dat";
+    public const string        FishRecordFileFormat = "fish_records_{0:D6}.dat";
     public       DirectoryInfo FishRecordDirectory;
 
-    public const int RecordsPerFile = 10000;
+    public const int RecordsPerFile = 100;
 
     public void WriteFile(FileInfo file, int from, int amount)
     {
@@ -31,19 +32,21 @@ public partial class FishRecorder
         }
     }
 
-    public void WriteAllFiles()
+    public void WriteAllFiles(int idx = 0)
     {
         if (Records.Count == 0)
             return;
 
+        var start    = idx / RecordsPerFile;
         var numFiles = Records.Count / RecordsPerFile + 1;
-        for (var i = 0; i < numFiles; ++i)
+        for (var i = start; i < numFiles; ++i)
         {
             var name = string.Format(FishRecordFileFormat, i);
             var file = new FileInfo(Path.Combine(FishRecordDirectory.FullName, name));
             WriteFile(file, i * RecordsPerFile, RecordsPerFile);
         }
     }
+
 
     public void WriteFullFile(FileInfo file)
         => WriteFile(file, 0, Records.Count);
@@ -55,11 +58,32 @@ public partial class FishRecorder
         return Functions.CompressedBase64(bytes);
     }
 
+    public void ExportJson(FileInfo file)
+    {
+        try
+        {
+            var data = JsonConvert.SerializeObject(Records.Select(r => r.ToJson()), Formatting.Indented);
+            File.WriteAllText(file.FullName, data);
+            PluginLog.Information($"Exported {Records.Count} fish records to {file.FullName}.");
+        }
+        catch (Exception e)
+        {
+            PluginLog.Warning($"Could not export json file to {file.FullName}:\n{e}");
+        }
+    }
+
     public void ImportBase64(string data)
     {
-        var bytes   = Functions.DecompressedBase64(data);
-        var records = ReadBytes(bytes, "Imported Data");
-        MergeRecordsIn(records);
+        try
+        {
+            var bytes   = Functions.DecompressedBase64(data);
+            var records = ReadBytes(bytes, "Imported Data");
+            MergeRecordsIn(records);
+        }
+        catch (Exception e)
+        {
+            PluginLog.Warning($"Error while importing fish records:\n{e}");
+        }
     }
 
     public void WriteNewestFile()
@@ -156,6 +180,7 @@ public partial class FishRecorder
     private void ReadAllFiles()
     {
         foreach (var file in FishRecordDirectory.EnumerateFiles("fish_records_*.dat"))
-            ReadFile(file);
+            Records.AddRange(ReadFile(file));
+        ResetTimes();
     }
 }

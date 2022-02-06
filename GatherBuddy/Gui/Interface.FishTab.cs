@@ -7,8 +7,6 @@ using GatherBuddy.Classes;
 using GatherBuddy.Config;
 using GatherBuddy.Enums;
 using GatherBuddy.Interfaces;
-using GatherBuddy.Plugin;
-using GatherBuddy.SeFunctions;
 using ImGuiNET;
 using ImGuiOtter;
 using ImGuiOtter.Table;
@@ -151,7 +149,7 @@ public partial class Interface
             public override float Width
                 => _nameColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedFish item)
+            public override void DrawColumn(ExtendedFish item, int _)
             {
                 using var style = ImGuiRaii.PushStyle(ImGuiStyleVar.ItemSpacing, ItemSpacing / 2);
                 ImGuiUtil.HoverIcon(item.Icon, LineIconSize);
@@ -175,7 +173,7 @@ public partial class Interface
             public override float Width
                 => _caughtColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedFish fish)
+            public override void DrawColumn(ExtendedFish fish, int _)
             {
                 using var font = ImGuiRaii.PushFont(UiBuilder.IconFont);
                 if (!fish.Data.InLog)
@@ -228,7 +226,7 @@ public partial class Interface
             public override float Width
                 => _nextUptimeColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedFish item)
+            public override void DrawColumn(ExtendedFish item, int _)
                 => DrawTimeInterval(item.Uptime.Item2, item.UptimeDependency);
 
             public override int Compare(ExtendedFish lhs, ExtendedFish rhs)
@@ -254,7 +252,7 @@ public partial class Interface
             public override float Width
                 => _baitColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedFish item)
+            public override void DrawColumn(ExtendedFish item, int _)
             {
                 using var style = ImGuiRaii.PushStyle(ImGuiStyleVar.ItemSpacing, ItemSpacing / 2);
                 ImGuiUtil.HoverIcon(item.Bait.First().Icon, LineIconSize);
@@ -271,7 +269,7 @@ public partial class Interface
             public override float Width
                 => _closestAetheryteColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedFish item)
+            public override void DrawColumn(ExtendedFish item, int _)
             {
                 var aetheryte = item.Uptime.Item1.ClosestAetheryte;
                 if (aetheryte == null)
@@ -326,7 +324,7 @@ public partial class Interface
                 GatherBuddy.Config.Save();
             }
 
-            public override void DrawColumn(ExtendedFish item)
+            public override void DrawColumn(ExtendedFish item, int _)
             {
                 ImGui.Text(item.Data.Patch.ToVersionString());
                 ImGuiUtil.HoverTooltip(item.Data.Patch.ToPatchName());
@@ -350,7 +348,7 @@ public partial class Interface
                 SetNames("Regular Fish", "Big Fish", "Spearfishing", "Oceanfishing");
             }
 
-            public override void DrawColumn(ExtendedFish item)
+            public override void DrawColumn(ExtendedFish item, int _)
                 => ImGui.Text(item.FishType);
 
             public override int Compare(ExtendedFish lhs, ExtendedFish rhs)
@@ -391,7 +389,7 @@ public partial class Interface
             public override float Width
                 => _uptimeColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedFish fish)
+            public override void DrawColumn(ExtendedFish fish, int _)
                 => ImGuiUtil.RightAlign(fish.UptimeString);
 
             public override int Compare(ExtendedFish lhs, ExtendedFish rhs)
@@ -416,7 +414,7 @@ public partial class Interface
             public override float Width
                 => _bestSpotColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedFish item)
+            public override void DrawColumn(ExtendedFish item, int _)
             {
                 if (ImGui.Selectable(ToName(item)))
                     _plugin.Executor.GatherLocation(item.Uptime.Item1);
@@ -441,7 +439,7 @@ public partial class Interface
             public override float Width
                 => _bestZoneColumnWidth * ImGuiHelpers.GlobalScale;
 
-            public override void DrawColumn(ExtendedFish item)
+            public override void DrawColumn(ExtendedFish item, int _)
             {
                 if (ImGui.Selectable(ToName(item)))
                     Executor.TeleportToTerritory(item.Uptime.Item1.Territory);
@@ -466,7 +464,7 @@ public partial class Interface
             public override int Compare(ExtendedFish lhs, ExtendedFish rhs)
                 => lhs.Data.ItemId.CompareTo(rhs.Data.ItemId);
 
-            public override void DrawColumn(ExtendedFish item)
+            public override void DrawColumn(ExtendedFish item, int _)
                 => ImGuiUtil.RightAlign($"{item.Data.ItemId}");
         }
 
@@ -478,7 +476,7 @@ public partial class Interface
             public override int Compare(ExtendedFish lhs, ExtendedFish rhs)
                 => lhs.Data.FishId.CompareTo(rhs.Data.FishId);
 
-            public override void DrawColumn(ExtendedFish item)
+            public override void DrawColumn(ExtendedFish item, int _)
                 => ImGuiUtil.RightAlign($"{item.Data.FishId}{(item.Data.IsSpearFish ? " (sf)" : string.Empty)}");
         }
 

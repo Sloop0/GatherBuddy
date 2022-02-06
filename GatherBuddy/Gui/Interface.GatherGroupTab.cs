@@ -184,14 +184,12 @@ public partial class Interface
 
         ImGui.TableNextColumn();
         if (_gatherGroupCache.GatherableSelector.Draw(node.Item.Name[GatherBuddy.Language], out var newIdx))
-            if (_plugin.GatherGroupManager.ChangeGroupNode(@group, idx, GatherGroupCache.AllGatherables[newIdx], null, null, null, false))
+            if (_plugin.GatherGroupManager.ChangeGroupNode(group, idx, GatherGroupCache.AllGatherables[newIdx], null, null, null, false))
                 _plugin.GatherGroupManager.Save();
 
         _gatherGroupCache.Selector.CreateDropSource(node.Item.Name[GatherBuddy.Language]);
 
         ImGui.TableNextColumn();
-        if (ImGui.GetContentRegionAvail().X >= 400 * ImGuiHelpers.GlobalScale)
-            ImGui.SameLine();
         DrawTimeInput(node.EorzeaStartMinute, node.EorzeaEndMinute, (from, to) =>
         {
             if (_plugin.GatherGroupManager.ChangeGroupNode(group, i, null, from, to, null, false))
@@ -257,7 +255,7 @@ public partial class Interface
          && _plugin.GatherGroupManager.ChangeGroupNode(group, group.Nodes.Count, GatherGroupCache.AllGatherables[idx], null, null, null, false))
             _plugin.GatherGroupManager.Save();
         ImGui.TableNextColumn();
-        if (_gatherGroupCache.GatherableSelector.Draw(GatherGroupCache.AllGatherables[idx].Name[GatherBuddy.Language], out idx))
+        if (_gatherGroupCache.GatherableSelector.Draw(idx, out idx))
             _gatherGroupCache.NewItemIdx = idx;
         ImGui.TableNextColumn();
         ImGui.TableNextColumn();

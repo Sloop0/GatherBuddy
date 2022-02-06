@@ -52,7 +52,7 @@ public partial class Interface
             public override string ToName(CachedWeather item)
                 => item.Zone;
 
-            public override void DrawColumn(CachedWeather item)
+            public override void DrawColumn(CachedWeather item, int _)
             {
                 var pos = ImGui.GetCursorPosY();
                 ImGui.SetCursorPosY(pos + _textHeightIconOffset);
@@ -97,7 +97,7 @@ public partial class Interface
                 return false;
             }
 
-            public override void DrawColumn(CachedWeather line)
+            public override void DrawColumn(CachedWeather line, int _)
             {
                 if (_cellColor != 0)
                     ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, _cellColor.Value());

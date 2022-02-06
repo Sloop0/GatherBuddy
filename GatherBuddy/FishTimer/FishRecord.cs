@@ -1,59 +1,224 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using GatherBuddy.Classes;
 using GatherBuddy.Enums;
 using GatherBuddy.Structs;
 using GatherBuddy.Time;
+using ImGuiOtter;
+using Newtonsoft.Json;
 
 namespace GatherBuddy.FishTimer;
 
 public struct FishRecord
 {
-    public const byte Version            = 1;
-    public const int  Version1ByteLength = 8 + 8 + 4 + 4 + 2 + 2 + 1 + 1;
-    public const int  ByteLength         = Version1ByteLength;
+    public const ushort MinBiteTime        = 3000;
+    public const ushort MaxBiteTime        = 65000;
+    public const byte   Version            = 1;
+    public const int    Version1ByteLength = 4 + 4 + 4 + 4 + 4 + 2 + 2 + 2 + 2 + 2 + 1 + 1;
+    public const int    ByteLength         = Version1ByteLength;
+
+    public static readonly Effects ValidEffects = Enum.GetValues<Effects>().Aggregate((a, b) => a | b);
 
     [Flags]
-    public enum Effects : byte
+    public enum Effects : uint
     {
-        Snagging      = 0x01,
-        Chum          = 0x02,
-        Intuition     = 0x04,
-        FishEyes      = 0x08,
-        IdenticalCast = 0x10,
-
-        Valid = 0x80,
+        None          = 0x0000,
+        Snagging      = 0x0001,
+        Chum          = 0x0002,
+        Intuition     = 0x0004,
+        FishEyes      = 0x0008,
+        IdenticalCast = 0x0010,
+        SurfaceSlap   = 0x0020,
+        PrizeCatch    = 0x0040,
+        Patience      = 0x0080,
+        Patience2     = 0x0100,
+        Collectible   = 0x2000,
+        Large         = 0x4000,
+        Valid         = 0x8000,
     }
 
-    public ulong       ContentId;
-    public TimeStamp   CastStart;
-    public Bait        Bait;
-    public Fish?       Catch;
-    public ushort      Bite;
-    public FishingSpot FishingSpot;
-    public Effects     Flags;
-    public BiteType    BiteType;
+    private uint    _bait;
+    private uint    _catch;
+    public  int     ContentIdHash;
+    private int     _timeStamp;
+    public  Effects Flags;
+    public  ushort  Bite;
+    public  ushort  Perception;
+    public  ushort  Gathering;
+    public  ushort  Size;
+    private ushort  _fishingSpot;
+    private byte    _tugAndHook;
+    public  byte    Amount;
 
-    public bool FishEscaped()
-        => BiteType != BiteType.Unknown && Catch != null;
+    public TimeStamp TimeStamp
+    {
+        get => new(_timeStamp * 1000L);
+        set => _timeStamp = (int)(value.Time / 1000);
+    }
+
+    public FishingSpot? FishingSpot
+    {
+        get => HasSpot ? GatherBuddy.GameData.FishingSpots.TryGetValue(_fishingSpot, out var s) ? s : null : null;
+        set => _fishingSpot = (ushort)(value?.Id ?? 0);
+    }
+
+    public bool HasSpot
+        => _fishingSpot != 0;
+
+    public Bait Bait
+    {
+        get => HasBait
+            ? GatherBuddy.GameData.Bait.TryGetValue(_bait, out var b) ? b :
+            GatherBuddy.GameData.Fishes.TryGetValue(_bait, out var f) ? new Bait(f.ItemData) : Bait.Unknown
+            : Bait.Unknown;
+        set => _bait = value.Id;
+    }
+
+    public bool HasBait
+        => _bait != 0;
+
+    public Fish? Catch
+    {
+        get => HasCatch ? GatherBuddy.GameData.Fishes.TryGetValue(_catch, out var f) ? f : null : null;
+        set => _catch = value?.ItemId ?? 0;
+    }
+
+    public uint CatchId
+        => _catch;
+
+    public uint BaitId
+        => _bait;
+
+    public ushort SpotId
+        => _fishingSpot;
+
+    public bool HasCatch
+        => _catch != 0;
+
+    public void SetTugHook(BiteType bite, HookSet set)
+    {
+        var b = bite switch
+        {
+            BiteType.None      => 0,
+            BiteType.Weak      => 1,
+            BiteType.Strong    => 2,
+            BiteType.Legendary => 3,
+            _                  => 4,
+        };
+        b |= set switch
+        {
+            HookSet.None       => 0,
+            HookSet.Hook       => 1 << 4,
+            HookSet.Precise    => 2 << 4,
+            HookSet.Powerful   => 3 << 4,
+            HookSet.DoubleHook => 4 << 4,
+            HookSet.TripleHook => 5 << 4,
+            _                  => 6 << 4,
+        };
+        _tugAndHook = (byte)b;
+    }
+
+    public BiteType Tug
+        => (_tugAndHook & 0x0F) switch
+        {
+            0 => BiteType.None,
+            1 => BiteType.Weak,
+            2 => BiteType.Strong,
+            3 => BiteType.Legendary,
+            _ => BiteType.Unknown,
+        };
+
+    public HookSet Hook
+        => (_tugAndHook >> 4) switch
+        {
+            0 => HookSet.None,
+            1 => HookSet.Hook,
+            2 => HookSet.Precise,
+            3 => HookSet.Powerful,
+            4 => HookSet.DoubleHook,
+            5 => HookSet.TripleHook,
+            _ => HookSet.Unknown,
+        };
+
+    public bool Escaped()
+        => Hook != HookSet.None && Tug != BiteType.None;
+
+    public bool MissedChance()
+        => Tug != BiteType.None && Hook == HookSet.None;
 
     public bool NothingHooked()
-        => BiteType == BiteType.Unknown;
+        => Hook == HookSet.None && Tug != BiteType.None;
 
-    public void ToBytes(IList<byte> bytes, int from)
+    public unsafe void ToBytes(byte[] bytes, int from)
     {
-        if (bytes.Count < from + ByteLength)
+        if (bytes.Length < from + ByteLength)
             throw new ArgumentException("Not enough storage");
 
-        ToBytes(bytes, from,      ContentId);
-        ToBytes(bytes, from + 8,  (ulong)CastStart.Time);
-        ToBytes(bytes, from + 16, Bait.Id);
-        ToBytes(bytes, from + 20, Catch?.ItemId ?? 0);
-        ToBytes(bytes, from + 24, Bite);
-        ToBytes(bytes, from + 26, FishingSpot.Id);
-        bytes[from + 28] = (byte)Flags;
-        bytes[from + 29] = (byte)BiteType;
+        fixed (FishRecord* ptr = &this)
+        {
+            Marshal.Copy((IntPtr)ptr, bytes, from, ByteLength);
+        }
     }
+
+    internal struct JsonStruct
+    {
+        public uint     ContentIdHash;
+        public ushort   Gathering;
+        public ushort   Perception;
+        public bool     Valid;
+        public int      TimeStamp;
+        public uint     BaitItemId;
+        public ushort   FishingSpotId;
+        public bool     Snagging;
+        public bool     Chum;
+        public bool     Intuition;
+        public bool     FishEyes;
+        public bool     IdenticalCast;
+        public bool     SurfaceSlap;
+        public bool     PrizeCatch;
+        public bool     Patience;
+        public bool     Patience2;
+        public ushort   BiteTime;
+        public BiteType Tug;
+        public HookSet  HookSet;
+        public uint     CatchItemId;
+        public byte     Amount;
+        public float    Size;
+        public bool     Collectible;
+        public bool     Large;
+    }
+
+    internal JsonStruct ToJson()
+        => new()
+        {
+            ContentIdHash = (uint) ContentIdHash,
+            Gathering     = Gathering,
+            Perception    = Perception,
+            Valid         = Flags.HasFlag(Effects.Valid),
+            TimeStamp     = _timeStamp,
+            BaitItemId    = BaitId,
+            FishingSpotId = SpotId,
+            Snagging      = Flags.HasFlag(Effects.Snagging),
+            Chum          = Flags.HasFlag(Effects.Chum),
+            Intuition     = Flags.HasFlag(Effects.Intuition),
+            FishEyes      = Flags.HasFlag(Effects.FishEyes),
+            IdenticalCast = Flags.HasFlag(Effects.IdenticalCast),
+            SurfaceSlap   = Flags.HasFlag(Effects.SurfaceSlap),
+            PrizeCatch    = Flags.HasFlag(Effects.PrizeCatch),
+            Patience      = Flags.HasFlag(Effects.Patience),
+            Patience2     = Flags.HasFlag(Effects.Patience2),
+            BiteTime      = Bite,
+            Tug           = Tug,
+            HookSet       = Hook,
+            CatchItemId   = CatchId,
+            Amount        = Amount,
+            Size          = Size / 10f,
+            Collectible   = Flags.HasFlag(Effects.Collectible),
+            Large         = Flags.HasFlag(Effects.Large),
+        };
 
     private static ushort From2Bytes(ReadOnlySpan<byte> bytes, int from)
         => (ushort)(bytes[from] | (bytes[from + 1] << 8));
@@ -61,79 +226,85 @@ public struct FishRecord
     private static uint From4Bytes(ReadOnlySpan<byte> bytes, int from)
         => (uint)(bytes[from] | (bytes[from + 1] << 8) | (bytes[from + 2] << 16) | (bytes[from + 3] << 24));
 
-    private static ulong From8Bytes(ReadOnlySpan<byte> bytes, int from)
-        => bytes[from]
-          | ((ulong)bytes[from + 1] << 8)
-          | ((ulong)bytes[from + 2] << 16)
-          | ((ulong)bytes[from + 3] << 24)
-          | ((ulong)bytes[from + 4] << 32)
-          | ((ulong)bytes[from + 5] << 40)
-          | ((ulong)bytes[from + 6] << 48)
-          | ((ulong)bytes[from + 7] << 56);
-
-    private static void ToBytes(IList<byte> bytes, int from, ushort value)
+    private bool VerifyData()
     {
-        bytes[from]     = (byte)value;
-        bytes[from + 1] = (byte)(value >> 8);
+        var ts = TimeStamp;
+        if (ts < TimeStamp.Epoch || ts > GatherBuddy.Time.ServerTime)
+            return false;
+
+        if (_bait != 0 && Bait.Equals(Bait.Unknown))
+            return false;
+
+        if (_catch != 0 && Catch == null)
+            return false;
+
+        if (_fishingSpot != 0 && FishingSpot == null)
+            return false;
+
+        if ((Flags & ~ValidEffects) != 0)
+            return false;
+
+        if ((_tugAndHook & 0x0F) > 4 || _tugAndHook >> 4 > 6)
+            return false;
+
+        return true;
     }
 
-    private static void ToBytes(IList<byte> bytes, int from, uint value)
+    public bool VerifyValidity()
     {
-        bytes[from]     = (byte)value;
-        bytes[from + 1] = (byte)(value >> 8);
-        bytes[from + 2] = (byte)(value >> 16);
-        bytes[from + 3] = (byte)(value >> 24);
+        if (!Flags.HasFlag(Effects.Valid))
+            return false;
+
+        if (_bait == 0
+         || TimeStamp <= TimeStamp.Epoch
+         || TimeStamp > GatherBuddy.Time.ServerTime
+         || Bite is < MinBiteTime or > MaxBiteTime
+         || Perception == 0
+         || Gathering == 0
+         || ContentIdHash == 0
+         || _fishingSpot == 0)
+            return false;
+
+
+        if (_catch == 0 && (Amount > 0 || Size != 0 || Flags.HasFlag(Effects.Collectible | Effects.Large)))
+            return false;
+
+        if (_catch != 0 && (Amount == 0 || Size == 0 || Tug is BiteType.None or BiteType.Unknown || Hook is HookSet.None or HookSet.Unknown))
+            return false;
+
+        if (!Flags.HasFlag(Effects.Patience) && !Flags.HasFlag(Effects.Patience2) && Hook is HookSet.Powerful or HookSet.Precise)
+            return false;
+
+        if (Amount > 1 && Hook is not HookSet.DoubleHook or HookSet.TripleHook)
+            return false;
+
+        if (_catch != 0 && Flags.HasFlag(Effects.PrizeCatch) && !Flags.HasFlag(Effects.Large))
+            return false;
+        if (Flags.HasFlag(Effects.Patience) && Flags.HasFlag(Effects.Patience2))
+            return false;
+
+        return true;
     }
 
-    private static void ToBytes(IList<byte> bytes, int from, ulong value)
-    {
-        bytes[from]     = (byte)value;
-        bytes[from + 1] = (byte)(value >> 8);
-        bytes[from + 2] = (byte)(value >> 16);
-        bytes[from + 3] = (byte)(value >> 24);
-        bytes[from + 4] = (byte)(value >> 32);
-        bytes[from + 5] = (byte)(value >> 40);
-        bytes[from + 6] = (byte)(value >> 48);
-        bytes[from + 7] = (byte)(value >> 56);
-    }
 
     public static bool FromBytesV1(ReadOnlySpan<byte> bytes, int from, out FishRecord record)
     {
         record = new FishRecord();
-        if (bytes.Length < from + 8 + 8 + 4 + 4 + 2 + 2 + 2 + 1)
+        if (bytes.Length < from + Version1ByteLength)
             return false;
 
-        record.ContentId = From8Bytes(bytes, from);
-        record.CastStart = new TimeStamp((long)From8Bytes(bytes, from + 8));
-        if (record.CastStart < TimeStamp.Epoch || record.CastStart > GatherBuddy.Time.ServerTime)
-            return false;
-
-        var baitId = From4Bytes(bytes, from + 16);
-        var bait = GatherBuddy.GameData.Bait.TryGetValue(baitId, out var b) ? b :
-            GatherBuddy.GameData.Fishes.TryGetValue(baitId, out var f)      ? new Bait(f.ItemData) : null;
-        if (bait == null)
-            return false;
-
-        record.Bait = bait;
-
-        var catchId = From4Bytes(bytes, from + 20);
-        record.Catch = catchId == 0 ? null : GatherBuddy.GameData.Fishes.TryGetValue(catchId, out var c) ? c : null;
-        if (record.Catch == null && catchId != 0)
-            return false;
-
-        record.Bite = From2Bytes(bytes, from + 24);
-        var fishingSpotId = From2Bytes(bytes, from + 26);
-        if (!GatherBuddy.GameData.FishingSpots.TryGetValue(fishingSpotId, out record.FishingSpot!))
-            return false;
-
-        record.Flags = (Effects)bytes[28];
-        if (!Enum.IsDefined(record.Flags))
-            return false;
-
-        record.BiteType = (BiteType)bytes[29];
-        if (!Enum.IsDefined(record.BiteType) || record.BiteType == BiteType.Unknown)
-            return false;
-
-        return true;
+        record._bait         = From4Bytes(bytes, from);
+        record._catch        = From4Bytes(bytes, from += 4);
+        record.ContentIdHash = (int)From4Bytes(bytes,     from += 4);
+        record._timeStamp    = (int)From4Bytes(bytes,     from += 4);
+        record.Flags         = (Effects)From4Bytes(bytes, from += 4);
+        record.Bite          = From2Bytes(bytes, from += 4);
+        record.Perception    = From2Bytes(bytes, from += 2);
+        record.Gathering     = From2Bytes(bytes, from += 2);
+        record.Size          = From2Bytes(bytes, from += 2);
+        record._fishingSpot  = From2Bytes(bytes, from += 2);
+        record._tugAndHook   = bytes[from             += 2];
+        record.Amount        = bytes[from             += 1];
+        return record.VerifyData();
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Dalamud.Data;
+using Dalamud.Game;
 using Dalamud.Logging;
 using GatherBuddy.Classes;
 using GatherBuddy.Plugin;
@@ -22,13 +24,13 @@ public unsafe class FishLog
 
     public event Action? Change;
 
-    public FishLog()
+    public FishLog(SigScanner sigScanner, DataManager gameData)
     {
-        _numFish      = (uint)(Dalamud.GameData.GetExcelSheet<FishParameter>()?.Count(f => f.IsInLog) ?? 0);
-        _numSpearFish = Dalamud.GameData.GetExcelSheet<SpearfishingItem>()?.RowCount ?? 0;
+        _numFish      = (uint)(gameData.GetExcelSheet<FishParameter>()?.Count(f => f.IsInLog) ?? 0);
+        _numSpearFish = gameData.GetExcelSheet<SpearfishingItem>()?.RowCount ?? 0;
 
-        _fish      = (byte*)new FishLogData(Dalamud.SigScanner).Address;
-        _spearFish = (byte*)new SpearFishLogData(Dalamud.SigScanner).Address;
+        _fish      = (byte*)new FishLogData(sigScanner).Address;
+        _spearFish = (byte*)new SpearFishLogData(sigScanner).Address;
 
         _fishStore      = new byte[(_numFish + 7) / 8];
         _spearFishStore = new byte[(_numSpearFish + 7) / 8];

@@ -6,10 +6,13 @@ public class FishRecordTimes
 {
     public struct Times
     {
-        public ushort Min = ushort.MaxValue;
-        public ushort Max;
+        public ushort Min     = ushort.MaxValue;
+        public ushort Max     = 0;
         public ushort MinChum = ushort.MaxValue;
-        public ushort MaxChum;
+        public ushort MaxChum = 0;
+
+        public Times()
+        {}
 
         public bool Apply(ushort duration, bool chum)
         {
@@ -47,7 +50,7 @@ public class FishRecordTimes
         }
     }
 
-    public Times                   All;
+    public Times                   All = new();
     public SortedList<uint, Times> Data = new();
 
     public bool Apply(uint baitId, ushort duration, bool chum)
@@ -56,26 +59,6 @@ public class FishRecordTimes
         var baitTimes = Data.TryGetValue(baitId, out var b) ? b : new Times();
         ret          |= baitTimes.Apply(duration, chum);
         Data[baitId] =  baitTimes;
-        return ret;
-    }
-
-    public static Dictionary<uint, FishRecordTimes> FromBites(IList<FishRecord> bites)
-    {
-        var ret = new Dictionary<uint, FishRecordTimes>();
-        foreach (var bite in bites)
-        {
-            if (!bite.Flags.HasFlag(FishRecord.Effects.Valid))
-                continue;
-
-            if (!ret.TryGetValue(bite.Catch?.ItemId ?? 0, out var times))
-            {
-                times = new FishRecordTimes();
-                ret.Add(bite.Catch?.ItemId ?? 0, times);
-            }
-
-            times.Apply(bite.Bait.Id, bite.Bite, bite.Flags.HasFlag(FishRecord.Effects.Chum));
-        }
-
         return ret;
     }
 }

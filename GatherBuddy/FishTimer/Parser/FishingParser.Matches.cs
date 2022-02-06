@@ -1,9 +1,7 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Dalamud;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Logging;
 
 namespace GatherBuddy.FishTimer.Parser;
@@ -42,32 +40,7 @@ public partial class FishingParser
             PluginLog.Error($"Discovered unknown fishing spot: \"{fishingSpotName}\".");
     }
 
-    private void HandleCatchMatch(SeString message)
-    {
-        var item = (ItemPayload?)message.Payloads.FirstOrDefault(p => p is ItemPayload);
-        if (item == null)
-        {
-            PluginLog.Error("Fish caught, but no item link in message.");
-            return;
-        }
-
-        if (item.ItemId == 0u)
-        {
-            PluginLog.Error("Caught unknown fish with unknown id.");
-            return;
-        }
-
-        // Check against collectibles.
-        var id = item.ItemId > 500000 ? item.ItemId - 500000 : item.ItemId;
-
-        if (GatherBuddy.GameData.Fishes.TryGetValue(id, out var fish))
-            CaughtFish?.Invoke(fish);
-        else
-            PluginLog.Error($"Caught unknown fish with id {id}.");
-    }
-
     private const XivChatType FishingMessage      = (XivChatType)2243;
-    private const XivChatType FishingCatchMessage = (XivChatType)2115;
 
 
     private void OnMessageDelegate(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
@@ -77,12 +50,6 @@ public partial class FishingParser
             case FishingMessage:
             {
                 var text = message.TextValue;
-
-                if (text == _regexes.Bite)
-                {
-                    SomethingBit?.Invoke();
-                    return;
-                }
 
                 if (text.Contains(_regexes.Undiscovered))
                 {
@@ -107,13 +74,6 @@ public partial class FishingParser
                 match = _regexes.AreaDiscovered.Match(text);
                 if (match.Success)
                     HandleSpotDiscoveredMatch(match);
-                break;
-            }
-            case FishingCatchMessage:
-            {
-                var text = message.TextValue;
-                if (_regexes.Catch.Match(text).Success || _regexes.NoCatchFull.Match(text).Success)
-                    HandleCatchMatch(message);
                 break;
             }
         }

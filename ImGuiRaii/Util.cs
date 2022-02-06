@@ -172,7 +172,7 @@ public static partial class ImGuiUtil
         return ret;
     }
 
-    public static void ClippedDraw<T>(IReadOnlyList<T> data, Action<T> func, float lineHeight)
+    public static void ClippedDraw<T>(IReadOnlyList<T> data, Action<T, int> func, float lineHeight)
     {
         ImGuiListClipperPtr clipper;
         unsafe
@@ -191,7 +191,7 @@ public static partial class ImGuiUtil
                 if (actualRow < 0)
                     continue;
 
-                func(data[actualRow]);
+                func(data[actualRow], actualRow);
             }
         }
 

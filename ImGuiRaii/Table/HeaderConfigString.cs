@@ -52,7 +52,7 @@ public class HeaderConfigString<TItem> : HeaderConfig<TItem>
         return FilterRegex?.IsMatch(name) ?? name.Contains(FilterValue, StringComparison.InvariantCultureIgnoreCase);
     }
 
-    public override void DrawColumn(TItem item)
+    public override void DrawColumn(TItem item, int _)
     {
         ImGui.Text(ToName(item));
     }

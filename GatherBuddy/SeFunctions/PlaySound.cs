@@ -1,6 +1,5 @@
 using Dalamud.Game;
 using GatherBuddy.Alarms;
-using GatherBuddy.Enums;
 
 namespace GatherBuddy.SeFunctions;
 

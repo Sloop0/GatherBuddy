@@ -39,7 +39,7 @@ public class WeatherTimeline : IComparable<WeatherTimeline>
 
     public void Append(uint amount)
     {
-        var offset = List.Count > 0 ? MillisecondsPerWeather - (int)List.Last().Offset(GatherBuddy.Time.ServerTime) : -MillisecondsPerWeather;
+        var offset = List.Count > 0 ? MillisecondsPerWeather - List.Last().Offset(GatherBuddy.Time.ServerTime) : -MillisecondsPerWeather;
         List.AddRange(RequestData(amount, offset));
     }
 
@@ -68,6 +68,7 @@ public class WeatherTimeline : IComparable<WeatherTimeline>
         var previousFit = false;
         var idx         = 1;
 
+        var maxDate = now.AddDays(100);
         while (true)
         {
             for (--idx; idx < List.Count; ++idx)
@@ -88,6 +89,8 @@ public class WeatherTimeline : IComparable<WeatherTimeline>
             }
 
             Append(increment);
+            if (List.Last().Timestamp >= maxDate)
+                return new WeatherListing(Structs.Weather.Invalid, TimeStamp.Epoch);
         }
     }
 

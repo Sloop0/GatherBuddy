@@ -23,6 +23,7 @@ public partial class Interface : Window, IDisposable
         _gatherWindowCache = new GatherWindowCache();
         _locationTable     = new LocationTable();
         _alarmCache        = new AlarmCache(_plugin.AlarmManager);
+        _recordTable       = new RecordTable();
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(MinSize,     17 * ImGui.GetTextLineHeightWithSpacing() / ImGuiHelpers.GlobalScale),
@@ -68,6 +69,7 @@ public partial class Interface : Window, IDisposable
         DrawGatherWindowTab();
         DrawConfigTab();
         DrawLocationsTab();
+        DrawRecordTab();
         DrawDebugTab();
     }
 

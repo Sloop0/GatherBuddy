@@ -113,6 +113,8 @@ public class UptimeManager : IDisposable
             return fish.Interval.NextRealUptime(now);
 
         var wl      = GatherBuddy.WeatherManager.RequestForecast(territory, fish.CurrentWeather, fish.PreviousWeather, fish.Interval, now);
+        if (wl.Timestamp == TimeStamp.Epoch)
+            return TimeInterval.Invalid;
         var end     = GatherBuddy.WeatherManager.ExtendedDuration(territory, fish.CurrentWeather, fish.PreviousWeather, wl);
         var overlap = new TimeInterval(wl.Timestamp, end).FirstOverlap(fish.Interval);
         return overlap;

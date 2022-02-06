@@ -170,7 +170,7 @@ public class ItemSelector<T>
     private static unsafe bool IsDropping(string name)
         => ImGui.AcceptDragDropPayload(name).NativePtr != null;
 
-    private void InternalDraw(int idx)
+    private void InternalDraw(int idx, int _)
     {
         // Add a slight distance from the border so that the padding of a selectable fills the whole border.
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetStyle().FramePadding.X);
@@ -184,7 +184,7 @@ public class ItemSelector<T>
         // If the ItemSelector supports Move, every item is a Move-DragDropSource. The data is the index of the dragged element.
         if (_flags.HasFlag(Flags.Move) && ImGui.BeginDragDropSource())
         {
-            using var _ = ImGuiRaii.DeferredEnd(ImGui.EndDragDropSource);
+            using var source = ImGuiRaii.DeferredEnd(ImGui.EndDragDropSource);
             _dragDropData = idx;
             ImGui.SetDragDropPayload(MoveLabel, IntPtr.Zero, 0);
         }

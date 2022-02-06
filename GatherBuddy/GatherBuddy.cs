@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Dalamud;
+using Dalamud.Game;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using GatherBuddy.Alarms;
@@ -36,6 +37,7 @@ public partial class GatherBuddy : IDalamudPlugin
     public static UptimeManager  UptimeManager  { get; private set; } = null!;
     public static FishLog        FishLog        { get; private set; } = null!;
     public static EventFramework EventFramework { get; private set; } = null!;
+    public static CurrentBait    CurrentBait    { get; private set; } = null!;
     public static SeTugType      TugType        { get; private set; } = null!;
     public static FishingParser  FishingParser  { get; private set; } = null!;
 
@@ -47,8 +49,9 @@ public partial class GatherBuddy : IDalamudPlugin
     internal readonly Interface                      Interface;
     internal readonly GatherWindow                   GatherWindow;
     internal readonly Executor                       Executor;
-    internal readonly ContextMenu                        ContextMenu;
+    internal readonly ContextMenu                    ContextMenu;
     internal readonly SpearfishingHelper             SpearfishingHelper;
+    internal readonly FishRecorder                   FishRecorder;
 
     internal readonly GatherBuddyIpc Ipc;
     //    internal readonly WotsitIpc Wotsit;
@@ -64,10 +67,10 @@ public partial class GatherBuddy : IDalamudPlugin
 
         WeatherManager      = new WeatherManager(GameData);
         UptimeManager       = new UptimeManager(GameData);
-        FishLog             = new FishLog();
+        FishLog             = new FishLog(Dalamud.SigScanner, Dalamud.GameData);
         EventFramework      = new EventFramework(Dalamud.SigScanner);
+        CurrentBait         = new CurrentBait(Dalamud.SigScanner);
         TugType             = new SeTugType(Dalamud.SigScanner);
-        FishingParser       = new FishingParser();
         Executor            = new Executor();
         ContextMenu         = new ContextMenu(Executor);
         GatherGroupManager  = GatherGroup.GatherGroupManager.Load();
@@ -78,6 +81,9 @@ public partial class GatherBuddy : IDalamudPlugin
 
         SpearfishingHelper = new SpearfishingHelper(GameData);
         InitializeCommands();
+
+        FishRecorder = new FishRecorder();
+        FishRecorder.Enable();
 
         WindowSystem = new WindowSystem(Name);
         Interface    = new Interface(this);
@@ -94,6 +100,7 @@ public partial class GatherBuddy : IDalamudPlugin
 
     void IDisposable.Dispose()
     {
+        FishRecorder.Disable();
         ContextMenu.Dispose();
         UptimeManager.Dispose();
         Ipc.Dispose();

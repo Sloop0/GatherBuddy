@@ -37,18 +37,18 @@ public partial class AlarmManager : IDisposable
         GatherBuddy.Config.AlarmsEnabled = true;
         GatherBuddy.Config.Save();
 
+        SetActiveAlarms();
         Dalamud.Framework.Update  += OnUpdate;
         Dalamud.ClientState.Login += OnLogin;
-        SetActiveAlarms();
     }
 
     internal void ForceEnable()
     {
         if (GatherBuddy.Config.AlarmsEnabled)
         {
+            SetActiveAlarms();
             Dalamud.ClientState.Login -= OnLogin;
             Dalamud.Framework.Update  += OnUpdate;
-            SetActiveAlarms();
         }
     }
 

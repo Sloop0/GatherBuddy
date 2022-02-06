@@ -22,8 +22,8 @@ public class Table<T>
     protected readonly string            Label;
     protected readonly HeaderConfig<T>[] Headers;
 
-    protected float ItemHeight         { get; init; }
-    protected float ExtraFiltersHeight { get; init; } = 0;
+    protected float ItemHeight  { get; init; }
+    protected float ExtraHeight { get; set; } = 0;
 
     private int _currentIdx = 0;
 
@@ -58,7 +58,6 @@ public class Table<T>
         using var id = ImGuiRaii.PushId(Label);
         UpdateFilter();
         DrawTableInternal();
-        DrawFiltersInternal();
     }
 
     protected virtual void DrawFilters()
@@ -109,23 +108,25 @@ public class Table<T>
         SortDirty   = true;
     }
 
-    private void DrawItem(T item)
+    private void DrawItem(T item, int idx)
     {
         var       column = 0;
-        using var id     = ImGuiRaii.PushId(_currentIdx++);
+        using var id     = ImGuiRaii.PushId(_currentIdx);
         foreach (var header in Headers)
         {
             id.Push(column++);
             if (ImGui.TableNextColumn())
-                header.DrawColumn(item);
+                header.DrawColumn(item, idx);
             id.Pop();
         }
+
+        ++_currentIdx;
     }
 
     private void DrawTableInternal()
     {
         if (!ImGui.BeginTable("Table", Headers.Length, Flags,
-                ImGui.GetContentRegionAvail() - ExtraFiltersHeight * Vector2.UnitY * ImGuiHelpers.GlobalScale))
+                ImGui.GetContentRegionAvail() - ExtraHeight * Vector2.UnitY * ImGuiHelpers.GlobalScale))
             return;
 
         using var end = ImGuiRaii.DeferredEnd(ImGui.EndTable);
@@ -153,20 +154,5 @@ public class Table<T>
         SortInternal();
         _currentIdx = 0;
         ImGuiUtil.ClippedDraw(FilteredItems, DrawItem, ItemHeight);
-    }
-
-    private void DrawFiltersInternal()
-    {
-        if (ExtraFiltersHeight == 0)
-            return;
-
-        if (!ImGui.BeginChild("FiltersChild", ImGui.GetContentRegionAvail(), true))
-        {
-            ImGui.EndChild();
-            return;
-        }
-
-        using var end = ImGuiRaii.DeferredEnd(ImGui.EndChild);
-        DrawFilters();
     }
 }
